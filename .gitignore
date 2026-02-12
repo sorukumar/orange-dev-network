@@ -6,10 +6,12 @@ venv/
 .env
 
 # Data (Keep the repo lean)
-data/
+data/*
+!data/viz/
 *.parquet
 *.json
 !config/identity_mappings.json
+!data/viz/*.json
 
 # IDEs
 .vscode/
