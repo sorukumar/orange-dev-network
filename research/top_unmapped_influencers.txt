@@ -1,0 +1,31 @@
+Total social records: 24526
+Index(['source', 'message_id', 'date', 'author_name', 'author_email',
+       'canonical_id', 'subject', 'body_snippet', 'thread_id', 'reply_to',
+       'link'],
+      dtype='object')
+Total unique social authors: 1834
+Unmapped unique authors: 1761
+
+Top unmapped contributors by post count:
+canonical_id
+Peter Todd            1278
+Mike Hearn             981
+ZmnSCPxj               590
+Anthony Towns          342
+Eric Voskuil           316
+Mark Friedenbach       284
+Erik Aronesty          264
+Jeremy                 222
+Tier Nolan             218
+Russell O'Connor       212
+Eric Lombrozo          211
+Andreas Schildbach     198
+Adam Back              193
+Billy Tetrud           183
+Tamas Blummer          176
+David A. Harding       162
+Johnson Lau            147
+Rusty Russell          141
+Tom Harding            137
+Alan Reiner            135
+Name: count, dtype: int64

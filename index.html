@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Technical Influence Graph | Orange Dev Network</title>
+    <meta name="description"
+        content="Visualize the technical expertise and social authority of Bitcoin developers across the mailing list and Delving Bitcoin.">
+    <link rel="canonical" href="https://sorukumar.github.io/orange-dev-network/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sorukumar.github.io/orange-dev-network/">
+    <meta property="og:title" content="Bitcoin Technical Influence Graph | Orange Dev Network">
+    <meta property="og:description"
+        content="Map the social and technical influence hubs of Bitcoin R&D. Visualizing 15+ years of mailing list and research data.">
+    <meta property="og:image" content="https://sorukumar.github.io/orange-dev-network/assets/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sorukumar.github.io/orange-dev-network/">
+    <meta property="twitter:title" content="Bitcoin Technical Influence Graph | Orange Dev Network">
+    <meta property="twitter:description"
+        content="Map the social and technical influence hubs of Bitcoin R&D. Visualizing 15+ years of mailing list and research data.">
+    <meta property="twitter:image" content="https://sorukumar.github.io/orange-dev-network/assets/og-image.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Orange Dev Network",
+      "url": "https://sorukumar.github.io/orange-dev-network/",
+      "description": "An interactive visualization mapping the social and technical influence hubs within the Bitcoin R&D ecosystem.",
+      "applicationCategory": "DataVisualization",
+      "operatingSystem": "All",
+      "abstract": "Mapping 15 years of Bitcoin technical discussions to reveal influence hubs and technical evolution.",
+      "creator": {
+        "@type": "Organization",
+        "name": "Bitcoin Data Labs"
+      }
+    }
+    </script>
+
+    <!-- Bitcoin Data Labs Font & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bitcoin Data Labs Shell Styles -->
+    <link rel="stylesheet" href="https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css">
+
+    <!-- Modularized Local Styles -->
+    <link rel="stylesheet" href="styles/style.css">
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://sorukumar.github.io/Bitcoin-Data-Labs/favicon.png">
+</head>
+
+<body class="has-fixed-header">
+    <div id="main-container">
+        <!-- Bitcoin Data Labs Header -->
+        <div id="header"></div>
+
+        <div id="app-content">
+            <!-- Visualization Area -->
+            <div id="graph-container">
+                <svg id="viz"></svg>
+
+                <!-- HUD Controls -->
+                <div class="hud">
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Search Contributor...">
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="bip-search" placeholder="Filter by BIP (e.g. 119)">
+                    </div>
+
+                    <div class="stats-hud">
+                        <div class="stat-row">
+                            <span>Total Developers</span>
+                            <span id="total-pop" class="stat-val">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Mapped in Viz</span>
+                            <span id="viz-count" class="stat-val highlight">-</span>
+                        </div>
+                        <div class="stat-row"
+                            style="border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px;">
+                            <span>Filtered View</span>
+                            <span id="node-count" class="stat-val highlight">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="controls">
+                    <button class="control-btn" id="zoom-in" title="Zoom In"><i class="fas fa-plus"></i></button>
+                    <button class="control-btn" id="zoom-out" title="Zoom Out"><i class="fas fa-minus"></i></button>
+                    <button class="control-btn" id="reset" title="Reset View"><i class="fas fa-expand"></i></button>
+                </div>
+
+                <div id="tooltip" class="tooltip"></div>
+            </div>
+
+            <!-- Sidebar Controls -->
+            <div id="sidebar">
+                <div class="sidebar-header">
+                    <h1><i class="fas fa-project-diagram"></i> Influence Map</h1>
+                    <p>Decoding the technical expertise and social authority of Bitcoin R&D.</p>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Temporal Window</span>
+                    <div class="btn-group" style="display: flex; flex-direction: column; gap: 6px;">
+                        <button class="filter-btn active" data-view="all">Foundation (All-Time)</button>
+                        <button class="filter-btn" data-view="p2016">Post-Segwit (2016+)</button>
+                        <button class="filter-btn" data-view="modern">Modern R&D (Past 3y)</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Technical Theme</span>
+                    <div class="btn-group theme-grid">
+                        <button class="filter-btn active" data-theme="all">All Themes</button>
+                        <button class="filter-btn" data-theme="Consensus">Consensus</button>
+                        <button class="filter-btn" data-theme="L2">Layer 2 / LN</button>
+                        <button class="filter-btn" data-theme="Script">Script / Covenants</button>
+                        <button class="filter-btn" data-theme="Mempool">Mempool / Fees</button>
+                        <button class="filter-btn" data-theme="Privacy">Privacy</button>
+                        <button class="filter-btn" data-theme="Wallet">Wallet / Keys</button>
+                        <button class="filter-btn" data-theme="Mining">Mining</button>
+                    </div>
+                </div>
+
+                <!-- Selection Details (Populated by JS) -->
+                <div id="selection-panel" class="info-panel" style="display: none;">
+                    <div class="info-title">Contributor Focus</div>
+                    <div id="selection-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitcoin Data Labs Footer -->
+        <div id="footer"></div>
+    </div>
+
+    <!-- Bitcoin Data Labs App Components -->
+    <script src="https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            BitcoinLabsAppComponents.init({
+                isApp: true,
+                appName: 'orange-dev-network',
+                appHomeUrl: 'index.html'
+            });
+        });
+    </script>
+
+    <!-- Visualization Logic -->
+    <script src="js/visualization.js"></script>
+</body>
+
+</html>

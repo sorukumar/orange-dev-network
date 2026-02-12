@@ -1,0 +1,33 @@
+# Orange Dev Network | Bitcoin Technical Influence Map
+
+Orange Dev Network is an interactive visualization tool that maps the social and technical influence hubs within the Bitcoin R&D ecosystem. By analyzing over 15 years of technical discussions from the Bitcoin-dev mailing list and Delving Bitcoin, it reveals the hidden structures of peer review and technical authority.
+
+## Core Purpose
+- **Visualize Influence**: Identifying "Influence Hubs" based on reply-weighted network graphs.
+- **Trace Evolution**: Categorizing 27,000+ technical messages into key technical milestones (SegWit, Taproot, Covenants, etc.).
+- **Map Expertise**: Linking proposal authors to their social and technical contributions.
+
+## Technical Stats
+- **Data Source**: Bitcoin-dev mailing list (2011–Present) and Delving Bitcoin (2024–Present).
+- **Message Count**: 27,172 messages.
+- **Contributor Base**: 1,523 unique technical contributors.
+- **Top Categories**: Mining, Mempool/Fees, Block Size Debate, Covenants, Taproot.
+
+## Top Influencers (based on network centrality)
+1. Peter Todd
+2. Mike Hearn
+3. Gregory Maxwell
+4. Luke Dashjr
+5. Gavin Andresen
+6. Pieter Wuille
+7. ZmnSCPxj
+8. Jeff Garzik
+9. Matt Corallo
+10. Mark Friedenbach
+
+## Project Links
+- [Interactive Map](https://sorukumar.github.io/orange-dev-network/): The primary force-directed graph visualization.
+- [GitHub Repository](https://github.com/sorukumar/orange-dev-network): Source code and data processing pipeline.
+
+## Full Context
+For a detailed technical README, see the [README.md](https://github.com/sorukumar/orange-dev-network/blob/main/README.md).
