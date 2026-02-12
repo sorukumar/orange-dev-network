@@ -26,7 +26,13 @@ This repository analyzes 15+ years of technical discussions (2011–Present) fro
 - **Mining & PoW**: Historically peaked in **2015**, capturing the era of intense debate over block templates, ASICs, and the fundamental consensus rules.
 - **Wallet & Keys**: Primary development of standards (BIP 32/39/44) occurred in **2014**, with **Pavol Rusnak** as a key technical contributor to early HD wallet architecture.
 
-### 📈 Network Summary
+### � How Influence is Calculated
+Influence in this network is not just about posting frequency; it is a measure of **technical weight** and **directed attention**.
+
+- **For the Curious**: We use a **Temporal PageRank** algorithm (Eigenvector Centrality). We treat replies as a form of "technical peer review." When a high-influence contributor engages with your thread or responds to your post, your own centrality increases. This ensures that "signal" is prioritized over "noise."
+- **In Simple Terms**: It is a digital reputation system. If the most respected engineers in Bitcoin are constantly reviewing, debating, or building on your ideas, you gain influence. It’s not about how much you talk—it’s about who listens and responds to you.
+
+### �📈 Network Summary
 - **Total Messages Parsed**: 27,800+
 - **Unique Contributors**: 1,752
 - **Primary Channels**: Bitcoin-dev Mailing List & Delving Bitcoin
