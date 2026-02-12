@@ -13,9 +13,9 @@ This repository analyzes 15+ years of technical discussions (2011–Present) fro
 
 | Era | Top 10 Contributors |
 | :--- | :--- |
-| **Foundation (All-Time)** | Peter Todd, Mike Hearn, Gregory Maxwell, Luke Dashjr, ZmnSCPxj, Jeff Garzik, Pieter Wuille, Jorge Timón, Gavin Andresen, Matt Corallo |
-| **Post-Segwit (2016+)** | ZmnSCPxj, Peter Todd, Antoine Riard, Luke Dashjr, Anthony Towns, Gregory Maxwell, Erik Aronesty, Eric Voskuil, Matt Corallo, Jeremy Rubin |
-| **Modern R&D (2023+)** | David A. Harding, Antoine Riard, Peter Todd, Anthony Towns, Antoine Poinsot, Gregory Maxwell, Erik Aronesty, Mark Erhardt (Murch), Andrew Poelstra, Bastien Teinturier |
+| **Foundation (All-Time)** | Peter Todd, Gregory Maxwell, Mike Hearn, Luke Dashjr, Pieter Wuille, ZmnSCPxj, Gavin Andresen, Jeff Garzik, Jorge Timón, Matt Corallo |
+| **Post-Segwit (2016+)** | ZmnSCPxj, Peter Todd, Gregory Maxwell, Luke Dashjr, Erik Aronesty, Anthony Towns, Pieter Wuille, David A. Harding, Matt Corallo, Antoine Riard |
+| **Modern R&D (2023+)** | Peter Todd, Gregory Maxwell, Antoine Riard, David A. Harding, Anthony Towns, Antoine Poinsot, Jameson Lopp, Mark Erhardt, Andrew Poelstra, Boris Nagaev |
 
 ### 📂 Technical Area Deep-Dive
 - **Mempool & Fees**: Discourse reached a historical peak in **2024**, marking the most active period for fee policy research in Bitcoin's history. The data shows a shift from general fee estimation toward high-complexity topics like **v3 relay** and **cluster mempool**, as the network adapted to unprecedented congestion levels.
