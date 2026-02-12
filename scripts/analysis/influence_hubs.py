@@ -29,11 +29,11 @@ def load_identity_resolver():
         resolver[canonical.lower()] = canonical
     
     def resolve(name_or_id):
-        if not name_or_id: return "Unknown"
-        clean = str(name_or_id).lower().strip()
+        clean = str(name_or_id).strip()
         clean = re.sub(r'^[\'"]|[\'"]$', '', clean)
-        clean = clean.split(' via ')[0]
-        return resolver.get(clean, name_or_id)
+        clean = clean.split(' via ')[0].strip()
+        clean = re.sub(r'^[\'"]|[\'"]$', '', clean)
+        return resolver.get(clean.lower(), name_or_id)
         
     return resolve
 
@@ -49,6 +49,10 @@ def extract_network():
     df = pd.read_parquet(INPUT_DATA_PATH)
     df['date'] = pd.to_datetime(df['date'])
     df['canonical_id'] = df['canonical_id'].apply(resolve)
+    
+    # Filter out system and unknown early
+    df = df[~df['canonical_id'].str.lower().isin(['system', 'unknown'])]
+    df = df[df['canonical_id'].notna()]
     
     # Define historical eras
     now = df['date'].max()
@@ -110,7 +114,7 @@ def extract_network():
             
         node_metadata[author]["last_active"] = max(node_metadata[author]["last_active"], date)
         
-        if pd.isna(reply_to) or not author:
+        if pd.isna(reply_to) or not author or author.lower() in ['system', 'unknown']:
             continue
             
         target_mid = reply_to.strip('<>')
