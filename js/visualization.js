@@ -71,8 +71,8 @@ svg.call(zoom);
 function initViz() {
     updateDimensions();
 
-    // Load data from centralized source
-    d3.json("https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/network/network_graph.json").then(data => {
+    // Load data
+    d3.json("data/viz/network_graph.json").then(data => {
         allData = data;
         totalPopulation = data.metadata.total_population || data.nodes.length;
 
