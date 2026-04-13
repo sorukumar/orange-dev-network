@@ -73,7 +73,7 @@ function initViz() {
 
     // Load data
     const DATA_PATH_PREFIX = 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/';
-    d3.json(DATA_PATH_PREFIX + "data/viz/network_graph.json").then(data => {
+    d3.json(DATA_PATH_PREFIX + "output/network/network_graph.json").then(data => {
         allData = data;
         totalPopulation = data.metadata.total_population || data.nodes.length;
 
