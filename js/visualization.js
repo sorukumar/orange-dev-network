@@ -17,24 +17,19 @@ const THEME_MAPPING = {
     'payment-protocol': 'Ecosystem', 'ecash': 'Ecosystem', 'nostr': 'Ecosystem', 'scaling': 'Ecosystem', 'testing-devtools': 'Ecosystem', 'core-dev': 'Ecosystem', 'bip-process': 'Ecosystem'
 };
 
-// Temporal Color Mapping (Recency)
-const TEMPORAL_COLORS = {
-    'active': '#E8916B',     // BDL Primary Orange: Last 6mo
-    'recent': '#F4C2A1',     // BDL Warm Accent: 6mo - 2y
-    'aged': '#94A3B8',       // Muted Steel: 2y - 5y
-    'historical': '#475569', // Dark Slate: > 5y
-    'legendary': '#1E293B'   // Deep Navy: Long inactive
+// Archetype Color Mapping
+const ARCHETYPE_COLORS = {
+    'Protocol Architect': '#E8916B',    // BDL Primary Orange: Leaders
+    'Core Engineer': '#4ADE80',         // Vibrant Green: Builders
+    'Social Researcher': '#60A5FA',     // Sky Blue: Researchers
+    'BIP Author': '#A855F7',            // Purple: Protocol Designers
+    'Silent Contributor': '#94A3B8',    // Muted Slate: Code-only
+    'Protocol Participant': '#475569',  // Dark Slate: Community
+    'Specialist': '#FACC15'             // Yellow: Niche Experts
 };
 
-function getTemporalColor(lastActiveDate) {
-    const lastActive = new Date(lastActiveDate);
-    const now = new Date();
-    const diffDays = (now - lastActive) / (1000 * 60 * 60 * 24);
-
-    if (diffDays < 180) return TEMPORAL_COLORS.active;
-    if (diffDays < 730) return TEMPORAL_COLORS.recent;
-    if (diffDays < 1825) return TEMPORAL_COLORS.aged;
-    return TEMPORAL_COLORS.historical;
+function getNodeColor(d) {
+    return ARCHETYPE_COLORS[d.dev_type] || '#475569';
 }
 
 const THEME_COLORS = {
@@ -200,7 +195,7 @@ function render() {
         .join("circle")
         .attr("class", "node")
         .attr("r", d => getRadius(d))
-        .attr("fill", d => getTemporalColor(d.last_active))
+        .attr("fill", d => getNodeColor(d))
         .attr("stroke", "#000")
         .call(drag(simulation));
 
@@ -216,10 +211,12 @@ function render() {
     node.on("mouseover", (e, d) => {
         tooltip.style("display", "block").html(`
             <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${d.id}</div>
-            <div style="color:${getTemporalColor(d.last_active)}">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
-            <div style="margin-top:8px; font-size:11px; color:#ccc;">
-                Primary Focus: <span style="color:${THEME_COLORS[d.theme] || '#fff'}; font-weight:600;">${d.theme}</span><br>
-                Posts: Threads (${d.threads_started}) | Replies (${d.replies_sent})<br>
+            <div style="font-size:11px; font-weight:600; color:${getNodeColor(d)}; text-transform:uppercase; margin-bottom:4px;">${d.dev_type}</div>
+            <div style="color:#94a3b8; font-size:10px;">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
+            <div style="margin-top:8px; font-size:11px; color:#ccc; border-top:1px solid #334155; padding-top:6px;">
+                Focus: <span style="color:${THEME_COLORS[d.theme] || '#fff'}; font-weight:600;">${d.theme}</span><br>
+                Code: <b>${d.code_stats.commits}</b> commits<br>
+                Social: <b>${d.threads_started + d.replies_sent}</b> posts<br>
                 Influence: <span style="color:var(--bitcoin-orange); font-weight:600;">${formatInfluence(d)}</span>
             </div>
         `);
@@ -280,28 +277,43 @@ function showProfile(d) {
 
     document.getElementById('selection-content').innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span class="tag ${srcClass}">${d.dominant_source.replace('_', ' ')}</span>
+            <div style="display:flex; gap:6px;">
+                <span class="tag ${srcClass}">${d.dominant_source.replace('_', ' ')}</span>
+                <span class="tag" style="background:${getNodeColor(d)}22; color:${getNodeColor(d)}; border:1px solid ${getNodeColor(d)}55;">${d.dev_type}</span>
+            </div>
             ${d.growth > 1.5 ? `<span class="tag" style="color:var(--bitcoin-orange); border:1px solid var(--bitcoin-orange); font-size: 9px;">↑ Rising</span>` : ''}
         </div>
-        <div style="font-size:18px; font-weight:700; margin-bottom:4px; color: #fff;">${d.id}</div>
-        <div style="font-size:12px; color:${THEME_COLORS[d.theme]}; font-weight:600; text-transform:uppercase; margin-bottom:16px;">
-            ${d.theme} Expert
+        <div style="font-size:20px; font-weight:800; margin-bottom:4px; color: #fff; letter-spacing:-0.01em;">${d.id}</div>
+        <div style="font-size:12px; color:${THEME_COLORS[d.theme]}; font-weight:700; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.05em;">
+            ${d.theme} Specialist
         </div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+            <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Commits</div>
+                <div style="font-size:16px; font-weight:700; color:#4ade80;">${d.code_stats.commits.toLocaleString()}</div>
+            </div>
+            <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Impact</div>
+                <div style="font-size:16px; font-weight:700; color:var(--bitcoin-orange);">${d.code_stats.impact.toLocaleString()}</div>
+            </div>
+        </div>
+
         <div class="expertise-label">Technical Fingerprint</div>
         ${expertiseHtml}
-        <div class="expertise-label">BIP Association</div>
-        <div style="margin-top:8px;">${bipsHtml}</div>
-        <div class="expertise-label">Platform Breakdown</div>
-        <div style="margin-top:10px;">
-            <div class="info-item"><span class="info-label">Mailing List</span><span class="info-val">${mlCount} posts</span></div>
-            <div class="info-item"><span class="info-label">Delving Bitcoin</span><span class="info-val">${dvCount} posts</span></div>
+        
+        <div class="expertise-label" style="margin-top:20px;">Protocol Assets</div>
+        <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${bipsHtml}
+            ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:#4ade8022; color:#4ade80; border-color:#4ade8044;">CORE MAINTAINER</span>' : ''}
         </div>
+
         <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
-            <div class="info-item"><span class="info-label">Threads Started</span><span class="info-val">${d.threads_started}</span></div>
-            <div class="info-item"><span class="info-label">Replies Sent</span><span class="info-val">${d.replies_sent}</span></div>
+            <div class="info-item"><span class="info-label">Threads / Replies</span><span class="info-val">${d.threads_started} / ${d.replies_sent}</span></div>
             <div class="info-item"><span class="info-label">Replies Received</span><span class="info-val">${d.replies_received}</span></div>
-            <div class="info-item" style="margin-top:10px;"><span class="info-label">Influence Rank</span><span class="info-val" style="color:var(--bitcoin-orange); font-weight:700;">${formatInfluence(d)}</span></div>
+            <div class="info-item" style="margin-top:10px;"><span class="info-label">Network Authority</span><span class="info-val" style="color:var(--bitcoin-orange); font-weight:700;">${formatInfluence(d)}</span></div>
             <div class="info-item"><span class="info-label">Last Active</span><span class="info-val">${new Date(d.last_active).toLocaleDateString()}</span></div>
+            <div class="info-item"><span class="info-label">Hybrid Score</span><span class="info-val" style="color:#94a3b8;">${d.hybrid_score}</span></div>
         </div>`;
 
     // Smooth scroll to selection info on mobile if needed
