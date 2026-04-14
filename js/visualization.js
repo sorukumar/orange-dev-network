@@ -134,7 +134,8 @@ function updateViz() {
         if (currentFilters.bip !== '') {
             if (!n.bips.some(b => b.includes(currentFilters.bip))) return false;
         }
-        return score > 0.00001;
+        // Allow anything with a positive score (Hybrid or Social)
+        return score > 0;
     });
 
     const nodeIds = new Set(nodes.map(n => n.id));
@@ -161,13 +162,22 @@ function highlightSearch() {
 }
 
 function formatInfluence(n) {
-    const rank = n.ranks[currentFilters.view];
-    const pct = (rank / totalPopulation) * 100;
-    if (pct <= 2.5) return `Top 2.5% (Rank #${rank})`;
+    const rank = n.ranks[currentFilters.view] || 9999;
+    const isHybrid = currentFilters.view === 'all';
+    
+    // If we're in 'all' view, use the index in the sorted array for rank if explicit rank is missing
+    let displayRank = rank;
+    if (isHybrid && rank === 9999) {
+       // Find index in original allData.nodes which is already sorted by hybrid_score
+       displayRank = allData.nodes.findIndex(node => node.id === n.id) + 1;
+    }
+
+    const pct = (displayRank / totalPopulation) * 100;
+    if (pct <= 2.5) return `Top 2.5% (Rank #${displayRank})`;
     if (pct <= 10) return `Top 10%`;
     if (pct <= 25) return `Top 25%`;
     if (pct <= 50) return `Top 50%`;
-    return "Active Participant";
+    return n.dev_type === 'Silent Contributor' ? "Technical Contributor" : "Active Participant";
 }
 
 function render() {
@@ -201,7 +211,7 @@ function render() {
 
     const label = g.append("g")
         .selectAll("text")
-        .data(nodes.filter(n => getScore(n) > 0.005))
+        .data(nodes.filter(n => (getScore(n) > 0.005) || (n.hybrid_score > 3)))
         .join("text")
         .attr("class", "label")
         .text(d => d.id)
@@ -322,10 +332,17 @@ function showProfile(d) {
     }
 }
 
-function getScore(d) { return d.scores[currentFilters.view] || 0; }
+function getScore(d) { 
+    if (currentFilters.view === 'all') return d.hybrid_score || 0;
+    return d.scores[currentFilters.view] || 0; 
+}
+
 function getRadius(d) {
-    // Starker scaling: Higher power (0.75 vs 0.5) to separate top influencers from the mid-tier
-    return Math.pow(getScore(d), 0.85) * 800 + 3;
+    // If backend provided a pre-scaled value, use it, otherwise fall back to legacy scaling
+    if (currentFilters.view === 'all' && d.val) return d.val;
+    
+    const score = getScore(d);
+    return Math.pow(score, 0.85) * 800 + 3;
 }
 function drag(simulation) {
     return d3.drag()
