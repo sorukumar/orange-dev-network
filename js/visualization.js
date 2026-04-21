@@ -21,11 +21,11 @@ const THEME_MAPPING = {
 // 4 roles + Creator. Labels map 1:1 to influence.py dev_type values.
 // Fewer groups = clearer signal: each color answers "what does this person primarily do?"
 const ARCHETYPE_COLORS = {
-    'Creator':           '#D26B2F',  // Burnt orange — richer and more distinct
-    'Protocol Designer': '#A97D62',  // Warm bronze — calmer and grounded
-    'Builder':           '#4ADE80',  // Green          — ships the code
-    'Reviewer':          '#22D3EE',  // Cyan           — scrutinizes and validates
-    'Participant':       '#94A3B8',  // Slate          — broad participation
+    'Creator':           '#E8916B',  // Bitcoin orange — matches theme accent
+    'Protocol Designer': '#8a7a5f',  // Warm bronze — matches text-secondary
+    'Builder':           '#f59e0b',  // Amber — matches script color
+    'Reviewer':          '#10b981',  // Green — matches L2 color
+    'Participant':       '#94A3B8',  // Slate — neutral gray
 };
 
 function getNodeColor(d) {
@@ -179,7 +179,7 @@ function updateViz() {
 function highlightSearch() {
     const term = currentFilters.search;
     g.selectAll("circle")
-        .style("stroke", n => n.id.toLowerCase().includes(term) && term !== '' ? "#fff" : "#000")
+        .style("stroke", n => n.id.toLowerCase().includes(term) && term !== '' ? "var(--text-primary)" : "var(--bg-secondary)")
         .style("stroke-width", n => n.id.toLowerCase().includes(term) && term !== '' ? 2 : 0.5)
         .attr("r", n => {
             const base = getRadius(n);
@@ -277,9 +277,9 @@ function render() {
         tooltip.style("display", "block").html(`
             <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${d.display_name || d.id}</div>
             <div style="font-size:11px; font-weight:600; color:${getNodeColor(d)}; text-transform:uppercase; margin-bottom:4px;">${d.dev_type}</div>
-            <div style="color:#94a3b8; font-size:10px;">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
-            <div style="margin-top:8px; font-size:11px; color:#ccc; border-top:1px solid #334155; padding-top:6px;">
-                Focus: <span style="color:${THEME_COLORS[d.theme] || '#fff'}; font-weight:600;">${d.theme}</span><br>
+            <div style="color:var(--text-secondary); font-size:10px;">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
+            <div style="margin-top:8px; font-size:11px; color:var(--text-secondary); border-top:1px solid var(--border); padding-top:6px;">
+                Focus: <span style="color:${THEME_COLORS[d.theme] || 'var(--text-primary)'}; font-weight:600;">${d.theme}</span><br>
                 Code: <b>${d.code_stats.commits}</b> commits<br>
                 Social: <b>${d.threads_started + d.replies_sent}</b> posts<br>
                 Influence: <span style="color:var(--bitcoin-orange); font-weight:600;">${formatInfluence(d)}</span>
@@ -358,7 +358,7 @@ function showProfile(d) {
         </div>
     `).join('');
 
-    let bipsHtml = d.bips.length > 0 ? d.bips.map(b => `<span class="bip-chip">BIP ${b}</span>`).join('') : '<span style="color:#666; font-size:11px;">None cited</span>';
+    let bipsHtml = d.bips.length > 0 ? d.bips.map(b => `<span class="bip-chip">BIP ${b}</span>`).join('') : '<span style="color:var(--text-secondary); font-size:11px;">None cited</span>';
     const mlCount = d.source_breakdown.mailing_list || 0;
     const dvCount = d.source_breakdown.delving || 0;
 
@@ -370,14 +370,14 @@ function showProfile(d) {
             </div>
             ${d.growth > 1.5 ? `<span class="tag" style="color:var(--bitcoin-orange); border:1px solid var(--bitcoin-orange); font-size: 9px;">↑ Rising</span>` : ''}
         </div>
-        <div style="font-size:20px; font-weight:800; margin-bottom:4px; color: #fff; letter-spacing:-0.01em;">${d.display_name || d.id}</div>
+        <div style="font-size:20px; font-weight:800; margin-bottom:4px; letter-spacing:-0.01em;">${d.display_name || d.id}</div>
         <div style="font-size:12px; color:${THEME_COLORS[d.theme]}; font-weight:700; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.05em;">
             ${d.theme} Specialist
         </div>
 
         ${d.uuid ? `
         <div style="margin-bottom: 20px;">
-            <a href="directory.html?uuid=${d.uuid}" style="display: block; width: 100%; text-align: center; background: var(--bitcoin-orange); color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 13px;">
+            <a href="directory.html?uuid=${d.uuid}" style="display: block; width: 100%; text-align: center; background: var(--bitcoin-orange); padding: 10px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 13px;">
                 <i class="fas fa-user-circle"></i> View Full Directory Profile
             </a>
         </div>
@@ -385,8 +385,8 @@ function showProfile(d) {
         
         <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:20px;">
             <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Commits</div>
-                <div style="font-size:16px; font-weight:700; color:#4ade80;">${d.code_stats.commits.toLocaleString()}</div>
+                <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Commits</div>
+                <div style="font-size:16px; font-weight:700; color:#f59e0b;">${d.code_stats.commits.toLocaleString()}</div>
             </div>
         </div>
 
@@ -396,7 +396,7 @@ function showProfile(d) {
         <div class="expertise-label" style="margin-top:20px;">Protocol Assets</div>
         <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
             ${bipsHtml}
-            ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:#4ade8022; color:#4ade80; border-color:#4ade8044;">CORE MAINTAINER</span>' : ''}
+            ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:#10b98122; color:#10b981; border-color:#10b98144;">CORE MAINTAINER</span>' : ''}
         </div>
 
         <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
@@ -404,7 +404,7 @@ function showProfile(d) {
             <div class="info-item"><span class="info-label">Replies Received</span><span class="info-val">${d.replies_received}</span></div>
             <div class="info-item" style="margin-top:10px;"><span class="info-label">Network Authority</span><span class="info-val" style="color:var(--bitcoin-orange); font-weight:700;">${formatInfluence(d)}</span></div>
             <div class="info-item"><span class="info-label">Last Active</span><span class="info-val">${new Date(d.last_active).toLocaleDateString()}</span></div>
-            <div class="info-item"><span class="info-label">Hybrid Score</span><span class="info-val" style="color:#94a3b8;">${d.hybrid_score}</span></div>
+            <div class="info-item"><span class="info-label">Hybrid Score</span><span class="info-val" style="color:var(--text-secondary);">${d.hybrid_score}</span></div>
         </div>`;
 
     // Smooth scroll to selection info on mobile if needed

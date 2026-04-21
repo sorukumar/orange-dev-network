@@ -123,6 +123,19 @@
     padding: 12px 12px;
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
+    color: var(--text-primary);
+}
+
+/* Ensure all table data inherits proper colors */
+#contributor-table td,
+#contributor-table td * {
+    color: var(--text-primary) !important;
+}
+
+/* Specific rules for mailing list and delving columns */
+#contributor-table td:nth-child(4),
+#contributor-table td:nth-child(5) {
+    color: var(--text-primary) !important;
 }
 
 #contributor-table th:first-child,
@@ -190,7 +203,7 @@
     font-size: 9px;
     padding: 2px 6px;
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     color: var(--text-secondary);
     font-weight: 700;
     text-transform: uppercase;
@@ -198,8 +211,8 @@
 }
 
 .mini-badge.maintainer {
-    background: rgba(74, 222, 128, 0.15);
-    color: #4ade80;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
 }
 
 .mini-badge.sponsor {
@@ -314,7 +327,7 @@
 
 .pagination-page {
     font-size: 13px;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 /* Modal Styles */
@@ -346,9 +359,9 @@
 }
 
 .glassman-card {
-    background: #111827;
+    background: var(--card-bg);
     border: 1px solid var(--border);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+    box-shadow: 0 40px 100px rgba(26, 18, 8, 0.8);
 }
 
 .close-modal {
@@ -363,11 +376,19 @@
 }
 
 .close-modal:hover {
-    color: #fff;
+    color: var(--text-primary);
 }
 
-#modal-body {
-    padding: 0;
+#modal-body,
+#modal-body * {
+    color: var(--text-primary);
+}
+
+#modal-body .text-secondary,
+#modal-body .metric-subtext,
+#modal-body .work-secondary,
+#modal-body .efficiency-latency {
+    color: var(--text-secondary);
 }
 
 /* Loading States */

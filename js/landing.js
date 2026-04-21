@@ -70,12 +70,12 @@ function renderMetrics(stats) {
         
         const bar = document.getElementById('focus-bar');
         bar.innerHTML = '';
-        const colors = ['var(--bitcoin-orange)', '#60A5FA', '#10B981', '#A855F7', '#FACC15'];
+        const colors = ['var(--bitcoin-orange)', 'var(--color-wallet)', 'var(--color-l2)', 'var(--color-privacy)', 'var(--color-script)'];
         topFocus.forEach((f, i) => {
             const seg = document.createElement('div');
             seg.className = 'focus-segment';
             seg.style.width = `${f[1]}%`;
-            seg.style.background = colors[i] || '#444';
+            seg.style.background = colors[i] || 'var(--text-secondary)';
             seg.title = `${f[0]}: ${f[1]}%`;
             bar.appendChild(seg);
         });
@@ -114,13 +114,13 @@ function renderDiscussionPulse(pulse) {
     if (topicsEl && pulse.topics && pulse.topics.length > 0) {
         const maxShare = pulse.topics[0].share;
         topicsEl.innerHTML = pulse.topics.map((t, i) => {
-            const colors = ['var(--bitcoin-orange)', '#60A5FA', '#10B981'];
-            const color = colors[i] || '#94A3B8';
+            const colors = ['var(--bitcoin-orange)', 'var(--color-l2)', 'var(--color-script)'];
+            const color = colors[i] || 'var(--text-secondary)';
             const barWidth = maxShare > 0 ? Math.round((t.share / maxShare) * 100) : 0;
             return `
                 <div style="margin-bottom: 10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <span style="font-size:13px; font-weight:600; color:#fff;">${t.label}</span>
+                        <span style="font-size:13px; font-weight:600;">${t.label}</span>
                         <span style="font-size:11px; color:var(--text-secondary);">${t.count.toLocaleString()} msgs &nbsp;<span style="color:${color}; font-weight:700;">${t.share}%</span></span>
                     </div>
                     <div style="background:rgba(255,255,255,0.06); border-radius:4px; height:5px; overflow:hidden;">
@@ -140,7 +140,7 @@ function renderDiscussionPulse(pulse) {
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px;">
                     <span style="color:var(--bitcoin-orange); font-weight:700; min-width:48px;">BIP ${b.bip_id}</span>
                     <span style="color:var(--text-secondary); flex:1; padding: 0 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.title}</span>
-                    <span style="color:#94A3B8; font-size:11px;">${b.mentions.toLocaleString()}</span>
+                    <span style="color:var(--text-secondary); font-size:11px;">${b.mentions.toLocaleString()}</span>
                 </div>
             `).join('')}
         `;

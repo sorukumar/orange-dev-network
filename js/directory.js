@@ -18,11 +18,11 @@ const PAGE_SIZE = 100;
 // Archetype colors — kept in sync with visualization.js for consistency across all three pages
 // 4 roles + Creator — kept in sync with visualization.js and influence.py archetypes.
 const ARCHETYPE_COLORS = {
-    'Creator':           '#F7931A',  // Bitcoin orange — singular, foundational
-    'Protocol Designer': '#A97D62',  // Warm bronze — softer and more in line with the network graph palette
-    'Builder':           '#4ADE80',  // Green          — ships the code
-    'Reviewer':          '#22D3EE',  // Cyan           — scrutinizes and validates
-    'Participant':       '#94A3B8',  // Slate          — broad participation
+    'Creator':           '#E8916B',  // Bitcoin orange — matches theme accent
+    'Protocol Designer': '#8a7a5f',  // Warm bronze — matches text-secondary
+    'Builder':           '#f59e0b',  // Amber — matches script color
+    'Reviewer':          '#10b981',  // Green — matches L2 color
+    'Participant':       '#94A3B8',  // Slate — neutral gray
 };
 
 function getArchetypeColor(devType) {
@@ -85,7 +85,7 @@ async function initDirectory() {
         console.error("Failed to load directory data:", error);
         document.getElementById('contributor-list').innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; padding: 40px; color: #ef4444;">
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--color-consensus);">
                     <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 12px;"></i>
                     <p>Failed to load the index. Please check your connection or try again later.</p>
                 </td>
@@ -229,10 +229,10 @@ function renderTable() {
                 <td style="text-align: center; font-weight: 600;">${c.authored_commits?.toLocaleString() || 0}</td>
                 <td style="text-align: center; color: var(--text-secondary);">${c.bips_authored || 0}</td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
-                    <span style="color: #fff;">${ml_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${ml_responses}</span>
+                    <span>${ml_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${ml_responses}</span>
                 </td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
-                    <span style="color: #fff;">${delving_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${delving_responses}</span>
+                    <span>${delving_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${delving_responses}</span>
                 </td>
                 <td>
                     <span class="focus-tag">${c.technical_focus}</span>
@@ -356,7 +356,7 @@ function renderProfile(p, isBasic = false) {
                     <h4 style="color: var(--text-secondary); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 16px;">Work & Impact</h4>
                     <div class="profile-info-row">
                         <span>Authored Commits</span>
-                        <span style="font-weight: 700; color: #fff;">${p.authored_commits?.toLocaleString() || p.total_commits?.toLocaleString() || 0}</span>
+                        <span style="font-weight: 700;">${p.authored_commits?.toLocaleString() || p.total_commits?.toLocaleString() || 0}</span>
                     </div>
                     <div class="profile-info-row">
                         <span>Merge Commits (Maintainer)</span>
@@ -368,7 +368,7 @@ function renderProfile(p, isBasic = false) {
                     </div>
                     <div class="profile-info-row" style="border: none;">
                         <span>Technical Focus</span>
-                        <span style="font-weight: 700; color: #fff;">${p.technical_focus}</span>
+                        <span style="font-weight: 700;">${p.technical_focus}</span>
                     </div>
                 </div>
                 <div>
@@ -414,7 +414,7 @@ function renderProfile(p, isBasic = false) {
             .stat-value {
                 font-size: 18px;
                 font-weight: 800;
-                color: #fff;
+                color: var(--text-primary);
             }
             .social-link {
                 background: rgba(255,255,255,0.05);
@@ -428,9 +428,9 @@ function renderProfile(p, isBasic = false) {
                 border: 1px solid var(--border);
             }
             .social-link:hover {
-                background: rgba(255,255,255,0.1);
-                color: #fff;
-                border-color: rgba(255,255,255,0.2);
+                background: rgba(232, 213, 176, 0.08);
+                color: var(--text-primary);
+                border-color: rgba(232, 213, 176, 0.2);
             }
         </style>
     `;

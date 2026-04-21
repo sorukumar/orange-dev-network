@@ -26,6 +26,23 @@
     --color-other: #444;
 }
 
+/* Logo styling for external components */
+.app-logo img,
+.logo img,
+header img[src*="logo"],
+#header img {
+    filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(25deg) brightness(1.2) !important;
+}
+
+/* App name text beside logo */
+#currentAppName,
+#header .app-name,
+#header [id*="appName"],
+#header .app-logo a {
+    color: var(--bitcoin-orange) !important;
+    font-weight: 700 !important;
+}
+
 /* Global Reset & Base */
 html,
 body {
@@ -189,7 +206,7 @@ body {
 }
 
 .stats-hud {
-    background: rgba(11, 14, 20, 0.85);
+    background: rgba(26, 18, 8, 0.85);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -230,7 +247,7 @@ body {
 }
 
 .control-btn {
-    background: rgba(11, 14, 20, 0.85);
+    background: rgba(26, 18, 8, 0.85);
     backdrop-filter: blur(8px);
     border: 1px solid var(--border);
     padding: 10px;
@@ -248,14 +265,15 @@ body {
 
 .control-btn:hover {
     background: var(--card-bg);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--bitcoin-orange);
+    color: var(--bitcoin-orange);
     transform: scale(1.05);
 }
 
 /* Tooltip */
 .tooltip {
     position: absolute;
-    background: rgba(11, 14, 20, 0.98);
+    background: rgba(26, 18, 8, 0.98);
     border: 1px solid var(--border);
     padding: 16px;
     border-radius: 12px;
@@ -287,12 +305,12 @@ circle.node {
 }
 
 text.label {
-    fill: #fff;
+    fill: var(--text-primary);
     font-size: 9px;
     font-weight: 500;
     pointer-events: none;
     opacity: 0.6;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 3px rgba(26, 18, 8, 0.8);
 }
 
 /* Selection Panel / Profile */
@@ -408,9 +426,9 @@ text.label {
 }
 
 .tag-mixed {
-    background: rgba(240, 240, 240, 0.1);
-    color: #f0f0f0;
-    border: 1px solid rgba(240, 240, 240, 0.2);
+    background: rgba(232, 213, 176, 0.1);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
 }
 
 /* Scrollbar Styles */
