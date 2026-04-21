@@ -18,14 +18,14 @@ const THEME_MAPPING = {
 };
 
 // Archetype Color Mapping
+// 4 roles + Creator. Labels map 1:1 to influence.py dev_type values.
+// Fewer groups = clearer signal: each color answers "what does this person primarily do?"
 const ARCHETYPE_COLORS = {
-    'Protocol Architect': '#E8916B',    // BDL Primary Orange: Leaders
-    'Core Engineer': '#4ADE80',         // Vibrant Green: Builders
-    'Social Researcher': '#60A5FA',     // Sky Blue: Researchers
-    'BIP Author': '#A855F7',            // Purple: Protocol Designers
-    'Silent Contributor': '#94A3B8',    // Muted Slate: Code-only
-    'Protocol Participant': '#475569',  // Dark Slate: Community
-    'Specialist': '#FACC15'             // Yellow: Niche Experts
+    'Creator':           '#D26B2F',  // Burnt orange — richer and more distinct
+    'Protocol Designer': '#A97D62',  // Warm bronze — calmer and grounded
+    'Builder':           '#4ADE80',  // Green          — ships the code
+    'Reviewer':          '#22D3EE',  // Cyan           — scrutinizes and validates
+    'Participant':       '#94A3B8',  // Slate          — broad participation
 };
 
 function getNodeColor(d) {
@@ -47,9 +47,12 @@ const THEME_COLORS = {
     'other': 'var(--color-other)'
 };
 
-let allData, nodes, links, simulation;
+const THEME_CLUSTER_ORDER = ['Consensus', 'Script', 'L2', 'Privacy', 'Wallet', 'Mempool', 'Network', 'Mining', 'Crypto', 'Data', 'Ecosystem', 'other'];
+
+let allData, nodes, links, simulation, rankMap = new Map();
 let currentFilters = { view: 'all', theme: 'all', search: '', bip: '' };
 let totalPopulation = 0;
+let selectedNode = null;
 
 const svg = d3.select("#viz");
 const container = d3.select("#graph-container");
@@ -66,11 +69,18 @@ svg.call(zoom);
 function initViz() {
     updateDimensions();
 
-    // Load data
-    const DATA_PATH_PREFIX = 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/';
-    d3.json(DATA_PATH_PREFIX + "output/network/network_graph.json").then(data => {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const DATA_BASE = isLocal 
+        ? "output/" 
+        : "https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/";
+
+    const graphPath = DATA_BASE + "network/network_graph.json";
+
+    // network_graph.json is self-contained: n.id is the canonical uuid,
+    // display_name is embedded. No second fetch needed.
+    d3.json(graphPath).then((data) => {
         allData = data;
-        totalPopulation = data.metadata.total_population || data.nodes.length;
+        totalPopulation = data.metadata?.total_population || data.nodes.length;
 
         document.getElementById('total-pop').innerText = totalPopulation.toLocaleString();
         document.getElementById('viz-count').innerText = data.nodes.length.toLocaleString();
@@ -78,12 +88,14 @@ function initViz() {
         allData.nodes.forEach(n => {
             n.theme = THEME_MAPPING[n.top_category] || 'other';
             n.expertise.forEach(e => { e.theme = THEME_MAPPING[e.topic] || 'other'; });
+            // n.id is already the canonical uuid — use it directly for directory deep-links
+            n.uuid = n.id;
         });
 
         updateViz();
         setupEventListeners();
     }).catch(error => {
-        console.error("Error loading graph data:", error);
+        console.error("Error loading data:", error);
     });
 }
 
@@ -120,6 +132,18 @@ function setupEventListeners() {
     document.getElementById('zoom-out').onclick = () => svg.transition().duration(300).call(zoom.scaleBy, 0.6);
     document.getElementById('reset').onclick = () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
 
+    // Clear selection on background click
+    svg.on("click", (e) => {
+        if (e.target.tagName !== 'circle') {
+            selectedNode = null;
+            document.getElementById('selection-panel').style.display = 'none';
+            d3.selectAll(".node").style("opacity", 1);
+            d3.selectAll(".link")
+                .style("stroke-opacity", d => Math.min(0.4, 0.05 + d.weight * 0.05))
+                .style("stroke-width", d => Math.sqrt(d.weight) * 0.5);
+        }
+    });
+
     window.onresize = () => {
         updateDimensions();
     };
@@ -145,6 +169,8 @@ function updateViz() {
         return nodeIds.has(s) && nodeIds.has(t);
     });
 
+    rankMap = buildRankMap(allData.nodes);
+
     document.getElementById('node-count').innerText = nodes.length;
     render();
     if (currentFilters.search) highlightSearch();
@@ -162,33 +188,40 @@ function highlightSearch() {
 }
 
 function formatInfluence(n) {
-    const rank = n.ranks[currentFilters.view] || 9999;
-    const isHybrid = currentFilters.view === 'all';
-    
-    // If we're in 'all' view, use the index in the sorted array for rank if explicit rank is missing
-    let displayRank = rank;
-    if (isHybrid && rank === 9999) {
-       // Find index in original allData.nodes which is already sorted by hybrid_score
-       displayRank = allData.nodes.findIndex(node => node.id === n.id) + 1;
-    }
+    const rank = rankMap.get(n.id) || 9999;
+    return rank !== 9999
+        ? `Rank #${rank}`
+        : n.dev_type === 'Silent Contributor'
+            ? "Technical Contributor"
+            : "Active Participant";
+}
 
-    const pct = (displayRank / totalPopulation) * 100;
-    if (pct <= 2.5) return `Top 2.5% (Rank #${displayRank})`;
-    if (pct <= 10) return `Top 10%`;
-    if (pct <= 25) return `Top 25%`;
-    if (pct <= 50) return `Top 50%`;
-    return n.dev_type === 'Silent Contributor' ? "Technical Contributor" : "Active Participant";
+function buildRankMap(nodesToRank) {
+    const sorted = [...nodesToRank].sort((a, b) => {
+        const diff = getScore(b) - getScore(a);
+        if (diff !== 0) return diff;
+        return (a.id || '').localeCompare(b.id || '');
+    });
+    const map = new Map();
+    sorted.forEach((node, index) => {
+        map.set(node.id, index + 1);
+    });
+    return map;
 }
 
 function render() {
     g.selectAll("*").remove();
     if (simulation) simulation.stop();
 
+    const chargeStrength = -150 - Math.min(nodes.length, 200) * 0.25;
     simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(40))
-        .force("charge", d3.forceManyBody().strength(-120))
+        .force("link", d3.forceLink(links).id(d => d.id).distance(45))
+        .force("charge", d3.forceManyBody().strength(chargeStrength))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(d => getRadius(d) + 1));
+        .force("x", d3.forceX(d => getClusterPosition(d).x).strength(0.05))
+        .force("y", d3.forceY(d => getClusterPosition(d).y).strength(0.05))
+        .force("collision", d3.forceCollide().radius(d => getRadius(d) + 2))
+        .force("bound", forceBox(width, height));
 
     const link = g.append("g")
         .selectAll("line")
@@ -214,13 +247,35 @@ function render() {
         .data(nodes.filter(n => (getScore(n) > 0.005) || (n.hybrid_score > 3)))
         .join("text")
         .attr("class", "label")
-        .text(d => d.id)
+        .text(d => d.display_name || d.id)
         .attr("dx", d => getRadius(d) + 3)
         .attr("dy", ".35em");
 
+    function applyHighlight(activeNode) {
+        if (!activeNode) return;
+        const neighbors = new Set();
+        links.forEach(l => {
+            const sId = typeof l.source === 'object' ? l.source.id : l.source;
+            const tId = typeof l.target === 'object' ? l.target.id : l.target;
+            if (sId === activeNode.id) neighbors.add(tId);
+            if (tId === activeNode.id) neighbors.add(sId);
+        });
+        node.style("opacity", n => neighbors.has(n.id) || n.id === activeNode.id ? 1 : 0.05);
+        link.style("stroke-opacity", l => {
+            const sId = typeof l.source === 'object' ? l.source.id : l.source;
+            const tId = typeof l.target === 'object' ? l.target.id : l.target;
+            return sId === activeNode.id || tId === activeNode.id ? 0.8 : 0.02;
+        })
+        .style("stroke-width", l => {
+            const sId = typeof l.source === 'object' ? l.source.id : l.source;
+            const tId = typeof l.target === 'object' ? l.target.id : l.target;
+            return sId === activeNode.id || tId === activeNode.id ? 2 : 0.5;
+        });
+    }
+
     node.on("mouseover", (e, d) => {
         tooltip.style("display", "block").html(`
-            <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${d.id}</div>
+            <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${d.display_name || d.id}</div>
             <div style="font-size:11px; font-weight:600; color:${getNodeColor(d)}; text-transform:uppercase; margin-bottom:4px;">${d.dev_type}</div>
             <div style="color:#94a3b8; font-size:10px;">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
             <div style="margin-top:8px; font-size:11px; color:#ccc; border-top:1px solid #334155; padding-top:6px;">
@@ -231,34 +286,24 @@ function render() {
             </div>
         `);
 
-        const neighbors = new Set();
-        links.forEach(l => {
-            const sId = typeof l.source === 'object' ? l.source.id : l.source;
-            const tId = typeof l.target === 'object' ? l.target.id : l.target;
-            if (sId === d.id) neighbors.add(tId);
-            if (tId === d.id) neighbors.add(sId);
-        });
-        node.style("opacity", n => neighbors.has(n.id) || n.id === d.id ? 1 : 0.05);
-        link.style("stroke-opacity", l => {
-            const sId = typeof l.source === 'object' ? l.source.id : l.source;
-            const tId = typeof l.target === 'object' ? l.target.id : l.target;
-            return sId === d.id || tId === d.id ? 0.8 : 0.02;
-        })
-            .style("stroke-width", l => {
-                const sId = typeof l.source === 'object' ? l.source.id : l.source;
-                const tId = typeof l.target === 'object' ? l.target.id : l.target;
-                return sId === d.id || tId === d.id ? 2 : 0.5;
-            });
+        if (!selectedNode) applyHighlight(d);
     })
         .on("mousemove", (e) => tooltip.style("left", (e.pageX + 15) + "px").style("top", (e.pageY - 15) + "px"))
         .on("mouseout", () => {
             tooltip.style("display", "none");
-            node.style("opacity", 1);
-            link.style("stroke-opacity", d => Math.min(0.4, 0.05 + d.weight * 0.05))
-                .style("stroke-width", d => Math.sqrt(d.weight) * 0.5);
+            if (!selectedNode) {
+                node.style("opacity", 1);
+                link.style("stroke-opacity", d => Math.min(0.4, 0.05 + d.weight * 0.05))
+                    .style("stroke-width", d => Math.sqrt(d.weight) * 0.5);
+            } else {
+                applyHighlight(selectedNode);
+            }
         })
         .on("click", (e, d) => {
+            e.stopPropagation(); // prevent svg click
+            selectedNode = d;
             showProfile(d);
+            applyHighlight(d);
         });
 
     simulation.on("tick", () => {
@@ -266,6 +311,38 @@ function render() {
         node.attr("cx", d => d.x).attr("cy", d => d.y);
         label.attr("x", d => d.x).attr("y", d => d.y);
     });
+}
+
+function getClusterPosition(d) {
+    const index = THEME_CLUSTER_ORDER.indexOf(d.theme);
+    const angle = (index >= 0 ? index : THEME_CLUSTER_ORDER.length - 1) / THEME_CLUSTER_ORDER.length * Math.PI * 2 - Math.PI / 2;
+    const radius = Math.min(width, height) * 0.28;
+    return {
+        x: width / 2 + Math.cos(angle) * radius,
+        y: height / 2 + Math.sin(angle) * radius
+    };
+}
+
+function forceBox(width, height) {
+    let nodes;
+    function force(alpha) {
+        if (!nodes) return;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const maxDist = Math.min(width, height) * 0.48;
+        nodes.forEach(d => {
+            const dx = d.x - centerX;
+            const dy = d.y - centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            if (dist > maxDist) {
+                const push = (dist - maxDist) * 0.003 * alpha;
+                d.vx -= (dx / dist) * push;
+                d.vy -= (dy / dist) * push;
+            }
+        });
+    }
+    force.initialize = function(_) { nodes = _; };
+    return force;
 }
 
 function showProfile(d) {
@@ -293,19 +370,23 @@ function showProfile(d) {
             </div>
             ${d.growth > 1.5 ? `<span class="tag" style="color:var(--bitcoin-orange); border:1px solid var(--bitcoin-orange); font-size: 9px;">↑ Rising</span>` : ''}
         </div>
-        <div style="font-size:20px; font-weight:800; margin-bottom:4px; color: #fff; letter-spacing:-0.01em;">${d.id}</div>
+        <div style="font-size:20px; font-weight:800; margin-bottom:4px; color: #fff; letter-spacing:-0.01em;">${d.display_name || d.id}</div>
         <div style="font-size:12px; color:${THEME_COLORS[d.theme]}; font-weight:700; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.05em;">
             ${d.theme} Specialist
         </div>
+
+        ${d.uuid ? `
+        <div style="margin-bottom: 20px;">
+            <a href="directory.html?uuid=${d.uuid}" style="display: block; width: 100%; text-align: center; background: var(--bitcoin-orange); color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 13px;">
+                <i class="fas fa-user-circle"></i> View Full Directory Profile
+            </a>
+        </div>
+        ` : ''}
         
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:20px;">
             <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
                 <div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Commits</div>
                 <div style="font-size:16px; font-weight:700; color:#4ade80;">${d.code_stats.commits.toLocaleString()}</div>
-            </div>
-            <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8; text-transform:uppercase;">Impact</div>
-                <div style="font-size:16px; font-weight:700; color:var(--bitcoin-orange);">${d.code_stats.impact.toLocaleString()}</div>
             </div>
         </div>
 
