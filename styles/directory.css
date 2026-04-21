@@ -56,10 +56,10 @@
 .search-box input {
     width: 100%;
     padding: 12px 16px 12px 44px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(232, 213, 176, 0.05);
     border: 1px solid var(--border);
     border-radius: 12px;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 14px;
     transition: all 0.2s;
     outline: none;
@@ -72,12 +72,12 @@
 
 /* Glassmorphism Surface */
 .glassman-surface {
-    background: rgba(22, 27, 34, 0.6);
+    background: rgba(46, 36, 16, 0.6);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 40px rgba(26, 18, 8, 0.4);
 }
 
 /* Table Styles */
@@ -165,9 +165,9 @@
     height: 100px;
     border-radius: 20px;
     font-size: 40px;
-    background: #1f2937;
-    border: 4px solid #111827;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    background: var(--card-bg);
+    border: 4px solid var(--bg-secondary);
+    box-shadow: 0 10px 20px rgba(26, 18, 8, 0.3);
 }
 
 .contributor-info {
@@ -177,7 +177,7 @@
 
 .contributor-name {
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .badge-list {
@@ -238,7 +238,7 @@
 
 .work-primary {
     display: block;
-    color: #fff;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -254,7 +254,7 @@
 
 .efficiency-primary {
     display: block;
-    color: #fff;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -270,7 +270,7 @@
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     color: var(--text-secondary);
 }
 
@@ -294,9 +294,9 @@
 .pagination-button {
     padding: 10px 16px;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.05);
-    color: #fff;
+    border: 1px solid var(--border);
+    background: rgba(232, 213, 176, 0.05);
+    color: var(--text-primary);
     font-size: 13px;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
