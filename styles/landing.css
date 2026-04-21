@@ -1,0 +1,309 @@
+/* Landing Page Styles - Ecosystem Portal */
+
+body.landing-layout {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+}
+
+body.landing-layout #main-container {
+    height: auto !important;
+    min-height: 100vh;
+    display: block !important;
+}
+
+body.landing-layout .landing-layout {
+    background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-primary) 70%) !important;
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.hero-section {
+    padding: 60px 20px 40px 20px;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hero-section h1 {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    background: linear-gradient(to bottom, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-section p {
+    font-size: 20px;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto 48px auto;
+    line-height: 1.6;
+}
+
+.summary-section {
+    width: 100%;
+    max-width: 720px;
+    margin: 32px auto 0 auto;
+    padding: 24px 22px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 22px;
+    text-align: left;
+}
+
+.summary-section h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.summary-insight {
+    font-size: 15px;
+    color: #f8fafc;
+    margin-bottom: 14px;
+}
+
+.summary-list {
+    list-style: disc inside;
+    margin: 0;
+    padding: 0;
+    color: #e2e8f0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 24px;
+}
+
+.summary-list li {
+    margin-bottom: 0;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.summary-list li strong {
+    color: #fff;
+}
+
+.summary-list li span {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.summary-note {
+    margin-top: 18px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Venn Diagram Component */
+.venn-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 680px;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.venn-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.venn-circle {
+    fill-opacity: 0.15;
+    stroke-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.venn-circle:hover {
+    fill-opacity: 0.25;
+}
+
+.venn-label {
+    font-size: 14px;
+    font-weight: 700;
+    fill: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+.venn-count {
+    font-size: 24px;
+    font-weight: 800;
+    fill: #fff;
+    pointer-events: none;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.metric-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    padding: 32px;
+    border-radius: 24px;
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-4px);
+}
+
+.metric-card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.metric-subtext {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Call to Action Buttons */
+.cta-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1000px;
+    margin: 40px auto 100px auto;
+    padding: 0 20px;
+}
+
+.cta-card {
+    display: block;
+    text-decoration: none;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: var(--bitcoin-orange);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.cta-card:hover {
+    transform: translateY(-8px);
+    background: #1c2431;
+    border-color: var(--bitcoin-orange);
+}
+
+.cta-card:hover::before {
+    opacity: 1;
+}
+
+.cta-icon {
+    font-size: 40px;
+    color: var(--bitcoin-orange);
+    margin-bottom: 24px;
+}
+
+.cta-card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.cta-card p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* Focus Bar */
+.focus-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 12px;
+    display: flex;
+}
+
+.focus-segment {
+    height: 100%;
+    transition: width 1s ease-out;
+}
+/* Legend / Glossary */
+.venn-glossary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.venn-note {
+    width: 100%;
+    max-width: 760px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.7;
+}
+
+.glossary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.glossary-item .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.glossary-item strong {
+    color: #fff;
+}

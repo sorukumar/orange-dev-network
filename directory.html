@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributor Directory | Orange Dev Network</title>
+    <meta name="description" content="Discover and rank Bitcoin contributors across all domains (Core, BIPs, Social).">
+    
+    <!-- Bitcoin Data Labs Font & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bitcoin Data Labs Shell Styles -->
+    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css">
+
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/directory.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+</head>
+
+<body class="has-fixed-header">
+    <div id="main-container">
+        <!-- Bitcoin Data Labs Header -->
+        <div id="header"></div>
+
+        <div id="app-content" class="directory-layout">
+            <div class="container">
+                <header class="page-header">
+                    <div class="header-content">
+                        <h1>Contributor Directory</h1>
+                        <p>The Human Layer Index of Bitcoin R&D. Engineering impact, social authority, and technical focus.</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="directory-search" placeholder="Search by name, login, or subsystem...">
+                        </div>
+                    </div>
+                </header>
+
+                <div class="table-container glassman-surface">
+                    <table id="contributor-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="display_name" class="sortable">Contributor <i class="fas fa-sort"></i></th>
+                                <th data-sort="hybrid_score" class="sortable">Impact <i class="fas fa-sort"></i></th>
+                                <th data-sort="authored_commits" class="sortable">Authored Commits <i class="fas fa-sort"></i></th>
+                                <th data-sort="bips_authored" class="sortable">BIPs <i class="fas fa-sort"></i></th>
+                                <th data-sort="ml_total" class="sortable">Mailing List <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i></th>
+                                <th data-sort="delving_total" class="sortable">Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i></th>
+                                <th data-sort="technical_focus" class="sortable">Focus <i class="fas fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="contributor-list">
+                            <!-- Populated by JS -->
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading the index...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="pagination-controls" class="pagination-controls"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content glassman-card">
+                <span class="close-modal">&times;</span>
+                <div id="modal-body">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitcoin Data Labs Footer -->
+        <div id="footer"></div>
+    </div>
+
+    <!-- Bitcoin Data Labs App Components -->
+    <script src="https://bitcoindatalabs.org/components/app-components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            BitcoinLabsApp.init({
+                isApp: true,
+                appName: 'orange-dev-network',
+                appHomeUrl: 'index.html'
+            });
+        });
+    </script>
+
+    <!-- Directory Logic -->
+    <script src="js/directory.js"></script>
+</body>
+
+</html>
