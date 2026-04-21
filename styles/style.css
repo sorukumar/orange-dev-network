@@ -1,18 +1,18 @@
 :root {
     /* Bitcoin Data Labs Dark Theme Variables */
-    --bdl-header-bg: #0B0E14;
-    --bdl-header-bg-compressed: #0B0E14;
-    --bdl-subnav-bg: #131A26;
+    --bdl-header-bg: #1a1208;
+    --bdl-header-bg-compressed: #1a1208;
+    --bdl-subnav-bg: #2e2410;
 
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --bg-primary: #0B0E14;
-    --bg-secondary: #131A26;
+    --text-primary: #e8d5b0;
+    --text-secondary: #8a7a5f;
+    --bg-primary: #1a1208;
+    --bg-secondary: #251c0c;
     --accent: #E8916B;
     --bitcoin-orange: #E8916B;
-    --border: rgba(255, 255, 255, 0.08);
-    --card-bg: #161B22;
-    --surface: #1a1a1a;
+    --border: rgba(232, 213, 176, 0.08);
+    --card-bg: #2e2410;
+    --surface: #251c0c;
 
     /* Theme Colors for Network Categories */
     --color-consensus: #ef4444;

@@ -23,7 +23,7 @@ body.landing-layout #app-content {
 }
 
 body.landing-layout .landing-layout {
-    background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-primary) 70%) !important;
+    background: radial-gradient(circle at 50% -20%, #2e2410 0%, var(--bg-primary) 70%) !important;
     min-height: 100vh;
     padding-bottom: 60px;
     display: block !important;
@@ -47,7 +47,7 @@ body.landing-layout .landing-layout {
     font-weight: 900;
     letter-spacing: -0.03em;
     margin-bottom: 12px;
-    background: linear-gradient(to bottom, #fff, #94a3b8);
+    background: linear-gradient(to bottom, #e8d5b0, #ffb000);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
