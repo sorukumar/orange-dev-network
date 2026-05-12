@@ -21,6 +21,9 @@ scripts/analysis/influence_hubs.py
 # Public Viz Data (Needed for GitHub Pages)
 !data/viz/*.json
 
+# Local dev symlink to orange-dev-data/output (never commit)
+output
+
 # IDEs
 .vscode/
 .idea/

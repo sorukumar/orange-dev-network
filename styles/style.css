@@ -1,20 +1,29 @@
 :root {
-    /* Bitcoin Data Labs Dark Theme Variables */
-    --bdl-header-bg: #1a1208;
-    --bdl-header-bg-compressed: #1a1208;
-    --bdl-subnav-bg: #2e2410;
+    /* Bitcoin Data Labs "Obsidian Data" Theme Variables */
+    --bg-primary: #05070A;
+    --bg-secondary: #0D0F14;
+    --surface: #0D0F14;
+    --card-bg: #080A0F;
+    
+    --text-primary: #FDF6E3;
+    --text-secondary: #94A3B8;
+    
+    --primary: #E8916B;       /* Brand Terracotta */
+    --accent: var(--primary);
+    
+    --border: rgba(253, 246, 227, 0.08);
+    --border-subtle: rgba(253, 246, 227, 0.05);
+    
+    --card-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
 
-    --text-primary: #e8d5b0;
-    --text-secondary: #8a7a5f;
-    --bg-primary: #1a1208;
-    --bg-secondary: #251c0c;
-    --accent: #E8916B;
-    --bitcoin-orange: #E8916B;
-    --border: rgba(232, 213, 176, 0.08);
-    --card-bg: #2e2410;
-    --surface: #251c0c;
+    /* Warm Data Palette - 5 Core Roles */
+    --legend-creator: #FFB000;
+    --legend-architect: #E8916B;
+    --legend-engineer: #D4A298;
+    --legend-researcher: #8293AB;
+    --legend-participant: #2D3748;
 
-    /* Theme Colors for Network Categories */
+    /* Theme Colors for Network Categories - Refined for Obsidian */
     --color-consensus: #ef4444;
     --color-script: #f59e0b;
     --color-l2: #10b981;
@@ -24,14 +33,22 @@
     --color-network: #06b6d4;
     --color-mining: #71717a;
     --color-other: #444;
+
+    /* Header & Navigation Sync - Using 'Classy' Terracotta for selections */
+    --bdl-header-bg: rgba(5, 7, 10, 0.9);
+    --bdl-header-bg-compressed: rgba(5, 7, 10, 0.98);
+    --bdl-subnav-bg: #0D0F14;
+    --bdl-nav-active-bg: rgba(232, 145, 107, 0.12);
+    --bdl-nav-active-text: var(--primary);
 }
 
-/* Logo styling for external components */
+/* 🏆 Golden-Radiance Filter Sync 🏆 */
 .app-logo img,
 .logo img,
 header img[src*="logo"],
-#header img {
-    filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(25deg) brightness(1.2) !important;
+#header img,
+.logo-img {
+    filter: invert(1) hue-rotate(170deg) brightness(1.7) contrast(1.1) saturate(1.1) drop-shadow(0 0 4px rgba(255, 176, 0, 0.3)) !important;
 }
 
 /* App name text beside logo */
@@ -39,8 +56,9 @@ header img[src*="logo"],
 #header .app-name,
 #header [id*="appName"],
 #header .app-logo a {
-    color: var(--bitcoin-orange) !important;
+    color: var(--primary) !important;
     font-weight: 700 !important;
+    letter-spacing: 0.02em;
 }
 
 /* Global Reset & Base */
@@ -88,7 +106,14 @@ body {
     flex-direction: column;
     gap: 20px;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 10;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+}
+
+#sidebar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 /* Header & Sidebar Typography */
@@ -96,10 +121,16 @@ body {
     font-size: 18px;
     font-weight: 700;
     margin: 0;
-    color: var(--bitcoin-orange);
+    color: var(--primary);
     display: flex;
     align-items: center;
     gap: 10px;
+    letter-spacing: 0.02em;
+}
+
+.sidebar-header h1 i {
+    font-size: 14px;
+    opacity: 0.8;
 }
 
 .sidebar-header p {
@@ -115,6 +146,7 @@ body {
     padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
 }
 
 .filter-label {
@@ -140,31 +172,102 @@ body {
 }
 
 .filter-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 8px 16px;
     color: var(--text-secondary);
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 11px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-align: center;
+    text-align: left;
     flex: 1;
     min-width: 80px;
+    font-weight: 500;
+    position: relative;
 }
 
 .filter-btn:hover {
-    background: rgba(232, 213, 176, 0.08);
+    background: rgba(253, 246, 227, 0.03);
     color: var(--text-primary);
-    border-color: rgba(232, 213, 176, 0.2);
 }
 
 .filter-btn.active {
-    background: var(--bitcoin-orange);
-    color: #000;
-    border-color: var(--bitcoin-orange);
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(247, 147, 26, 0.2);
+    background: rgba(232, 145, 107, 0.06);
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.filter-btn.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 2px;
+    background: var(--primary);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Keep primary CTA as a subtle ghost block for surgical UX */
+#view-directory-btn,
+.btn-primary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid rgba(232, 145, 107, 0.3);
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+#view-directory-btn:hover,
+.btn-primary:hover {
+    background: rgba(232, 145, 107, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(232, 145, 107, 0.1);
+}
+
+#view-directory-btn.active,
+.btn-primary.active {
+    background: rgba(232, 145, 107, 0.12);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Premium Surgical Tooltips */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    width: 220px;
+    padding: 12px 14px;
+    background: rgba(13, 15, 20, 0.98);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232, 145, 107, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 11px;
+    line-height: 1.5;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* HUD & Overlays */
@@ -186,28 +289,31 @@ body {
 #bip-search {
     width: 220px;
     padding: 12px 16px;
-    background: rgba(46, 36, 16, 0.85);
-    backdrop-filter: blur(12px);
+    background: rgba(8, 10, 15, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text-primary);
     font-family: inherit;
     font-size: 13px;
     outline: none;
-    transition: all 0.2s;
-    box-shadow: 0 4px 20px rgba(26, 18, 8, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 #search-input:focus,
 #bip-search:focus {
-    border-color: var(--bitcoin-orange);
-    background: rgba(46, 36, 16, 0.95);
+    border-color: var(--primary);
+    background: rgba(8, 10, 15, 0.9);
     width: 260px;
+    box-shadow: 0 15px 40px rgba(232, 145, 107, 0.1);
 }
 
 .stats-hud {
-    background: rgba(26, 18, 8, 0.85);
-    backdrop-filter: blur(12px);
+    background: rgba(8, 10, 15, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 14px 18px;
@@ -216,7 +322,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--card-shadow);
     min-width: 200px;
 }
 
@@ -232,7 +338,7 @@ body {
 }
 
 .stat-val.highlight {
-    color: var(--bitcoin-orange);
+    color: var(--primary);
 }
 
 /* Map Controls */
@@ -247,8 +353,9 @@ body {
 }
 
 .control-btn {
-    background: rgba(26, 18, 8, 0.85);
-    backdrop-filter: blur(8px);
+    background: rgba(8, 10, 15, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     padding: 10px;
     color: var(--text-primary);
@@ -259,14 +366,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
 .control-btn:hover {
-    background: var(--card-bg);
-    border-color: var(--bitcoin-orange);
-    color: var(--bitcoin-orange);
+    background: rgba(232, 145, 107, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
     transform: scale(1.05);
 }
 
@@ -310,17 +417,16 @@ text.label {
     font-weight: 500;
     pointer-events: none;
     opacity: 0.6;
-    text-shadow: 0 1px 3px rgba(26, 18, 8, 0.8);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 /* Selection Panel / Profile */
 .info-panel {
     background: var(--card-bg);
-    padding: 24px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 12px;
     border: 1px solid var(--border);
-    border-left: 4px solid var(--bitcoin-orange);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--card-shadow);
     animation: slideIn 0.3s ease-out;
 }
 
@@ -373,7 +479,7 @@ text.label {
 }
 
 .bip-chip:hover {
-    background: rgba(232, 213, 176, 0.08);
+    background: rgba(232, 145, 107, 0.08);
     color: var(--text-primary);
 }
 
@@ -413,22 +519,80 @@ text.label {
     letter-spacing: 1px;
 }
 
-.tag-delving {
-    background: rgba(232, 145, 107, 0.15);
-    color: #E8916B;
-    border: 1px solid rgba(232, 145, 107, 0.3);
-}
-
+.tag-delving,
 .tag-ml {
-    background: rgba(232, 145, 107, 0.15);
-    color: #E8916B;
-    border: 1px solid rgba(232, 145, 107, 0.3);
+    background: rgba(232, 145, 107, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(232, 145, 107, 0.2);
 }
 
 .tag-mixed {
-    background: rgba(232, 213, 176, 0.1);
+    background: rgba(253, 246, 227, 0.05);
     color: var(--text-primary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-subtle);
+}
+
+/* 📱 Responsive Engineering 📱 */
+@media screen and (max-width: 1024px) {
+    #app-content {
+        flex-direction: column;
+    }
+
+    #sidebar {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--border-subtle);
+    }
+
+    #graph-container {
+        height: 60vh;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(13, 15, 20, 0.9);
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    #search-input,
+    #bip-search {
+        width: 100% !important;
+    }
+
+    .stats-hud {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .stats-hud .stat-row:last-child {
+        grid-column: span 2;
+        border-top: 1px solid var(--border-subtle);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .controls {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    #view-directory-btn {
+        font-size: 12px;
+        padding: 10px;
+    }
 }
 
 /* Scrollbar Styles */
@@ -455,5 +619,5 @@ text.label {
 }
 
 #header .nav-link.active {
-    color: var(--bitcoin-orange) !important;
+    color: var(--primary) !important;
 }

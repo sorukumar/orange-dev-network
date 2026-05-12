@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contributor Directory | Orange Dev Network</title>
     <meta name="description" content="Discover and rank Bitcoin contributors across all domains (Core, BIPs, Social).">
-    
+
     <!-- Bitcoin Data Labs Font & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Bitcoin Data Labs Shell Styles -->
     <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css">
@@ -34,12 +35,14 @@
                 <header class="page-header">
                     <div class="header-content">
                         <h1>Contributor Directory</h1>
-                        <p>The Human Layer Index of Bitcoin R&D. Engineering impact, social authority, and technical focus.</p>
+                        <p>The Human Layer Index of Bitcoin R&D. Engineering impact, social authority, and technical
+                            focus.</p>
                     </div>
                     <div class="header-actions">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="directory-search" placeholder="Search by name, login, or subsystem...">
+                            <input type="text" id="directory-search"
+                                placeholder="Search by name, login, or subsystem...">
                         </div>
                     </div>
                 </header>
@@ -48,12 +51,18 @@
                     <table id="contributor-table">
                         <thead>
                             <tr>
-                                <th data-sort="display_name" class="sortable">Contributor <i class="fas fa-sort"></i></th>
+                                <th data-sort="display_name" class="sortable">Contributor <i class="fas fa-sort"></i>
+                                </th>
                                 <th data-sort="hybrid_score" class="sortable">Impact <i class="fas fa-sort"></i></th>
-                                <th data-sort="authored_commits" class="sortable">Authored Commits <i class="fas fa-sort"></i></th>
+                                <th data-sort="authored_commits" class="sortable">Authored Commits <i
+                                        class="fas fa-sort"></i></th>
                                 <th data-sort="bips_authored" class="sortable">BIPs <i class="fas fa-sort"></i></th>
-                                <th data-sort="ml_total" class="sortable">Mailing List <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i></th>
-                                <th data-sort="delving_total" class="sortable">Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i></th>
+                                <th data-sort="ml_total" class="sortable">Mailing List <span
+                                        style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i
+                                        class="fas fa-sort"></i></th>
+                                <th data-sort="delving_total" class="sortable">Delving <span
+                                        style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i
+                                        class="fas fa-sort"></i></th>
                                 <th data-sort="technical_focus" class="sortable">Focus <i class="fas fa-sort"></i></th>
                             </tr>
                         </thead>

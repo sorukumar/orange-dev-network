@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -100,7 +100,8 @@
 
                     <!-- Directory Navigation -->
                     <div class="search-container" style="margin-top: 12px;">
-                        <a href="directory.html" class="filter-btn active" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;">
+                        <a href="directory.html" class="filter-btn active" id="view-directory-btn"
+                            style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;">
                             <i class="fas fa-address-book"></i> VIEW DIRECTORY
                         </a>
                     </div>
@@ -123,63 +124,70 @@
                     <p>Decoding the technical expertise and social authority of Bitcoin R&D.</p>
                 </div>
 
-                <div class="filter-group">
-                    <span class="filter-label">Temporal Window</span>
-                    <div class="btn-group" style="display: flex; flex-direction: column; gap: 6px;">
-                        <button class="filter-btn active" data-view="all">Foundation (All-Time)</button>
-                        <button class="filter-btn" data-view="p2016">Post-Segwit (2016+)</button>
-                        <button class="filter-btn" data-view="modern">Modern R&D (Past 3y)</button>
+                <!-- High-Density Controls -->
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+                    <!-- Temporal & Role Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                        <div class="filter-group" style="padding: 10px;">
+                            <span class="filter-label" style="margin-bottom: 8px;">Temporal Window</span>
+                            <div class="btn-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                                <button class="filter-btn active" data-view="all" style="font-size: 10px; padding: 6px 2px;">ALL</button>
+                                <button class="filter-btn" data-view="p2016" style="font-size: 10px; padding: 6px 2px;">2016+</button>
+                                <button class="filter-btn" data-view="modern" style="font-size: 10px; padding: 6px 2px;">3Y</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="filter-group">
-                    <span class="filter-label">Technical Theme</span>
-                    <div class="btn-group theme-grid">
-                        <button class="filter-btn active" data-theme="all">All Themes</button>
-                        <button class="filter-btn" data-theme="Consensus">Consensus</button>
-                        <button class="filter-btn" data-theme="L2">Layer 2 / LN</button>
-                        <button class="filter-btn" data-theme="Script">Script / Covenants</button>
-                        <button class="filter-btn" data-theme="Mempool">Mempool / Fees</button>
-                        <button class="filter-btn" data-theme="Privacy">Privacy</button>
-                        <button class="filter-btn" data-theme="Wallet">Wallet / Keys</button>
-                        <button class="filter-btn" data-theme="Mining">Mining</button>
+                    <!-- Theme Grid (High Density) -->
+                    <div class="filter-group" style="padding: 10px;">
+                        <span class="filter-label" style="margin-bottom: 8px;">Technical Theme</span>
+                        <div class="btn-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                            <button class="filter-btn active" data-theme="all">All</button>
+                            <button class="filter-btn" data-theme="Consensus">Consensus</button>
+                            <button class="filter-btn" data-theme="L2">L2 / LN</button>
+                            <button class="filter-btn" data-theme="Script">Script</button>
+                            <button class="filter-btn" data-theme="Mempool">Mempool</button>
+                            <button class="filter-btn" data-theme="Privacy">Privacy</button>
+                            <button class="filter-btn" data-theme="Wallet">Wallet</button>
+                            <button class="filter-btn" data-theme="Mining">Mining</button>
+                            <button class="filter-btn" data-theme="Crypto">Crypto</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Archetype Legend -->
-                <div class="filter-group">
-                    <span class="filter-label">Contributor Type</span>
-                    <div style="display: flex; flex-direction: column; gap: 7px; margin-top: 6px;">
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#F7931A; flex-shrink:0;"></span> Creator
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#E8916B; flex-shrink:0;"></span> Protocol Architect
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#4ADE80; flex-shrink:0;"></span> Core Engineer
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#60A5FA; flex-shrink:0;"></span> Social Researcher
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#A855F7; flex-shrink:0;"></span> BIP Author
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#FACC15; flex-shrink:0;"></span> Specialist
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#94A3B8; flex-shrink:0;"></span> Silent Contributor
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                            <span style="width:11px; height:11px; border-radius:50%; background:#475569; flex-shrink:0;"></span> Protocol Participant
+                    <!-- Role Grid (Surgical) -->
+                    <div class="filter-group" style="padding: 10px;">
+                        <span class="filter-label" style="margin-bottom: 8px;">Technical Role</span>
+                        <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                            <button class="filter-btn active" data-archetype="all" data-tooltip="All roles">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary); margin-right:6px; display:inline-block;"></span>
+                                All
+                            </button>
+                            <button class="filter-btn" data-archetype="Creator" data-tooltip="Creator">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-creator); margin-right:6px; display:inline-block;"></span>
+                                Creator
+                            </button>
+                            <button class="filter-btn" data-archetype="Protocol Designer" data-tooltip="Architect">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-architect); margin-right:6px; display:inline-block;"></span>
+                                Architect
+                            </button>
+                            <button class="filter-btn" data-archetype="Builder" data-tooltip="Engineer">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-engineer); margin-right:6px; display:inline-block;"></span>
+                                Engineer
+                            </button>
+                            <button class="filter-btn" data-archetype="Reviewer" data-tooltip="Researcher">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-researcher); margin-right:6px; display:inline-block;"></span>
+                                Researcher
+                            </button>
+                            <button class="filter-btn" data-archetype="Participant" data-tooltip="Participant">
+                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-participant); margin-right:6px; display:inline-block;"></span>
+                                Participant
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Selection Details (Populated by JS) -->
-                <div id="selection-panel" class="info-panel" style="display: none;">
-                    <div class="info-title">Contributor Focus</div>
+                <div id="selection-panel" class="info-panel" style="display: none; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
                     <div id="selection-content"></div>
                 </div>
             </div>

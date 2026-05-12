@@ -23,7 +23,7 @@ body.landing-layout #app-content {
 }
 
 body.landing-layout .landing-layout {
-    background: radial-gradient(circle at 50% -20%, #2e2410 0%, var(--bg-primary) 70%) !important;
+    background: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-primary) 70%) !important;
     min-height: 100vh;
     padding-bottom: 60px;
     display: block !important;
@@ -41,15 +41,15 @@ body.landing-layout .landing-layout {
     margin: 0 auto;
 }
 
-.hero-section > * {
+.hero-section>* {
     width: 100% !important;
     max-width: 1100px !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
 }
 
-.hero-section > h1,
-.hero-section > p {
+.hero-section>h1,
+.hero-section>p {
     max-width: 700px !important;
     text-align: center !important;
 }
@@ -87,16 +87,18 @@ body.landing-layout .landing-layout {
     font-weight: 900;
     letter-spacing: -0.03em;
     margin-bottom: 12px;
-    background: linear-gradient(to bottom, #e8d5b0, #ffb000);
+    background: linear-gradient(to bottom, var(--text-primary), var(--primary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 40px rgba(232, 145, 107, 0.2);
 }
 
 .hero-section p {
-    font-size: 18px;
+    font-size: 1.25rem;
     color: var(--text-secondary);
     max-width: 700px;
-    margin: 0 auto 32px auto;
+    margin: 0 auto 32px;
+    opacity: 0.9;
     line-height: 1.6;
 }
 
@@ -121,6 +123,12 @@ body.landing-layout .landing-layout {
 .summary-insight {
     font-size: 14px;
     color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.metric-subtext {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
     margin-bottom: 12px;
 }
 
@@ -233,9 +241,10 @@ body.landing-layout .landing-layout {
 }
 
 .metric-card:hover {
-    background: rgba(232, 213, 176, 0.08);
-    border-color: rgba(232, 213, 176, 0.2);
+    background: rgba(253, 246, 227, 0.05);
+    border-color: rgba(232, 145, 107, 0.2);
     transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .metric-card h3 {
@@ -284,8 +293,11 @@ body.landing-layout .landing-layout {
 .cta-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; height: 4px;
-    background: var(--bitcoin-orange);
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary);
     opacity: 0;
     transition: opacity 0.3s;
 }
@@ -293,7 +305,7 @@ body.landing-layout .landing-layout {
 .cta-card:hover {
     transform: translateY(-8px);
     background: var(--bg-secondary);
-    border-color: var(--bitcoin-orange);
+    border-color: var(--primary);
 }
 
 .cta-card:hover::before {
@@ -302,7 +314,7 @@ body.landing-layout .landing-layout {
 
 .cta-icon {
     font-size: 32px;
-    color: var(--bitcoin-orange);
+    color: var(--primary);
     margin-bottom: 16px;
 }
 
@@ -323,7 +335,7 @@ body.landing-layout .landing-layout {
 .focus-bar-container {
     width: 100%;
     height: 8px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
     overflow: hidden;
     margin-top: 12px;
@@ -334,6 +346,7 @@ body.landing-layout .landing-layout {
     height: 100%;
     transition: width 1s ease-out;
 }
+
 /* Legend / Glossary */
 .venn-glossary {
     display: flex;
@@ -373,4 +386,41 @@ body.landing-layout .landing-layout {
 
 .glossary-item strong {
     color: var(--text-primary);
+}
+
+/* 📱 Landing Mobile Polish 📱 */
+@media screen and (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+
+    .hero-section p {
+        font-size: 1.1rem;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .metric-card {
+        padding: 20px !important;
+    }
+
+    .summary-section {
+        padding: 20px 16px;
+        margin: 10px;
+        width: calc(100% - 20px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .hero-section h1 {
+        font-size: 28px;
+    }
+
+    .summary-list {
+        grid-template-columns: 1fr !important;
+    }
 }

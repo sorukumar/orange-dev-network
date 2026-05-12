@@ -18,14 +18,12 @@ const THEME_MAPPING = {
 };
 
 // Archetype Color Mapping
-// 4 roles + Creator. Labels map 1:1 to influence.py dev_type values.
-// Fewer groups = clearer signal: each color answers "what does this person primarily do?"
 const ARCHETYPE_COLORS = {
-    'Creator':           '#E8916B',  // Bitcoin orange — matches theme accent
-    'Protocol Designer': '#8a7a5f',  // Warm bronze — matches text-secondary
-    'Builder':           '#f59e0b',  // Amber — matches script color
-    'Reviewer':          '#10b981',  // Green — matches L2 color
-    'Participant':       '#94A3B8',  // Slate — neutral gray
+    'Creator':              '#FFB000',
+    'Protocol Designer':    '#E8916B',
+    'Builder':              '#D4A298',
+    'Reviewer':             '#8293AB',
+    'Participant':          '#2D3748'
 };
 
 function getNodeColor(d) {
@@ -50,7 +48,7 @@ const THEME_COLORS = {
 const THEME_CLUSTER_ORDER = ['Consensus', 'Script', 'L2', 'Privacy', 'Wallet', 'Mempool', 'Network', 'Mining', 'Crypto', 'Data', 'Ecosystem', 'other'];
 
 let allData, nodes, links, simulation, rankMap = new Map();
-let currentFilters = { view: 'all', theme: 'all', search: '', bip: '' };
+let currentFilters = { view: 'all', theme: 'all', archetype: 'all', search: '', bip: '' };
 let totalPopulation = 0;
 let selectedNode = null;
 
@@ -114,6 +112,7 @@ function setupEventListeners() {
 
         if (btn.attr("data-view")) currentFilters.view = btn.attr("data-view");
         if (btn.attr("data-theme")) currentFilters.theme = btn.attr("data-theme");
+        if (btn.attr("data-archetype")) currentFilters.archetype = btn.attr("data-archetype");
 
         updateViz();
     });
@@ -155,6 +154,7 @@ function updateViz() {
     nodes = allData.nodes.filter(n => {
         const score = getScore(n);
         if (currentFilters.theme !== 'all' && n.theme !== currentFilters.theme) return false;
+        if (currentFilters.archetype !== 'all' && n.dev_type !== currentFilters.archetype) return false;
         if (currentFilters.bip !== '') {
             if (!n.bips.some(b => b.includes(currentFilters.bip))) return false;
         }
@@ -359,52 +359,68 @@ function showProfile(d) {
     `).join('');
 
     let bipsHtml = d.bips.length > 0 ? d.bips.map(b => `<span class="bip-chip">BIP ${b}</span>`).join('') : '<span style="color:var(--text-secondary); font-size:11px;">None cited</span>';
-    const mlCount = d.source_breakdown.mailing_list || 0;
-    const dvCount = d.source_breakdown.delving || 0;
+    const rank = rankMap.get(d.id) || 'N/A';
+    const color = getNodeColor(d);
 
     document.getElementById('selection-content').innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div style="display:flex; gap:6px;">
-                <span class="tag ${srcClass}">${d.dominant_source.replace('_', ' ')}</span>
-                <span class="tag" style="background:${getNodeColor(d)}22; color:${getNodeColor(d)}; border:1px solid ${getNodeColor(d)}55;">${d.dev_type}</span>
+        <div style="border-left: 3px solid ${color}; padding-left: 16px; margin-left: -4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="display:flex; gap:6px;">
+                    <span class="tag ${srcClass}">${d.dominant_source.replace('_', ' ')}</span>
+                    ${d.growth > 1.5 ? `<span class="tag" style="color:var(--primary); border:1px solid var(--primary); font-size: 9px; background: rgba(232, 145, 107, 0.05);">↑ Rising</span>` : ''}
+                </div>
+                <div style="font-size:10px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em;">
+                    Authority #${rank}
+                </div>
             </div>
-            ${d.growth > 1.5 ? `<span class="tag" style="color:var(--bitcoin-orange); border:1px solid var(--bitcoin-orange); font-size: 9px;">↑ Rising</span>` : ''}
-        </div>
-        <div style="font-size:20px; font-weight:800; margin-bottom:4px; letter-spacing:-0.01em;">${d.display_name || d.id}</div>
-        <div style="font-size:12px; color:${THEME_COLORS[d.theme]}; font-weight:700; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.05em;">
-            ${d.theme} Specialist
-        </div>
 
-        ${d.uuid ? `
-        <div style="margin-bottom: 20px;">
-            <a href="directory.html?uuid=${d.uuid}" style="display: block; width: 100%; text-align: center; background: var(--bitcoin-orange); padding: 10px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 13px;">
-                <i class="fas fa-user-circle"></i> View Full Directory Profile
-            </a>
-        </div>
-        ` : ''}
-        
-        <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:20px;">
-            <div class="stat-card" style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Commits</div>
-                <div style="font-size:16px; font-weight:700; color:#f59e0b;">${d.code_stats.commits.toLocaleString()}</div>
+            <div style="font-size:22px; font-weight:800; margin-bottom:2px; letter-spacing:-0.01em; color:var(--text-primary);">${d.display_name || d.id}</div>
+            <div style="font-size:11px; color:var(--text-secondary); font-weight:500; margin-bottom:18px;">
+                <span style="color:${color}; font-weight:700;">${d.dev_type}</span> • ${d.theme} Specialist
             </div>
-        </div>
 
-        <div class="expertise-label">Technical Fingerprint</div>
-        ${expertiseHtml}
-        
-        <div class="expertise-label" style="margin-top:20px;">Protocol Assets</div>
-        <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
-            ${bipsHtml}
-            ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:#10b98122; color:#10b981; border-color:#10b98144;">CORE MAINTAINER</span>' : ''}
-        </div>
+            <div style="display:flex; gap:20px; margin-bottom:20px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div>
+                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Commits</div>
+                    <div style="font-size:15px; font-weight:700; color:var(--primary);">${d.code_stats.commits.toLocaleString()}</div>
+                </div>
+                <div style="border-left: 1px solid var(--border-subtle);"></div>
+                <div>
+                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Reviews</div>
+                    <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${(d.reviews_count || 0).toLocaleString()}</div>
+                </div>
+                <div style="border-left: 1px solid var(--border-subtle);"></div>
+                <div>
+                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Auth Score</div>
+                    <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${formatInfluence(d)}</div>
+                </div>
+            </div>
 
-        <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
-            <div class="info-item"><span class="info-label">Threads / Replies</span><span class="info-val">${d.threads_started} / ${d.replies_sent}</span></div>
-            <div class="info-item"><span class="info-label">Replies Received</span><span class="info-val">${d.replies_received}</span></div>
-            <div class="info-item" style="margin-top:10px;"><span class="info-label">Network Authority</span><span class="info-val" style="color:var(--bitcoin-orange); font-weight:700;">${formatInfluence(d)}</span></div>
-            <div class="info-item"><span class="info-label">Last Active</span><span class="info-val">${new Date(d.last_active).toLocaleDateString()}</span></div>
-            <div class="info-item"><span class="info-label">Hybrid Score</span><span class="info-val" style="color:var(--text-secondary);">${d.hybrid_score}</span></div>
+            ${d.uuid ? `
+            <div style="margin-bottom: 20px;">
+                <a href="directory.html?uuid=${d.uuid}" class="btn-primary" style="display: block; width: 100%; text-align: center; padding: 10px; font-weight: 700; text-decoration: none; font-size: 12px; letter-spacing: 0.5px;">
+                    <i class="fas fa-user-circle"></i> VIEW FULL PROFILE
+                </a>
+            </div>
+            ` : ''}
+
+            <div class="expertise-label" style="font-size:10px; margin-bottom:8px;">Technical Fingerprint</div>
+            <div style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom:20px;">
+                ${expertiseHtml}
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div>
+                    <div class="expertise-label" style="font-size:10px; margin-bottom:6px;">Protocol Assets</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                        ${bipsHtml}
+                        ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:rgba(16, 185, 129, 0.1); color:#10b981; border-color:rgba(16, 185, 129, 0.2); font-size:9px;">MAINTAINER</span>' : ''}
+                    </div>
+                </div>
+                <div style="font-size:10px; color:var(--text-secondary); text-align:right;">
+                    Active ${new Date(d.last_active).toLocaleDateString(undefined, {month:'short', year:'2-digit'})}
+                </div>
+            </div>
         </div>`;
 
     // Smooth scroll to selection info on mobile if needed

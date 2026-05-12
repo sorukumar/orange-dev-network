@@ -70,7 +70,7 @@ function renderMetrics(stats) {
         
         const bar = document.getElementById('focus-bar');
         bar.innerHTML = '';
-        const colors = ['var(--bitcoin-orange)', 'var(--color-wallet)', 'var(--color-l2)', 'var(--color-privacy)', 'var(--color-script)'];
+        const colors = ['var(--primary)', 'var(--color-wallet)', 'var(--color-l2)', 'var(--color-privacy)', 'var(--color-script)'];
         topFocus.forEach((f, i) => {
             const seg = document.createElement('div');
             seg.className = 'focus-segment';
@@ -114,7 +114,7 @@ function renderDiscussionPulse(pulse) {
     if (topicsEl && pulse.topics && pulse.topics.length > 0) {
         const maxShare = pulse.topics[0].share;
         topicsEl.innerHTML = pulse.topics.map((t, i) => {
-            const colors = ['var(--bitcoin-orange)', 'var(--color-l2)', 'var(--color-script)'];
+            const colors = ['var(--primary)', 'var(--color-l2)', 'var(--color-script)'];
             const color = colors[i] || 'var(--text-secondary)';
             const barWidth = maxShare > 0 ? Math.round((t.share / maxShare) * 100) : 0;
             return `
