@@ -1,4 +1,4 @@
-:root {
+[data-theme="dark"] {
     /* Bitcoin Data Labs "Obsidian Data" Theme Variables */
     --bg-primary: #05070A;
     --bg-secondary: #0D0F14;
@@ -40,15 +40,6 @@
     --bdl-subnav-bg: #0D0F14;
     --bdl-nav-active-bg: rgba(232, 145, 107, 0.12);
     --bdl-nav-active-text: var(--primary);
-}
-
-/* 🏆 Golden-Radiance Filter Sync 🏆 */
-.app-logo img,
-.logo img,
-header img[src*="logo"],
-#header img,
-.logo-img {
-    filter: invert(1) hue-rotate(170deg) brightness(1.7) contrast(1.1) saturate(1.1) drop-shadow(0 0 4px rgba(255, 176, 0, 0.3)) !important;
 }
 
 /* App name text beside logo */
@@ -620,4 +611,13 @@ text.label {
 
 #header .nav-link.active {
     color: var(--primary) !important;
+}
+
+#header .top-container,
+#header .nav-container {
+    max-width: 1200px !important;
+    padding: 0 24px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
 }
