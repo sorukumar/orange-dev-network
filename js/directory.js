@@ -13,6 +13,9 @@ let allContributors = [];
 let filteredContributors = [];
 let currentSort = { col: 'hybrid_score', dir: 'desc' };
 let currentPage = 1;
+let currentFilterView = 'all';
+let datasetLatestDate = 0;
+const THREE_YEARS = 3 * 365 * 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 100;
 
 // Archetype colors — kept in sync with visualization.js for consistency across all three pages
@@ -62,6 +65,10 @@ async function initDirectory() {
         const response = await fetch(REGISTRY_URL);
         const data = await response.json();
         allContributors = data.contributors.map(c => {
+            if (c.global_last_active) {
+                const d = new Date(c.global_last_active).getTime();
+                if (d > datasetLatestDate) datasetLatestDate = d;
+            }
             return {
                 ...c,
                 ml_total: (c.ml_threads || 0) + (c.ml_responses || 0),
@@ -95,6 +102,17 @@ async function initDirectory() {
 }
 
 function setupListeners() {
+    // Active Filter Toggle
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            currentFilterView = e.currentTarget.dataset.filter;
+            // Retrigger filter
+            document.getElementById('directory-search').dispatchEvent(new Event('input'));
+        });
+    });
+
     // Search
     document.getElementById('directory-search').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
@@ -103,7 +121,18 @@ function setupListeners() {
             const loginMatch = (c.github && c.github.login) ? c.github.login.toLowerCase().includes(term) : false;
             const focusValue = c.technical_focus ? c.technical_focus.toLowerCase() : '';
             const focusMatch = focusValue.includes(term);
-            return nameMatch || loginMatch || focusMatch;
+            const textMatch = nameMatch || loginMatch || focusMatch;
+            
+            let activeMatch = true;
+            if (currentFilterView === 'active') {
+                if (!c.global_last_active) activeMatch = false;
+                else {
+                    const cDate = new Date(c.global_last_active).getTime();
+                    if (datasetLatestDate - cDate > THREE_YEARS) activeMatch = false;
+                }
+            }
+            
+            return textMatch && activeMatch;
         });
         currentPage = 1;
         sortData();
@@ -286,11 +315,21 @@ async function showProfile(uuid) {
     if (filename) {
         try {
             const response = await fetch(PROFILE_BASE_URL + filename);
+            if (!response.ok) throw new Error("Local fetch failed");
             const profile = await response.json();
             renderProfile(profile);
         } catch (error) {
-            console.error("Error loading profile:", error);
-            modalBody.innerHTML = `<div style="padding: 40px; text-align: center;">Error loading profile data.</div>`;
+            console.log("Local profile missing or fetch failed, attempting remote fallback...");
+            try {
+                const remoteUrl = 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/shared/contributors/profiles/' + filename;
+                const res = await fetch(remoteUrl);
+                if (!res.ok) throw new Error("Remote fetch failed");
+                const profile = await res.json();
+                renderProfile(profile);
+            } catch (remoteError) {
+                console.error("Error loading profile:", remoteError);
+                modalBody.innerHTML = `<div style="padding: 40px; text-align: center;">Error loading profile data.</div>`;
+            }
         }
     } else {
         // Fallback for low-signal contributors who don't have a shard
@@ -300,7 +339,10 @@ async function showProfile(uuid) {
 }
 
 function renderProfile(p, isBasic = false) {
-    const avatarPlaceholder = `<div class="avatar-placeholder profile-large"><i class="fas fa-user-circle"></i></div>`;
+    let avatarHtml = `<div class="avatar-placeholder profile-large"><i class="fas fa-user-circle"></i></div>`;
+    if (p.github && p.github.login) {
+        avatarHtml = `<img src="https://github.com/${p.github.login}.png?size=100" alt="${p.display_name}" class="avatar-placeholder profile-large" style="object-fit: cover; border: 4px solid var(--bg-secondary); background: var(--card-bg);" onerror="this.outerHTML='<div class=\\'avatar-placeholder profile-large\\'><i class=\\'fas fa-user-circle\\'></i></div>'"/>`;
+    }
     const roles = (p.roles || []).map(r => `<span class="mini-badge ${r.toLowerCase()}" style="font-size: 12px; padding: 4px 10px;">${r}</span>`).join('');
 
     const githubLink = p.github_url ? `<a href="${p.github_url}" target="_blank" class="social-link"><i class="fab fa-github"></i> GitHub</a>` : '';
@@ -335,10 +377,10 @@ function renderProfile(p, isBasic = false) {
     }
 
     document.getElementById('modal-body').innerHTML = `
-        <div class="profile-header-strip" style="background: linear-gradient(90deg, var(--bitcoin-orange), #ff6b00); height: 80px; border-radius: 24px 24px 0 0;"></div>
+        <div class="profile-header-strip" style="background: linear-gradient(90deg, rgba(232, 145, 107, 0.15), rgba(232, 145, 107, 0.02)); height: 80px; border-radius: 24px 24px 0 0; border-bottom: 1px solid var(--border);"></div>
         <div class="profile-content" style="padding: 0 40px 40px 40px; margin-top: -40px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
-                ${avatarPlaceholder}
+                ${avatarHtml}
                 <div style="display: flex; gap: 12px; margin-bottom: 12px;">
                     ${githubLink}
                     ${delvingLink}

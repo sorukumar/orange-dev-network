@@ -75,13 +75,6 @@
 
                 <!-- HUD Controls -->
                 <div class="hud">
-                    <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Search Contributor...">
-                    </div>
-                    <div class="search-container">
-                        <input type="text" id="bip-search" placeholder="Filter by BIP (e.g. 119)">
-                    </div>
-
                     <div class="stats-hud">
                         <div class="stat-row">
                             <span>Total Developers</span>
@@ -96,14 +89,6 @@
                             <span>Filtered View</span>
                             <span id="node-count" class="stat-val highlight">-</span>
                         </div>
-                    </div>
-
-                    <!-- Directory Navigation -->
-                    <div class="search-container" style="margin-top: 12px;">
-                        <a href="directory.html" class="filter-btn active" id="view-directory-btn"
-                           style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;">
-                            <i class="fas fa-address-book"></i> VIEW DIRECTORY
-                        </a>
                     </div>
                 </div>
 
@@ -121,7 +106,22 @@
             <div id="sidebar">
                 <div class="sidebar-header">
                     <h1><i class="fas fa-project-diagram"></i> Influence Map</h1>
-                    <p>Decoding the technical expertise and social authority of Bitcoin R&D.</p>
+                    <p>Each node represents a developer, and edges map their technical interactions. Node size reflects their composite influence score.</p>
+                </div>
+
+                <!-- Search Controls -->
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; margin-top: 4px;">
+                    <div class="search-container">
+                        <input type="text" id="unified-search" placeholder="Search Contributor or BIP (e.g. 119)..." style="width: 100%;">
+                    </div>
+                    
+                    <!-- Directory Navigation -->
+                    <div class="search-container">
+                        <a href="directory.html" class="filter-btn active" id="view-directory-btn"
+                           style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;">
+                            <i class="fas fa-address-book"></i> VIEW DIRECTORY
+                        </a>
+                    </div>
                 </div>
 
                 <!-- High-Density Controls -->
@@ -139,7 +139,7 @@
                     </div>
 
                     <!-- Theme Grid (High Density) -->
-                    <div class="filter-group" style="padding: 10px;">
+                    <div class="filter-group hide-on-mobile" style="padding: 10px;">
                         <span class="filter-label" style="margin-bottom: 8px;">Technical Theme</span>
                         <div class="btn-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
                             <button class="filter-btn active" data-theme="all">All</button>

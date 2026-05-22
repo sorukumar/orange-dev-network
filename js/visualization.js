@@ -117,15 +117,24 @@ function setupEventListeners() {
         updateViz();
     });
 
-    document.getElementById('search-input').addEventListener('input', (e) => {
-        currentFilters.search = e.target.value.toLowerCase();
-        highlightSearch();
-    });
-
-    document.getElementById('bip-search').addEventListener('input', (e) => {
-        currentFilters.bip = e.target.value.trim();
-        updateViz();
-    });
+    const unifiedInput = document.getElementById('unified-search');
+    if (unifiedInput) {
+        unifiedInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            
+            // Check if value is a number or starts with bip/BIP and a number
+            let bipMatch = val.match(/^(?:bip)?\s*-?\s*(\d+)$/i);
+            
+            if (bipMatch) {
+                currentFilters.bip = bipMatch[1];
+                currentFilters.search = '';
+            } else {
+                currentFilters.bip = '';
+                currentFilters.search = val;
+            }
+            updateViz();
+        });
+    }
 
     document.getElementById('zoom-in').onclick = () => svg.transition().duration(300).call(zoom.scaleBy, 1.5);
     document.getElementById('zoom-out').onclick = () => svg.transition().duration(300).call(zoom.scaleBy, 0.6);
@@ -145,6 +154,10 @@ function setupEventListeners() {
 
     window.onresize = () => {
         updateDimensions();
+        if (simulation) {
+            simulation.force("center", d3.forceCenter(width / 2, height / 2));
+            simulation.alpha(0.3).restart();
+        }
     };
 }
 

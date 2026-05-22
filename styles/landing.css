@@ -87,9 +87,7 @@ body.landing-layout .landing-layout {
     font-weight: 900;
     letter-spacing: -0.03em;
     margin-bottom: 12px;
-    background: linear-gradient(to bottom, var(--text-primary), var(--primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary);
     text-shadow: 0 10px 40px rgba(232, 145, 107, 0.2);
 }
 

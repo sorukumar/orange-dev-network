@@ -276,9 +276,9 @@ body {
     position: relative;
 }
 
-#search-input,
-#bip-search {
-    width: 220px;
+#unified-search {
+    width: 100%;
+    box-sizing: border-box;
     padding: 12px 16px;
     background: rgba(8, 10, 15, 0.7);
     backdrop-filter: blur(20px);
@@ -293,11 +293,9 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-#search-input:focus,
-#bip-search:focus {
+#unified-search:focus {
     border-color: var(--primary);
     background: rgba(8, 10, 15, 0.9);
-    width: 260px;
     box-shadow: 0 15px 40px rgba(232, 145, 107, 0.1);
 }
 
@@ -542,6 +540,9 @@ text.label {
 }
 
 @media screen and (max-width: 768px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
     .hud {
         top: 10px;
         left: 10px;
@@ -557,8 +558,7 @@ text.label {
         width: 100%;
     }
 
-    #search-input,
-    #bip-search {
+    #unified-search {
         width: 100% !important;
     }
 

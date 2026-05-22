@@ -35,10 +35,15 @@
                 <header class="page-header">
                     <div class="header-content">
                         <h1>Contributor Directory</h1>
-                        <p>The Human Layer Index of Bitcoin R&D. Engineering impact, social authority, and technical
-                            focus.</p>
+                        <p>Filter, search, and audit the global network of active Bitcoin developers based on multi-dimensional impact scores, cross-platform discussion velocity, and domain focus.</p>
                     </div>
-                    <div class="header-actions">
+                    <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
+                        <div class="segmented-control">
+                            <button class="seg-btn active" data-filter="all">All-Time</button>
+                            <button class="seg-btn" data-filter="active">
+                                <span class="pulse-dot"></span> Active
+                            </button>
+                        </div>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" id="directory-search"
