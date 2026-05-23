@@ -28,6 +28,85 @@ const ARCHETYPE_COLORS = {
     'Participant':       '#94A3B8',  // Slate — neutral gray
 };
 
+// Commit category colors — identical to orange-dev-tracker/js/theme.js categoryColors
+const CATEGORY_COLORS = {
+    'Consensus (Domain Logic)':      '#E07A5F',
+    'Cryptography (Primitives)':     '#C53030',
+    'Core Libs':                     '#F6AD55',
+    'Node & RPC (App/Interface)':    '#ED8936',
+    'GUI (Presentation Layer)':      '#F4A261',
+    'Wallet (Client App)':           '#D69E2E',
+    'P2P Network (Infrastructure)':  '#2B6CB0',
+    'Database (Persistence)':        '#4A5568',
+    'Utilities (Shared Libs)':       '#9F86C0',
+    'Tests (QA)':                    '#81B29A',
+    'Build & CI (DevOps)':           '#3D405B',
+    'Documentation':                 '#F2CC8F',
+    'Merge':                         '#94A3B8',
+};
+
+// Ghibli palette for social topic trends — matches orange-dev-tracker/js/theme.js fallback
+const GHIBLI_PALETTE = [
+    '#7BA9CC','#B9D4E7','#5B8266','#A2C5AC','#E07A5F','#F4A261',
+    '#D4AF37','#E9C46A','#6D597A','#B5838D','#3E6073','#8BBEE8',
+    '#89B449','#C5D86D','#E27396','#FFB3C1','#585123','#DDA15E',
+    '#384D48','#ACD7EC'
+];
+
+// Human-readable labels for social topic category keys
+const TOPIC_LABELS = {
+    'quantum':'Quantum Resistance','covenants':'Covenants & Vaults','taproot':'Taproot',
+    'mining':'Mining Protocol','mempool-fees':'Mempool & Fees','privacy':'Privacy',
+    'lightning':'Lightning / L2','bitvm':'BitVM','p2p-network':'P2P Network',
+    'bip-process':'BIP Process','testing-devtools':'Dev Tooling',
+    'soft-fork-activation':'Soft Fork Activation','segwit':'SegWit',
+    'script-opcodes':'Script & Opcodes','ecash':'eCash','silent-payments':'Silent Payments',
+    'signatures-sighash':'Signatures & Sighash','scaling':'Scaling',
+    'spam-filtering':'Spam Filtering','utxo-sync':'UTXO & Sync',
+    'payment-protocol':'Payment Protocol','vaults':'Vaults','dlc':'DLCs',
+    'atomic-swaps':'Atomic Swaps','multisig-threshold':'Multisig','wallet-keys':'Wallet & Keys',
+    'core-dev':'Core Dev','nostr':'Nostr','hard-fork-block-size':'Block Size Debate',
+    'l2-bridges':'L2 Bridges','sidechains-drivechain':'Sidechains / Drivechain',
+    'tokens-runes':'Tokens & Runes','ordinals-inscriptions':'Ordinals & Inscriptions',
+    'data-structures':'Data Structures','transaction-format':'Transaction Format',
+    'consensus-cleanup':'Consensus Cleanup','other':'Other',
+};
+
+// BIP status pill colors
+const BIP_STATUS_COLORS = {
+    'Final':     { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
+    'Active':    { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
+    'Proposed':  { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
+    'Draft':     { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+    'Withdrawn': { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+    'Rejected':  { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+    'Replaced':  { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+    'Obsolete':  { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+};
+
+// ── ECharts lazy loader ────────────────────────────────────────────────────────
+// Loads echarts@5 from CDN exactly once regardless of how many modals are opened.
+let _echartsLoadPromise = null;
+function loadECharts() {
+    if (_echartsLoadPromise) return _echartsLoadPromise;
+    if (window.echarts) { _echartsLoadPromise = Promise.resolve(); return _echartsLoadPromise; }
+    _echartsLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js';
+        s.onload = resolve;
+        s.onerror = () => { _echartsLoadPromise = null; reject(new Error('ECharts CDN load failed')); };
+        document.head.appendChild(s);
+    });
+    return _echartsLoadPromise;
+}
+
+// Hold active chart instances so they can be disposed when the modal closes
+let _activeProfileCharts = [];
+function disposeProfileCharts() {
+    _activeProfileCharts.forEach(c => { try { c.dispose(); } catch(e) {} });
+    _activeProfileCharts = [];
+}
+
 function getArchetypeColor(devType) {
     return ARCHETYPE_COLORS[devType] || '#475569';
 }
@@ -55,6 +134,109 @@ function formatActiveDate(p, which) {
     }
 
     return { date: formatted, source };
+}
+
+// ── Profile chart rendering ────────────────────────────────────────────────────
+// Called after renderProfile() injects HTML. Loads ECharts lazily then draws
+// the commit-history and social-history stacked bar charts into their placeholder divs.
+async function renderProfileCharts(p) {
+    const hasCommitHistory = p.commit_history && Object.keys(p.commit_history).length > 0;
+    const hasSocialHistory = p.social_history && Object.keys(p.social_history).length > 0;
+    if (!hasCommitHistory && !hasSocialHistory) return;
+
+    try { await loadECharts(); } catch (e) {
+        console.warn('ECharts failed to load — chart sections hidden:', e);
+        return;
+    }
+
+    disposeProfileCharts();
+
+    const axisLabelStyle = { fontSize: 11, color: '#94A3B8' };
+    const splitLineStyle  = { lineStyle: { color: 'rgba(148,163,184,0.12)' } };
+    const gridPad = { left: 8, right: 8, top: 8, bottom: 40, containLabel: true };
+
+    // ── Commit History by Category ────────────────────────────────────────────
+    if (hasCommitHistory) {
+        const el = document.getElementById('chart-commit-history');
+        if (el) {
+            const years = Object.keys(p.commit_history).sort();
+            const allCats = new Set();
+            years.forEach(y => Object.keys(p.commit_history[y]).forEach(c => allCats.add(c)));
+            // Exclude Merge commits from authored view; keep all others
+            const cats = Array.from(allCats).filter(c => c !== 'Merge');
+
+            const series = cats.map(cat => ({
+                name: cat,
+                type: 'bar',
+                stack: 'total',
+                barMaxWidth: 40,
+                emphasis: { focus: 'series' },
+                itemStyle: { color: CATEGORY_COLORS[cat] || '#94A3B8', borderRadius: 0 },
+                data: years.map(y => +(p.commit_history[y][cat] || 0).toFixed(2)),
+            }));
+
+            const chart = echarts.init(el, null, { renderer: 'canvas' });
+            chart.setOption({
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'shadow' },
+                    formatter(params) {
+                        const year = params[0].axisValue;
+                        const rows = params.filter(p => p.value > 0)
+                            .sort((a, b) => b.value - a.value)
+                            .map(p => `<div style="display:flex;justify-content:space-between;gap:16px;">${p.marker}<span>${p.seriesName}</span><b>${p.value.toFixed(1)}</b></div>`)
+                            .join('');
+                        return `<div style="font:12px Inter,sans-serif;padding:4px;"><b style="display:block;margin-bottom:6px;">${year}</b>${rows}</div>`;
+                    }
+                },
+                grid: gridPad,
+                xAxis: { type: 'category', data: years, axisLabel: axisLabelStyle },
+                yAxis: { type: 'value', axisLabel: axisLabelStyle, splitLine: splitLineStyle },
+                series,
+            });
+            _activeProfileCharts.push(chart);
+        }
+    }
+
+    // ── Social Activity by Topic ──────────────────────────────────────────────
+    if (hasSocialHistory) {
+        const el = document.getElementById('chart-social-history');
+        if (el) {
+            const years = Object.keys(p.social_history).sort();
+            const allTopics = new Set();
+            years.forEach(y => Object.keys(p.social_history[y]).forEach(t => allTopics.add(t)));
+            const topics = Array.from(allTopics);
+
+            const series = topics.map((topic, idx) => ({
+                name: TOPIC_LABELS[topic] || topic,
+                type: 'bar',
+                stack: 'total',
+                barMaxWidth: 40,
+                emphasis: { focus: 'series' },
+                itemStyle: { color: GHIBLI_PALETTE[idx % GHIBLI_PALETTE.length], borderRadius: 0 },
+                data: years.map(y => p.social_history[y][topic] || 0),
+            }));
+
+            const chart = echarts.init(el, null, { renderer: 'canvas' });
+            chart.setOption({
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'shadow' },
+                    formatter(params) {
+                        const year = params[0].axisValue;
+                        const rows = params.filter(p => p.value > 0)
+                            .sort((a, b) => b.value - a.value)
+                            .map(p => `<div style="display:flex;justify-content:space-between;gap:16px;">${p.marker}<span>${p.seriesName}</span><b>${p.value}</b></div>`)
+                            .join('');
+                        return `<div style="font:12px Inter,sans-serif;padding:4px;"><b style="display:block;margin-bottom:6px;">${year}</b>${rows}</div>`;
+                    }
+                },
+                grid: gridPad,
+                xAxis: { type: 'category', data: years, axisLabel: axisLabelStyle },
+                yAxis: { type: 'value', axisLabel: axisLabelStyle, splitLine: splitLineStyle },
+                series,
+            });
+            _activeProfileCharts.push(chart);
+        }
+    }
 }
 
 async function initDirectory() {
@@ -86,7 +268,7 @@ async function initDirectory() {
         updateSortIcons();
 
         if (directUuid) {
-            setTimeout(() => showProfile(directUuid), 600);
+            window.location.href = 'profile.html?uuid=' + encodeURIComponent(directUuid);
         }
     } catch (error) {
         console.error("Failed to load directory data:", error);
@@ -161,6 +343,7 @@ function setupListeners() {
     document.querySelector('.close-modal').onclick = () => {
         document.getElementById('profile-modal').style.display = "none";
         document.body.style.overflow = "auto";
+        disposeProfileCharts();
     };
 
     window.onclick = (event) => {
@@ -168,6 +351,7 @@ function setupListeners() {
         if (event.target == modal) {
             modal.style.display = "none";
             document.body.style.overflow = "auto";
+            disposeProfileCharts();
         }
     };
 }
@@ -291,51 +475,8 @@ function renderTable() {
     }
 }
 
-async function showProfile(uuid) {
-    const contributor = allContributors.find(c => c.uuid === uuid);
-    if (!contributor) return;
-
-    const modal = document.getElementById('profile-modal');
-    const modalBody = document.getElementById('modal-body');
-
-    // Show spinner in modal while loading sharded profile
-    modalBody.innerHTML = `
-        <div style="padding: 100px; text-align: center;">
-            <div class="loading-spinner"></div>
-            <p>Loading deep profile...</p>
-        </div>
-    `;
-    modal.style.display = "block";
-    document.body.style.overflow = "hidden";
-
-    // Detect if this contributor has a sharded profile based on "is_high_signal" logic
-    // Or we check if the registry has the profile_filename
-    const filename = contributor.profile_filename;
-
-    if (filename) {
-        try {
-            const response = await fetch(PROFILE_BASE_URL + filename);
-            if (!response.ok) throw new Error("Local fetch failed");
-            const profile = await response.json();
-            renderProfile(profile);
-        } catch (error) {
-            console.log("Local profile missing or fetch failed, attempting remote fallback...");
-            try {
-                const remoteUrl = 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/shared/contributors/profiles/' + filename;
-                const res = await fetch(remoteUrl);
-                if (!res.ok) throw new Error("Remote fetch failed");
-                const profile = await res.json();
-                renderProfile(profile);
-            } catch (remoteError) {
-                console.error("Error loading profile:", remoteError);
-                modalBody.innerHTML = `<div style="padding: 40px; text-align: center;">Error loading profile data.</div>`;
-            }
-        }
-    } else {
-        // Fallback for low-signal contributors who don't have a shard
-        // Render basic info from registry
-        renderProfile(contributor, true);
-    }
+function showProfile(uuid) {
+    window.location.href = 'profile.html?uuid=' + encodeURIComponent(uuid);
 }
 
 function renderProfile(p, isBasic = false) {
@@ -374,6 +515,70 @@ function renderProfile(p, isBasic = false) {
                 </div>
             </div>
         `;
+    }
+
+    // ── BIPs Authored ─────────────────────────────────────────────────────────
+    let bipsSection = '';
+    if (!isBasic && p.bip_list && p.bip_list.length > 0) {
+        const bipItems = p.bip_list.map(b => {
+            const num = b.number ? String(b.number).padStart(4, '0') : '????';
+            const sc  = BIP_STATUS_COLORS[b.status] || BIP_STATUS_COLORS['Draft'];
+            const pill = `<span class="bip-status-pill" style="background:${sc.bg};color:${sc.color};border-color:${sc.border};">${b.status || 'Unknown'}</span>`;
+            const link = b.link ? `<a href="${b.link}" target="_blank" class="bip-number">BIP-${num}</a>` : `<span class="bip-number">BIP-${num}</span>`;
+            return `<li class="bip-item">${link}<span class="bip-title-text">${b.title}</span>${pill}</li>`;
+        }).join('');
+        bipsSection = `
+            <div class="profile-section">
+                <h4 class="section-label">BIPs Authored</h4>
+                <ul class="bip-list">${bipItems}</ul>
+            </div>`;
+    }
+
+    // ── First & Last Social Messages ───────────────────────────────────────────
+    let messagesSection = '';
+    if (!isBasic && (p.first_message || p.last_message)) {
+        const msgCard = (msg, label) => {
+            if (!msg) return '';
+            const srcLabel = msg.source === 'mailing_list' ? 'Mailing List' : 'Delving Bitcoin';
+            const srcCls   = msg.source === 'mailing_list' ? 'msg-src-ml' : 'msg-src-delving';
+            const dateStr  = msg.date ? msg.date.slice(0, 10) : '';
+            const subj     = msg.subject ? msg.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '(no subject)';
+            const linkEl   = msg.link
+                ? `<a href="${msg.link}" target="_blank" class="msg-subject">${subj}</a>`
+                : `<span class="msg-subject">${subj}</span>`;
+            return `<div class="message-card">
+                <div class="msg-meta"><span class="msg-label">${label}</span><span class="msg-src ${srcCls}">${srcLabel}</span><span class="msg-date">${dateStr}</span></div>
+                ${linkEl}
+            </div>`;
+        };
+        messagesSection = `
+            <div class="profile-section">
+                <h4 class="section-label">Social Footprint</h4>
+                <div class="message-bookmarks">
+                    ${msgCard(p.first_message, 'First Message')}
+                    ${msgCard(p.last_message, 'Last Message')}
+                </div>
+            </div>`;
+    }
+
+    // ── Commit History by Category (chart placeholder) ────────────────────────
+    let commitHistorySection = '';
+    if (!isBasic && p.commit_history && Object.keys(p.commit_history).length > 0) {
+        commitHistorySection = `
+            <div class="profile-section">
+                <h4 class="section-label">Commit History by Category</h4>
+                <div id="chart-commit-history" style="height:260px; width:100%;"></div>
+            </div>`;
+    }
+
+    // ── Social Activity by Topic (chart placeholder) ──────────────────────────
+    let socialHistorySection = '';
+    if (!isBasic && p.social_history && Object.keys(p.social_history).length > 0) {
+        socialHistorySection = `
+            <div class="profile-section">
+                <h4 class="section-label">Social Activity by Topic</h4>
+                <div id="chart-social-history" style="height:240px; width:100%;"></div>
+            </div>`;
     }
 
     document.getElementById('modal-body').innerHTML = `
@@ -422,6 +627,10 @@ function renderProfile(p, isBasic = false) {
             </div>
             
             ${extraStats}
+            ${bipsSection}
+            ${messagesSection}
+            ${commitHistorySection}
+            ${socialHistorySection}
         </div>
         <style>
             .profile-info-row {
@@ -474,8 +683,58 @@ function renderProfile(p, isBasic = false) {
                 color: var(--text-primary);
                 border-color: rgba(232, 213, 176, 0.2);
             }
+            /* ── New enriched sections ─────────────────────────────── */
+            .profile-section {
+                margin-top: 28px;
+                padding-top: 24px;
+                border-top: 1px solid var(--border);
+            }
+            .section-label {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 1.2px;
+                color: var(--text-secondary);
+                margin: 0 0 14px 0;
+                font-weight: 600;
+            }
+            /* BIP list */
+            .bip-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+            .bip-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+            .bip-number {
+                font-size: 13px; font-weight: 700; color: #E8916B;
+                text-decoration: none; white-space: nowrap;
+            }
+            .bip-number:hover { text-decoration: underline; }
+            .bip-title-text { font-size: 13px; color: var(--text-secondary); flex: 1; min-width: 120px; }
+            .bip-status-pill {
+                font-size: 10px; font-weight: 700; padding: 2px 8px;
+                border-radius: 6px; border: 1px solid; white-space: nowrap;
+            }
+            /* Message bookmarks */
+            .message-bookmarks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+            @media (max-width: 640px) { .message-bookmarks { grid-template-columns: 1fr; } }
+            .message-card {
+                background: rgba(255,255,255,0.03);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .msg-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+            .msg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); }
+            .msg-src { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px; }
+            .msg-src-ml      { background: rgba(245,158,11,0.15); color: #f59e0b; }
+            .msg-src-delving { background: rgba(59,130,246,0.15);  color: #3b82f6; }
+            .msg-date { font-size: 11px; color: var(--text-secondary); opacity: 0.7; margin-left: auto; }
+            .msg-subject { font-size: 13px; color: var(--text-primary); text-decoration: none; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            a.msg-subject:hover { color: #E8916B; text-decoration: underline; }
         </style>
     `;
+
+    // Kick off async chart rendering (fire-and-forget — fills placeholder divs after ECharts loads)
+    renderProfileCharts(p);
 }
 
 // Global initialization

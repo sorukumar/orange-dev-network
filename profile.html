@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Profile | Orange Dev Network</title>
+    <meta name="description" content="Deep-dive profile for a Bitcoin developer: commit history, BIPs authored, social footprint, and topic activity.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/profile.css">
+
+    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+</head>
+
+<body class="has-fixed-header">
+    <div id="main-container">
+        <div id="header"></div>
+
+        <div id="app-content" class="profile-layout">
+
+            <!-- Top navigation bar: back link + developer search -->
+            <div class="profile-topbar">
+                <div class="container">
+                    <a href="directory.html" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Directory
+                    </a>
+                    <div class="profile-search-wrap">
+                        <div class="search-combobox">
+                            <div class="search-input-row">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="profile-search"
+                                       placeholder="Search another developer…"
+                                       autocomplete="off" spellcheck="false">
+                            </div>
+                            <ul id="search-dropdown" class="search-dropdown" hidden></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile content area -->
+            <div class="profile-container">
+
+                <div id="profile-loading" class="profile-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading profile…</p>
+                </div>
+
+                <div id="profile-not-found" class="profile-not-found" hidden>
+                    <h2>Developer not found</h2>
+                    <p>The profile you're looking for doesn't exist or hasn't been indexed yet.</p>
+                    <a href="directory.html" class="back-link" style="display:inline-flex; margin-top:20px;">
+                        <i class="fas fa-arrow-left"></i> Back to Directory
+                    </a>
+                </div>
+
+                <!-- Sections injected by profile.js -->
+                <div id="profile-hero-slot"></div>
+                <div id="profile-stat-bar-slot"></div>
+                <div id="profile-work-slot"></div>
+                <div id="profile-jump-nav-slot"></div>
+                <div id="profile-commits-chart-slot"></div>
+                <div id="profile-bips-slot"></div>
+                <div id="profile-social-footprint-slot"></div>
+                <div id="profile-social-chart-slot"></div>
+
+            </div>
+        </div>
+
+        <div id="footer"></div>
+    </div>
+
+    <script src="https://bitcoindatalabs.org/components/app-components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            BitcoinLabsApp.init({
+                isApp: true,
+                appName: 'orange-dev-network',
+                appHomeUrl: 'index.html'
+            });
+        });
+    </script>
+
+    <script src="js/profile.js"></script>
+</body>
+
+</html>
