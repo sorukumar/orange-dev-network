@@ -356,7 +356,7 @@ function renderCommitChartSlot(p) {
         return;
     }
     document.getElementById('profile-commits-chart-slot').innerHTML = `
-        <div class="profile-section">
+        <div class="profile-section hide-on-mobile">
             <p class="section-title">Commit History by Category</p>
             <div class="chart-container" id="chart-commit-history"></div>
         </div>`;
@@ -368,7 +368,7 @@ function renderSocialChartSlot(p) {
         return;
     }
     document.getElementById('profile-social-chart-slot').innerHTML = `
-        <div class="profile-section">
+        <div class="profile-section hide-on-mobile">
             <p class="section-title">Social Activity by Topic</p>
             <div class="chart-container-sm" id="chart-social-history"></div>
         </div>`;

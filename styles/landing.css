@@ -398,7 +398,7 @@ body.landing-layout .landing-layout {
     }
 
     .metrics-grid {
-        grid-template-columns: 1fr !important;
+        flex-direction: column !important;
         gap: 16px !important;
     }
 

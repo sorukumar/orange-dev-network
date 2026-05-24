@@ -2,9 +2,14 @@
    Developer Profile Page — Orange Dev Network
    ═══════════════════════════════════════════════════════════════════════════════ */
 
+#main-container {
+    height: auto !important;
+    min-height: 100vh;
+}
+
 .profile-layout {
     display: block !important;
-    overflow-y: auto !important;
+    overflow: visible !important;
     background: radial-gradient(circle at 50% 0%, rgba(232, 145, 107, 0.04) 0%, transparent 55%);
     min-height: 100vh;
 }
