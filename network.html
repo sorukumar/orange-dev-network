@@ -136,6 +136,20 @@
                                 <button class="filter-btn" data-view="modern" style="font-size: 10px; padding: 6px 2px;">3Y</button>
                             </div>
                         </div>
+                        <div class="filter-group" style="padding: 10px;">
+                            <span class="filter-label" style="margin-bottom: 8px;">Cluster Mode</span>
+                            <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+                                <button class="filter-btn active" id="cluster-social" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by who talks to whom (time-weighted)">
+                                    <i class="fas fa-comments" style="margin-right:4px; opacity:0.8;"></i>Social
+                                </button>
+                                <button class="filter-btn" id="cluster-expertise" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by technical specialty overlap">
+                                    <i class="fas fa-code-branch" style="margin-right:4px; opacity:0.8;"></i>Expertise
+                                </button>
+                                <button class="filter-btn" id="cluster-domain" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by broad topic domain">
+                                    <i class="fas fa-layer-group" style="margin-right:4px; opacity:0.8;"></i>Domain
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Theme Grid (High Density) -->
