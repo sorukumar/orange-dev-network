@@ -173,10 +173,17 @@ function renderHero(p) {
 
     const fa = firstActive(p);
     const la = lastActive(p);
-    const periodParts = [];
-    if (fa) periodParts.push(`Active since ${fa.slice(0,4)}`);
-    if (la) periodParts.push(`Last seen ${la.slice(0,4)}`);
-    const period = periodParts.join(' · ') || '';
+    let period = '';
+    if (fa && la) {
+        const faYear = fa.slice(0, 4);
+        const laYear = la.slice(0, 4);
+        const yrs = Number(laYear) - Number(faYear) + 1;
+        period = faYear === laYear
+            ? `${faYear} (1 yr)`
+            : `${faYear} – ${laYear} (${yrs} yrs)`;
+    } else if (fa) {
+        period = fa.slice(0, 4);
+    }
 
     const ghLink = login
         ? `<a href="https://github.com/${login}" target="_blank" class="hero-link"><i class="fab fa-github"></i> ${esc(login)}</a>`
@@ -210,12 +217,13 @@ function renderHero(p) {
 function renderStatBar(p) {
     const mlTotal = (p.ml_threads || 0) + (p.ml_responses || 0);
     const dlTotal = (p.delving_threads || 0) + (p.delving_responses || 0);
-    const impactRaw = Number(p.hybrid_score);
-    const impactDisplay = isNaN(impactRaw) ? '—' : impactRaw.toFixed(3);
+    const isCreator = p.dev_type === 'Creator';
+    const impactRaw = p.impact_score != null ? Number(p.impact_score) : null;
+    const impactDisplay = isCreator ? 'Creator' : (impactRaw == null || isNaN(impactRaw) ? '—' : String(impactRaw));
 
     const stats = [
+        { label: 'Impact Score',     value: impactDisplay,              sub: isCreator ? '' : 'out of 100' },
         { label: 'Authored Commits', value: fmtNum(p.authored_commits), sub: `${fmtNum(p.merge_commits)} merges` },
-        { label: 'Impact Score',     value: impactDisplay,              sub: 'hybrid rank' },
         { label: 'Code Reviews',     value: fmtNum(p.reviews_count),    sub: 'PRs reviewed' },
         { label: 'BIPs Authored',    value: fmtNum(p.bips_authored, '0'), sub: 'proposals' },
         { label: 'Mailing List',     value: fmtNum(mlTotal, '0'),       sub: `${fmtNum(p.ml_threads,'0')}T / ${fmtNum(p.ml_responses,'0')}R` },
@@ -234,17 +242,20 @@ function renderStatBar(p) {
 }
 
 function renderWorkDetail(p) {
-    const fa = firstActive(p);
-    const la = lastActive(p);
     const focusAreas = Array.isArray(p.focus_areas) ? p.focus_areas :
                        Array.isArray(p.technical_focus) ? p.technical_focus :
                        (p.technical_focus ? [p.technical_focus] : []);
     const focusDisplay = focusAreas.slice(0, 3).join(', ') || p.primary_category || '—';
 
-    const commitYears = p.commit_history ? Object.keys(p.commit_history).sort() : [];
-    const spanDisplay = commitYears.length >= 2
-        ? `${commitYears[0]} – ${commitYears[commitYears.length-1]} (${commitYears.length} yrs)`
-        : commitYears.length === 1 ? commitYears[0] : '—';
+    const reciprocity = Number(p.review_reciprocity);
+    const reciprocityNote = (!isNaN(reciprocity) && reciprocity > 0)
+        ? `<span style="font-size:11px;color:var(--text-secondary);">${reciprocity.toFixed(1)}× reviews per PR authored</span>`
+        : '';
+
+    const approvalsCount = Number(p.approvals_count);
+    const approvalsRow = (!isNaN(approvalsCount) && approvalsCount > 0)
+        ? `<div class="info-row"><span class="info-row-label">PRs Approved</span><span class="info-row-value">${fmtNum(approvalsCount, '—')}</span></div>`
+        : '';
 
     document.getElementById('profile-work-slot').innerHTML = `
         <div class="profile-section">
@@ -255,8 +266,10 @@ function renderWorkDetail(p) {
                     <div class="info-row"><span class="info-row-label">Total Commits</span><span class="info-row-value">${fmtNum(p.total_commits, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">Authored Commits</span><span class="info-row-value">${fmtNum(p.authored_commits, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">Merge Commits</span><span class="info-row-value">${fmtNum(p.merge_commits, '—')}</span></div>
+                    <div class="info-row"><span class="info-row-label">PRs Authored</span><span class="info-row-value">${fmtNum(p.prs_authored, '—')}</span></div>
+                    <div class="info-row"><span class="info-row-label">PRs Reviewed</span><span class="info-row-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">${fmtNum(p.reviews_count, '—')}${reciprocityNote}</span></div>
+                    ${approvalsRow}
                     <div class="info-row"><span class="info-row-label">Primary Focus</span><span class="info-row-value" style="font-size:12px;">${esc(focusDisplay)}</span></div>
-                    <div class="info-row"><span class="info-row-label">Active Span</span><span class="info-row-value">${esc(spanDisplay)}</span></div>
                 </div>
                 <div>
                     <p class="work-col-title">Timeline</p>
@@ -264,7 +277,6 @@ function renderWorkDetail(p) {
                     <div class="info-row"><span class="info-row-label">Last Commit</span><span class="info-row-value">${fmtDate(p.last_commit)}</span></div>
                     <div class="info-row"><span class="info-row-label">First Social Active</span><span class="info-row-value">${p.first_message ? fmtDate(p.first_message.date) : '—'}</span></div>
                     <div class="info-row"><span class="info-row-label">Last Social Active</span><span class="info-row-value">${p.last_message ? fmtDate(p.last_message.date) : '—'}</span></div>
-                    <div class="info-row"><span class="info-row-label">PRs Authored</span><span class="info-row-value">${fmtNum(p.prs_authored, '—')}</span></div>
                 </div>
             </div>
         </div>`;

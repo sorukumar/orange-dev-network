@@ -268,9 +268,9 @@ body.landing-layout .landing-layout {
 /* Call to Action Buttons */
 .cta-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    max-width: 900px;
+    max-width: 1060px;
     margin: 24px auto 40px auto;
     padding: 0 20px;
 }
@@ -387,6 +387,12 @@ body.landing-layout .landing-layout {
 }
 
 /* 📱 Landing Mobile Polish 📱 */
+@media screen and (max-width: 900px) {
+    .cta-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .hero-section h1 {
         font-size: 32px;
@@ -397,13 +403,8 @@ body.landing-layout .landing-layout {
         font-size: 1.1rem;
     }
 
-    .metrics-grid {
-        flex-direction: column !important;
-        gap: 16px !important;
-    }
-
-    .metric-card {
-        padding: 20px !important;
+    .cta-container {
+        grid-template-columns: 1fr;
     }
 
     .summary-section {

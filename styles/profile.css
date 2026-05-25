@@ -182,10 +182,10 @@
 .hero-strip {
     height: 72px;
     background: linear-gradient(90deg,
-        rgba(232, 145, 107, 0.18) 0%,
-        rgba(232, 145, 107, 0.04) 60%,
+        rgba(232, 145, 107, 0.38) 0%,
+        rgba(232, 145, 107, 0.14) 55%,
         transparent 100%);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(232, 145, 107, 0.2);
 }
 
 .hero-body {

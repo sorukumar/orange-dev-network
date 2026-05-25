@@ -33,58 +33,37 @@
 
         <div id="app-content" class="landing-layout">
             <div class="hero-section">
-                <h1>Bitcoin R&D: The Human Layer</h1>
-                <p>Quantifying ecosystem health by mapping contributor activity across GitHub repositories, peer
-                    reviews, BIPs, Delving Bitcoin, and mailing lists</p>
+                <h1>The People Behind Bitcoin</h1>
+                <p>Every commit, code review, research post, and protocol proposal — mapped to the people who made it.
+                    7,000+ contributors tracked across GitHub, Delving Bitcoin, and the mailing list.</p>
 
                 <div class="summary-section">
-                    <h2>Contributor coverage</h2>
+                    <h2>Who's building Bitcoin</h2>
                     <div id="summary-insight" class="summary-insight">Loading current contributor coverage...</div>
                     <ul id="domain-count-list" class="summary-list">
                         <li>Loading contributor counts...</li>
                     </ul>
+                    <div id="onboarding-note" class="summary-note"></div>
                 </div>
 
                 <div class="cta-container">
                     <a href="network.html" class="cta-card">
                         <div class="cta-icon"><i class="fas fa-project-diagram"></i></div>
                         <h2>Influence Map</h2>
-                        <p>Explore the full social and technical authority graph of the 1,000+ top-signal developers.
-                        </p>
+                        <p>See how Bitcoin's top developers connect — who reviews whom, who shapes the conversation.</p>
                     </a>
                     <a href="directory.html" class="cta-card">
-                        <div class="cta-icon"><i class="fas fa-address-book"></i></div>
-                        <h2>Browse Directory</h2>
-                        <p>Deep-dive into the profiles of all 6,000+ contributors, tracking efficiency and expertise.
-                        </p>
+                        <div class="cta-icon"><i class="fas fa-users"></i></div>
+                        <h2>Meet the Builders</h2>
+                        <p>Explore profiles of 7,000+ contributors — their commits, reviews, BIPs, and research history.</p>
+                    </a>
+                    <a href="pulse.html" class="cta-card">
+                        <div class="cta-icon"><i class="fas fa-comments"></i></div>
+                        <h2>Protocol Pulse</h2>
+                        <p>What developers are actively debating — hot threads, trending topics, and key voices from Delving and the mailing list.</p>
                     </a>
                 </div>
 
-                <!-- Metrics Pulse -->
-                <div class="metrics-grid">
-                    <div class="metric-card" id="focus-metric">
-                        <h3>Current R&D Focus</h3>
-                        <div id="rd-focus-val" class="metric-value">-</div>
-                        <div id="rd-focus-sub" class="metric-subtext">Calculating momentum...</div>
-                        <div id="focus-bar" class="focus-bar-container"></div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Onboarding Health</h3>
-                        <div id="onboarding-val" class="metric-value">-</div>
-                        <div id="onboarding-sub" class="metric-subtext">New contributors in the last 90 days</div>
-                        <div style="margin-top: 12px; color: #10B981; font-size: 13px; font-weight: 700;">
-                            <i class="fas fa-arrow-up"></i> Growing Ecosystem
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Active Discussions <span
-                                style="display:block; margin-top:4px; font-size:10px; color: var(--text-secondary); font-weight:400; letter-spacing:1px; text-transform:uppercase;">Last
-                                90 days</span></h3>
-                        <div id="discussion-pulse-list" style="margin-top: 8px;"></div>
-                        <div id="discussion-bips"
-                            style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;"></div>
-                    </div>
-                </div>
             </div>
         </div>
 

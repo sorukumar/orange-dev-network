@@ -11,7 +11,7 @@ const PROFILE_BASE_URL = DATA_BASE_URL + 'profiles/';
 
 let allContributors = [];
 let filteredContributors = [];
-let currentSort = { col: 'hybrid_score', dir: 'desc' };
+let currentSort = { col: 'impact_score', dir: 'desc' };
 let currentPage = 1;
 let currentFilterView = 'all';
 let datasetLatestDate = 0;
@@ -406,8 +406,9 @@ function renderTable() {
         // Removed live GitHub avatar fetching based on user request to improve performance and reliability
         const avatarPlaceholder = `<div class="avatar-placeholder"><i class="fas fa-user"></i></div>`;
 
-        const hybrid = c.hybrid_score || 0;
-        const impactPct = Math.min(100, (hybrid / 4) * 100);
+        const impact = c.impact_score != null ? Number(c.impact_score) : 0;
+        const impactPct = Math.min(100, impact);  // already 0-100
+        const impactDisplay = c.dev_type === 'Creator' ? 'Creator' : (impact > 0 ? impact : '-');
 
         const badges = (c.roles || []).map(r => `<span class="mini-badge ${r.toLowerCase()}">${r}</span>`).join('');
         const archetypeColor = getArchetypeColor(c.dev_type);
@@ -433,7 +434,7 @@ function renderTable() {
                 </td>
                 <td>
                     <div class="impact-cell" style="width: 100%;">
-                        <span class="impact-val">${c.hybrid_score ? c.hybrid_score.toFixed(2) : '-'}</span>
+                        <span class="impact-val">${impactDisplay}</span>
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill" style="width: ${impactPct}%"></div>
                         </div>
@@ -611,7 +612,7 @@ function renderProfile(p, isBasic = false) {
                     </div>
                     <div class="profile-info-row">
                         <span>Impact Score</span>
-                        <span style="font-weight: 700; color: var(--bitcoin-orange);">${p.hybrid_score ? p.hybrid_score.toFixed(3) : (p.authored_commits?.toLocaleString() || 0)}</span>
+                        <span style="font-weight: 700; color: var(--bitcoin-orange);">${p.impact_score != null ? (p.dev_type === 'Creator' ? 'Creator' : Number(p.impact_score)) : '—'}</span>
                     </div>
                     <div class="profile-info-row" style="border: none;">
                         <span>Technical Focus</span>
