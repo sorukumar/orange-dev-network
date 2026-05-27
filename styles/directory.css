@@ -123,6 +123,26 @@
     animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
 }
 
+.filter-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.dir-select {
+    min-width: 155px;
+    padding: 10px 12px;
+    background: rgba(253, 246, 227, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+}
+
+.dir-select:focus {
+    border-color: var(--primary);
+}
+
 @keyframes pulse {
     to {
         box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
@@ -469,6 +489,20 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .filter-controls {
+        width: 100%;
+    }
+
+    .dir-select {
+        flex: 1;
+        min-width: 0;
     }
     
     .search-box {

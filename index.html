@@ -31,11 +31,20 @@
         <!-- Bitcoin Data Labs Header -->
         <div id="header"></div>
 
+        <nav class="app-nav" aria-label="Orange Dev Network">
+            <div class="app-nav-inner">
+                <a href="index.html" class="app-nav-link active">Home</a>
+                <a href="directory.html" class="app-nav-link">Directory</a>
+                <a href="network.html" class="app-nav-link">Influence Map</a>
+                <a href="pulse.html" class="app-nav-link">Protocol Pulse</a>
+            </div>
+        </nav>
+
         <div id="app-content" class="landing-layout">
             <div class="hero-section">
                 <h1>The People Behind Bitcoin</h1>
-                <p>Every commit, code review, research post, and protocol proposal — mapped to the people who made it.
-                    7,000+ contributors tracked across GitHub, Delving Bitcoin, and the mailing list.</p>
+                <p>Every commit, code review, BIP, and Delving & Mailing list thread - mapped to the real humans shaping Bitcoin.</p>
+                <div id="freshness-line" class="freshness-line">Updated - Contributors tracked -</div>
 
                 <div class="summary-section">
                     <h2>Who's building Bitcoin</h2>
@@ -43,8 +52,48 @@
                     <ul id="domain-count-list" class="summary-list">
                         <li>Loading contributor counts...</li>
                     </ul>
-                    <div id="onboarding-note" class="summary-note"></div>
                 </div>
+
+                <section class="snapshot-panel" aria-label="Network Snapshot">
+                    <div class="snapshot-panel-head">
+                        <h2>This Month in Bitcoin Dev</h2>
+                        <p>What changed across Bitcoin development since the previous monthly window.</p>
+                    </div>
+                    <div class="live-widgets">
+                        <article class="live-widget">
+                            <h3>Active Contributors</h3>
+                            <div id="widget-active-count" class="live-widget-value">-</div>
+                            <p id="widget-active-note" class="live-widget-note">Loading current activity...</p>
+                        </article>
+                        <article class="live-widget">
+                            <h3>Research Activity</h3>
+                            <div id="widget-mailing-spark" class="sparkline-text">Loading signal...</div>
+                            <p id="widget-mailing-note" class="live-widget-note"></p>
+                        </article>
+                        <article class="live-widget">
+                            <h3>Distinct Discussion Participants</h3>
+                            <div id="widget-voices-count" class="live-widget-value">-</div>
+                            <p id="widget-voices-note" class="live-widget-note">Loading discussion breadth...</p>
+                        </article>
+                        <article class="live-widget">
+                            <h3>Most Active Topics</h3>
+                            <ol id="widget-topics" class="rank-list">
+                                <li>Loading topic momentum...</li>
+                            </ol>
+                        </article>
+                        <article class="live-widget">
+                            <h3>Most Discussed BIPs</h3>
+                            <ul id="widget-bips" class="simple-list">
+                                <li>Loading BIP activity...</li>
+                            </ul>
+                        </article>
+                        <article class="live-widget">
+                            <h3>New Contributors (Last 90 days)</h3>
+                            <div id="widget-newcomers" class="live-widget-value">-</div>
+                            <p id="widget-newcomers-note" class="live-widget-note">Loading onboarding trend...</p>
+                        </article>
+                    </div>
+                </section>
 
                 <div class="cta-container">
                     <a href="network.html" class="cta-card">
@@ -63,6 +112,22 @@
                         <p>What developers are actively debating — hot threads, trending topics, and key voices from Delving and the mailing list.</p>
                     </a>
                 </div>
+
+                <section class="why-this-matters" aria-label="Why This Matters">
+                    <h2>Why This Matters</h2>
+                    <p>Bitcoin's roadmap emerges from thousands of distributed technical decisions. This network view helps researchers, builders, and capital allocators separate durable engineering signal from short-lived hype.</p>
+                    <p>By mapping code, review, standards, and discussion into one contributor graph, Orange Dev Network surfaces who is actively shaping consensus and where protocol attention is moving next.</p>
+                </section>
+
+                <section class="secondary-cta" aria-label="Follow and feedback">
+                    <a href="https://x.com/BitcoinDataLabs" target="_blank" rel="noopener noreferrer" class="secondary-link">Follow updates on X</a>
+                    <a href="https://github.com/sorukumar/orange-dev-network/issues" target="_blank" rel="noopener noreferrer" class="secondary-link">Share feedback</a>
+                </section>
+
+                <section class="methodology-note" aria-label="Data and Methodology">
+                    <h2>Data & Methodology</h2>
+                    <p>Sources: GitHub activity, Delving Bitcoin, and the bitcoin-dev mailing list. Contributor identities are resolved to canonical profiles in orange-dev-data before any dashboard aggregation. Artifacts are rebuilt on a daily and monthly cadence depending on pipeline stage.</p>
+                </section>
 
             </div>
         </div>

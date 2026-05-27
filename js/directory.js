@@ -14,6 +14,9 @@ let filteredContributors = [];
 let currentSort = { col: 'impact_score', dir: 'desc' };
 let currentPage = 1;
 let currentFilterView = 'all';
+let currentSearchTerm = '';
+let currentRoleFilter = 'all';
+let currentFocusFilter = 'all';
 let datasetLatestDate = 0;
 const THREE_YEARS = 3 * 365 * 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 100;
@@ -261,6 +264,7 @@ async function initDirectory() {
         // Initial filter & sort
         filteredContributors = [...allContributors];
         currentPage = 1;
+        populateDirectoryFilters();
         sortData();
         renderTable();
 
@@ -297,29 +301,25 @@ function setupListeners() {
 
     // Search
     document.getElementById('directory-search').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        filteredContributors = allContributors.filter(c => {
-            const nameMatch = c.display_name.toLowerCase().includes(term);
-            const loginMatch = (c.github && c.github.login) ? c.github.login.toLowerCase().includes(term) : false;
-            const focusValue = c.technical_focus ? c.technical_focus.toLowerCase() : '';
-            const focusMatch = focusValue.includes(term);
-            const textMatch = nameMatch || loginMatch || focusMatch;
-            
-            let activeMatch = true;
-            if (currentFilterView === 'active') {
-                if (!c.global_last_active) activeMatch = false;
-                else {
-                    const cDate = new Date(c.global_last_active).getTime();
-                    if (datasetLatestDate - cDate > THREE_YEARS) activeMatch = false;
-                }
-            }
-            
-            return textMatch && activeMatch;
-        });
-        currentPage = 1;
-        sortData();
-        renderTable();
+        currentSearchTerm = e.target.value.toLowerCase();
+        applyDirectoryFilters();
     });
+
+    const roleFilter = document.getElementById('role-filter');
+    if (roleFilter) {
+        roleFilter.addEventListener('change', (e) => {
+            currentRoleFilter = e.target.value;
+            applyDirectoryFilters();
+        });
+    }
+
+    const focusFilter = document.getElementById('focus-filter');
+    if (focusFilter) {
+        focusFilter.addEventListener('change', (e) => {
+            currentFocusFilter = e.target.value;
+            applyDirectoryFilters();
+        });
+    }
 
     // Sorting
     document.querySelectorAll('th.sortable').forEach(th => {
@@ -354,6 +354,65 @@ function setupListeners() {
             disposeProfileCharts();
         }
     };
+}
+
+function populateDirectoryFilters() {
+    const roleEl = document.getElementById('role-filter');
+    const focusEl = document.getElementById('focus-filter');
+    if (!roleEl || !focusEl) return;
+
+    const roleSet = new Set();
+    const focusSet = new Set();
+
+    allContributors.forEach(c => {
+        if (c.dev_type) roleSet.add(c.dev_type);
+        if (c.technical_focus && c.technical_focus !== 'None') focusSet.add(c.technical_focus);
+    });
+
+    const roles = Array.from(roleSet).sort((a, b) => a.localeCompare(b));
+    const focuses = Array.from(focusSet).sort((a, b) => a.localeCompare(b));
+
+    roleEl.innerHTML = '<option value="all">All Roles</option>' + roles.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
+    focusEl.innerHTML = '<option value="all">All Focus Areas</option>' + focuses.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+}
+
+function applyDirectoryFilters() {
+    filteredContributors = allContributors.filter(c => {
+        const term = currentSearchTerm;
+        const nameMatch = (c.display_name || '').toLowerCase().includes(term);
+        const loginMatch = (c.github && c.github.login) ? c.github.login.toLowerCase().includes(term) : false;
+        const focusValue = c.technical_focus ? c.technical_focus.toLowerCase() : '';
+        const focusMatch = focusValue.includes(term);
+        const textMatch = nameMatch || loginMatch || focusMatch;
+
+        let activeMatch = true;
+        if (currentFilterView === 'active') {
+            if (!c.global_last_active) activeMatch = false;
+            else {
+                const cDate = new Date(c.global_last_active).getTime();
+                if (datasetLatestDate - cDate > THREE_YEARS) activeMatch = false;
+            }
+        }
+
+        const roleMatch = currentRoleFilter === 'all' || (c.dev_type || '') === currentRoleFilter;
+        const focusExact = c.technical_focus || 'None';
+        const focusSelectionMatch = currentFocusFilter === 'all' || focusExact === currentFocusFilter;
+
+        return textMatch && activeMatch && roleMatch && focusSelectionMatch;
+    });
+
+    currentPage = 1;
+    sortData();
+    renderTable();
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function updateSortIcons() {

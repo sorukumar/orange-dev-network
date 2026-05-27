@@ -68,6 +68,15 @@
         <!-- Bitcoin Data Labs Header -->
         <div id="header"></div>
 
+        <nav class="app-nav" aria-label="Orange Dev Network">
+            <div class="app-nav-inner">
+                <a href="index.html" class="app-nav-link">Home</a>
+                <a href="directory.html" class="app-nav-link">Directory</a>
+                <a href="network.html" class="app-nav-link active">Influence Map</a>
+                <a href="pulse.html" class="app-nav-link">Protocol Pulse</a>
+            </div>
+        </nav>
+
         <div id="app-content">
             <!-- Visualization Area -->
             <div id="graph-container">
@@ -107,6 +116,12 @@
                 <div class="sidebar-header">
                     <h1><i class="fas fa-project-diagram"></i> Influence Map</h1>
                     <p>Each node represents a developer, and edges map their technical interactions. Node size reflects their composite influence score.</p>
+                </div>
+
+                <div class="filter-group" style="padding: 12px;">
+                    <span class="filter-label" style="margin-bottom: 8px;">How To Read</span>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Hover any node for influence details. Click to pin a profile panel with fast actions.</p>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Use mouse wheel to zoom, drag to pan, and Reset View to return to the default layout.</p>
                 </div>
 
                 <!-- Search Controls -->

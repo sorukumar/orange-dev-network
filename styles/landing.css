@@ -100,6 +100,15 @@ body.landing-layout .landing-layout {
     line-height: 1.6;
 }
 
+.freshness-line {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: -10px 0 18px;
+}
+
 .summary-section {
     width: 100%;
     max-width: 720px;
@@ -275,6 +284,172 @@ body.landing-layout .landing-layout {
     padding: 0 20px;
 }
 
+.snapshot-panel {
+    width: 100%;
+    max-width: 1060px;
+    margin: 24px auto 8px auto;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 20px;
+}
+
+.snapshot-panel-head {
+    margin-bottom: 16px;
+}
+
+.snapshot-panel-head h2 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    color: var(--text-primary);
+}
+
+.snapshot-panel-head p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.live-widgets {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+.live-widget {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.live-widget h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.live-widget-value {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.live-widget-note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.rank-list,
+.simple-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.rank-list li,
+.simple-list li {
+    line-height: 1.4;
+}
+
+.delta-pill {
+    margin-left: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+}
+
+.sparkline-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.bip-link,
+.reviewer-link {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.bip-link:hover,
+.reviewer-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.why-this-matters,
+.methodology-note {
+    width: 100%;
+    max-width: 1060px;
+    margin: 10px auto 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.why-this-matters h2,
+.methodology-note h2 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 20px;
+}
+
+.why-this-matters p,
+.methodology-note p {
+    margin: 0 0 10px 0;
+    max-width: 100%;
+    text-align: left;
+    font-size: 14px;
+}
+
+.why-this-matters p:last-child,
+.methodology-note p:last-child {
+    margin-bottom: 0;
+}
+
+.secondary-cta {
+    width: 100%;
+    max-width: 1060px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 16px auto;
+    flex-wrap: wrap;
+}
+
+.secondary-link {
+    text-decoration: none;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.secondary-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(232, 145, 107, 0.08);
+}
+
 .cta-card {
     display: block;
     text-decoration: none;
@@ -391,6 +566,10 @@ body.landing-layout .landing-layout {
     .cta-container {
         grid-template-columns: 1fr 1fr;
     }
+
+    .live-widgets {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media screen and (max-width: 768px) {
@@ -404,6 +583,18 @@ body.landing-layout .landing-layout {
     }
 
     .cta-container {
+        grid-template-columns: 1fr;
+    }
+
+    .secondary-cta {
+        justify-content: flex-start;
+    }
+
+    .snapshot-panel {
+        padding: 16px;
+    }
+
+    .live-widgets {
         grid-template-columns: 1fr;
     }
 

@@ -173,7 +173,7 @@ function renderHotThreads(threads, sourceFilter) {
         return;
     }
 
-    el.innerHTML = threads.map(t => {
+    el.innerHTML = filtered.map(t => {
         const hasLink = t.link && t.link.trim();
         const tag = hasLink ? 'a' : 'div';
         const linkAttr = hasLink ? `href="${escHtml(t.link)}" target="_blank" rel="noopener noreferrer"` : '';

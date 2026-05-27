@@ -30,6 +30,15 @@
         <!-- Bitcoin Data Labs Header -->
         <div id="header"></div>
 
+        <nav class="app-nav" aria-label="Orange Dev Network">
+            <div class="app-nav-inner">
+                <a href="index.html" class="app-nav-link">Home</a>
+                <a href="directory.html" class="app-nav-link active">Directory</a>
+                <a href="network.html" class="app-nav-link">Influence Map</a>
+                <a href="pulse.html" class="app-nav-link">Protocol Pulse</a>
+            </div>
+        </nav>
+
         <div id="app-content" class="directory-layout">
             <div class="container">
                 <header class="page-header">
@@ -43,6 +52,14 @@
                             <button class="seg-btn" data-filter="active">
                                 <span class="pulse-dot"></span> Active
                             </button>
+                        </div>
+                        <div class="filter-controls">
+                            <select id="role-filter" class="dir-select">
+                                <option value="all">All Roles</option>
+                            </select>
+                            <select id="focus-filter" class="dir-select">
+                                <option value="all">All Focus Areas</option>
+                            </select>
                         </div>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
