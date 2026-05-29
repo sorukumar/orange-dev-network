@@ -56,24 +56,18 @@ const GHIBLI_PALETTE = [
     '#384D48','#ACD7EC'
 ];
 
-// Human-readable labels for social topic category keys
-const TOPIC_LABELS = {
-    'quantum':'Quantum Resistance','covenants':'Covenants & Vaults','taproot':'Taproot',
-    'mining':'Mining Protocol','mempool-fees':'Mempool & Fees','privacy':'Privacy',
-    'lightning':'Lightning / L2','bitvm':'BitVM','p2p-network':'P2P Network',
-    'bip-process':'BIP Process','testing-devtools':'Dev Tooling',
-    'soft-fork-activation':'Soft Fork Activation','segwit':'SegWit',
-    'script-opcodes':'Script & Opcodes','ecash':'eCash','silent-payments':'Silent Payments',
-    'signatures-sighash':'Signatures & Sighash','scaling':'Scaling',
-    'spam-filtering':'Spam Filtering','utxo-sync':'UTXO & Sync',
-    'payment-protocol':'Payment Protocol','vaults':'Vaults','dlc':'DLCs',
-    'atomic-swaps':'Atomic Swaps','multisig-threshold':'Multisig','wallet-keys':'Wallet & Keys',
-    'core-dev':'Core Dev','nostr':'Nostr','hard-fork-block-size':'Block Size Debate',
-    'l2-bridges':'L2 Bridges','sidechains-drivechain':'Sidechains / Drivechain',
-    'tokens-runes':'Tokens & Runes','ordinals-inscriptions':'Ordinals & Inscriptions',
-    'data-structures':'Data Structures','transaction-format':'Transaction Format',
-    'consensus-cleanup':'Consensus Cleanup','other':'Other',
-};
+// Domain labels are loaded from registry_index.json metadata.domains.
+// Do NOT add hardcoded label maps here — edit metadata/expertise_domains.json instead.
+let DOMAIN_COLOR_MAP = {};  // id → color
+let DOMAIN_NAME_MAP  = {};  // id → name
+function buildRegistryDomainMaps(domains) {
+    DOMAIN_COLOR_MAP = {};
+    DOMAIN_NAME_MAP = {};
+    (domains || []).forEach(d => {
+        DOMAIN_COLOR_MAP[d.id] = d.color;
+        DOMAIN_NAME_MAP[d.id]  = d.name;
+    });
+}
 
 // BIP status pill colors
 const BIP_STATUS_COLORS = {
@@ -210,7 +204,7 @@ async function renderProfileCharts(p) {
             const topics = Array.from(allTopics);
 
             const series = topics.map((topic, idx) => ({
-                name: TOPIC_LABELS[topic] || topic,
+                name: DOMAIN_NAME_MAP[topic] || topic,
                 type: 'bar',
                 stack: 'total',
                 barMaxWidth: 40,
@@ -249,6 +243,7 @@ async function initDirectory() {
     try {
         const response = await fetch(REGISTRY_URL);
         const data = await response.json();
+        buildRegistryDomainMaps(data.metadata?.domains);
         allContributors = data.contributors.map(c => {
             if (c.global_last_active) {
                 const d = new Date(c.global_last_active).getTime();
@@ -329,7 +324,7 @@ function setupListeners() {
                 currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
             } else {
                 currentSort.col = col;
-                currentSort.dir = ['display_name', 'technical_focus'].includes(col) ? 'asc' : 'desc';
+                currentSort.dir = ['display_name'].includes(col) ? 'asc' : 'desc';
             }
 
             updateSortIcons();
@@ -366,14 +361,15 @@ function populateDirectoryFilters() {
 
     allContributors.forEach(c => {
         if (c.dev_type) roleSet.add(c.dev_type);
-        if (c.technical_focus && c.technical_focus !== 'None') focusSet.add(c.technical_focus);
     });
 
     const roles = Array.from(roleSet).sort((a, b) => a.localeCompare(b));
-    const focuses = Array.from(focusSet).sort((a, b) => a.localeCompare(b));
+    // Use registry metadata domains (DOMAIN_NAME_MAP) for focus options so all domains
+    // are available with proper human-readable names, not just top-3 from contributor records.
+    const domainEntries = Object.entries(DOMAIN_NAME_MAP).sort((a, b) => a[1].localeCompare(b[1]));
 
     roleEl.innerHTML = '<option value="all">All Roles</option>' + roles.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
-    focusEl.innerHTML = '<option value="all">All Focus Areas</option>' + focuses.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+    focusEl.innerHTML = '<option value="all">All Focus Areas</option>' + domainEntries.map(([id, name]) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
 }
 
 function applyDirectoryFilters() {
@@ -381,12 +377,16 @@ function applyDirectoryFilters() {
         const term = currentSearchTerm;
         const nameMatch = (c.display_name || '').toLowerCase().includes(term);
         const loginMatch = (c.github && c.github.login) ? c.github.login.toLowerCase().includes(term) : false;
-        const focusValue = c.technical_focus ? c.technical_focus.toLowerCase() : '';
-        const focusMatch = focusValue.includes(term);
+        // Use expertise_domain_scores for text search — any domain with >1% score matches
+        const domainMatchNames = Object.entries(c.expertise_domain_scores || {})
+            .filter(([, v]) => v > 0.01)
+            .map(([id]) => (DOMAIN_NAME_MAP[id] || id).toLowerCase());
+        const focusMatch = domainMatchNames.some(n => n.includes(term));
         const textMatch = nameMatch || loginMatch || focusMatch;
 
         let activeMatch = true;
-        if (currentFilterView === 'active') {
+        if (currentFilterView === 'modern') {
+            // "Last 3yr" era: limit to contributors active within the last 3 years
             if (!c.global_last_active) activeMatch = false;
             else {
                 const cDate = new Date(c.global_last_active).getTime();
@@ -395,8 +395,13 @@ function applyDirectoryFilters() {
         }
 
         const roleMatch = currentRoleFilter === 'all' || (c.dev_type || '') === currentRoleFilter;
-        const focusExact = c.technical_focus || 'None';
-        const focusSelectionMatch = currentFocusFilter === 'all' || focusExact === currentFocusFilter;
+        // Domain authority = era_hybrid_score × expertise_domain_scores[domain], computed on-the-fly.
+        // Uses the era-appropriate hybrid score so p2016/modern views rank contributors correctly.
+        const eraHybrid = currentFilterView === 'p2016' ? (c.p2016_hybrid_score || 0)
+            : currentFilterView === 'modern' ? (c.modern_hybrid_score || 0)
+            : (c.hybrid_score || 0);
+        const focusSelectionMatch = currentFocusFilter === 'all' ||
+            (eraHybrid * ((c.expertise_domain_scores || {})[currentFocusFilter] || 0)) > 0.01;
 
         return textMatch && activeMatch && roleMatch && focusSelectionMatch;
     });
@@ -428,8 +433,30 @@ function updateSortIcons() {
 
 function sortData() {
     filteredContributors.sort((a, b) => {
-        let valA = a[currentSort.col];
-        let valB = b[currentSort.col];
+        // When a domain filter is active, primary sort is by domain authority:
+        // hybrid_score × expertise_domain_scores[domain], computed on-the-fly.
+        // This weights Pieter Wuille's Mempool presence (3.79 × 0.112 = 0.42) above a
+        // Mempool-only contributor with low overall influence (0.2 × 0.9 = 0.18).
+        if (currentFocusFilter !== 'all') {
+            const eraA = currentFilterView === 'p2016' ? (a.p2016_hybrid_score || 0)
+                : currentFilterView === 'modern' ? (a.modern_hybrid_score || 0) : (a.hybrid_score || 0);
+            const eraB = currentFilterView === 'p2016' ? (b.p2016_hybrid_score || 0)
+                : currentFilterView === 'modern' ? (b.modern_hybrid_score || 0) : (b.hybrid_score || 0);
+            const authA = eraA * ((a.expertise_domain_scores || {})[currentFocusFilter] || 0);
+            const authB = eraB * ((b.expertise_domain_scores || {})[currentFocusFilter] || 0);
+            if (authA !== authB) return authB - authA;
+        }
+        // For Impact/Commits columns, map to era-appropriate fields
+        let valA = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (a.p2016_hybrid_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (a.modern_hybrid_score || 0)
+            : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (a.p2016_authored_commits || 0)
+            : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (a.modern_authored_commits || 0)
+            : a[currentSort.col];
+        let valB = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (b.p2016_hybrid_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (b.modern_hybrid_score || 0)
+            : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (b.p2016_authored_commits || 0)
+            : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (b.modern_authored_commits || 0)
+            : b[currentSort.col];
 
         // Handle nested github login for display_name sort if needed, 
         // but display_name is already at top level
@@ -461,13 +488,57 @@ function renderTable() {
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const pageItems = filteredContributors.slice(startIndex, startIndex + PAGE_SIZE);
 
+    // Compute max era score for progress bar normalization
+    const maxEraScore = currentFilterView === 'p2016'
+        ? Math.max(...filteredContributors.map(c => c.p2016_hybrid_score || 0), 0.01)
+        : currentFilterView === 'modern'
+        ? Math.max(...filteredContributors.map(c => c.modern_hybrid_score || 0), 0.01)
+        : 100; // impact_score is already 0–100
+
+    // Update column headers to reflect current era
+    const impactTh = document.querySelector('th[data-sort="impact_score"]');
+    if (impactTh) impactTh.innerHTML = (currentFilterView === 'p2016' ? '2016+ Score'
+        : currentFilterView === 'modern' ? '3yr Score' : 'Impact') + ' <i class="fas fa-sort"></i>';
+    const commitsTh = document.querySelector('th[data-sort="authored_commits"]');
+    if (commitsTh) {
+        const eraLabel = currentFilterView === 'p2016' ? ' (2016+)' : currentFilterView === 'modern' ? ' (3yr)' : '';
+        commitsTh.innerHTML = `Authored Commits${eraLabel} <i class="fas fa-sort"></i>`;
+    }
+    const mlTh = document.querySelector('th[data-sort="ml_total"]');
+    if (mlTh) {
+        if (currentFilterView === 'all') {
+            mlTh.innerHTML = 'Mailing List <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i>';
+        } else {
+            const eraLabel = currentFilterView === 'p2016' ? '2016+' : '3yr';
+            mlTh.innerHTML = `Posts <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(${eraLabel})</span> <i class="fas fa-sort"></i>`;
+        }
+    }
+    const delvingTh = document.querySelector('th[data-sort="delving_total"]');
+    if (delvingTh) {
+        delvingTh.innerHTML = currentFilterView === 'all'
+            ? 'Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i>'
+            : 'Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(n/a)</span> <i class="fas fa-sort"></i>';
+    }
+    updateSortIcons();
+
     list.innerHTML = pageItems.map(c => {
         // Removed live GitHub avatar fetching based on user request to improve performance and reliability
         const avatarPlaceholder = `<div class="avatar-placeholder"><i class="fas fa-user"></i></div>`;
 
-        const impact = c.impact_score != null ? Number(c.impact_score) : 0;
-        const impactPct = Math.min(100, impact);  // already 0-100
-        const impactDisplay = c.dev_type === 'Creator' ? 'Creator' : (impact > 0 ? impact : '-');
+        let impactPct, impactDisplay;
+        if (currentFilterView === 'p2016') {
+            const eScore = c.p2016_hybrid_score || 0;
+            impactPct = Math.min(100, (eScore / maxEraScore) * 100);
+            impactDisplay = eScore > 0 ? eScore.toFixed(2) : '-';
+        } else if (currentFilterView === 'modern') {
+            const eScore = c.modern_hybrid_score || 0;
+            impactPct = Math.min(100, (eScore / maxEraScore) * 100);
+            impactDisplay = eScore > 0 ? eScore.toFixed(2) : '-';
+        } else {
+            const impact = c.impact_score != null ? Number(c.impact_score) : 0;
+            impactPct = Math.min(100, impact);
+            impactDisplay = c.dev_type === 'Creator' ? 'Creator' : (impact > 0 ? impact : '-');
+        }
 
         const badges = (c.roles || []).map(r => `<span class="mini-badge ${r.toLowerCase()}">${r}</span>`).join('');
         const archetypeColor = getArchetypeColor(c.dev_type);
@@ -475,10 +546,26 @@ function renderTable() {
             ? `<span class="mini-badge" style="background:${archetypeColor}22; color:${archetypeColor}; border:1px solid ${archetypeColor}44; font-size:10px;">${c.dev_type}</span>`
             : '';
 
-        const ml_threads = c.ml_threads || 0;
-        const ml_responses = c.ml_responses || 0;
-        const delving_threads = c.delving_threads || 0;
-        const delving_responses = c.delving_responses || 0;
+        // Social columns: era-specific source-split counts or all-time threads/responses
+        let socialMlHtml, socialDelvingHtml;
+        if (currentFilterView === 'p2016') {
+            const mlPosts = c.p2016_ml_posts || 0;
+            const delvingPosts = c.p2016_delving_posts || 0;
+            socialMlHtml = `<span>${mlPosts}</span>`;
+            socialDelvingHtml = `<span>${delvingPosts}</span>`;
+        } else if (currentFilterView === 'modern') {
+            const mlPosts = c.modern_ml_posts || 0;
+            const delvingPosts = c.modern_delving_posts || 0;
+            socialMlHtml = `<span>${mlPosts}</span>`;
+            socialDelvingHtml = `<span>${delvingPosts}</span>`;
+        } else {
+            const ml_threads = c.ml_threads || 0;
+            const ml_responses = c.ml_responses || 0;
+            const delving_threads = c.delving_threads || 0;
+            const delving_responses = c.delving_responses || 0;
+            socialMlHtml = `<span>${ml_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${ml_responses}</span>`;
+            socialDelvingHtml = `<span>${delving_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${delving_responses}</span>`;
+        }
 
         return `
             <tr onclick="showProfile('${c.uuid}')">
@@ -499,16 +586,24 @@ function renderTable() {
                         </div>
                     </div>
                 </td>
-                <td style="text-align: center; font-weight: 600;">${c.authored_commits?.toLocaleString() || 0}</td>
+                <td style="text-align: center; font-weight: 600;">${currentFilterView === 'p2016' ? (c.p2016_authored_commits?.toLocaleString() || 0) : currentFilterView === 'modern' ? (c.modern_authored_commits?.toLocaleString() || 0) : (c.authored_commits?.toLocaleString() || 0)}</td>
                 <td style="text-align: center; color: var(--text-secondary);">${c.bips_authored || 0}</td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
-                    <span>${ml_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${ml_responses}</span>
+                    ${socialMlHtml}
                 </td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
-                    <span>${delving_threads}</span><span style="opacity: 0.4; font-size: 0.8em; margin: 0 2px;">/</span><span>${delving_responses}</span>
+                    ${socialDelvingHtml}
                 </td>
                 <td>
-                    <span class="focus-tag">${c.technical_focus}</span>
+                    ${Object.entries(c.expertise_domain_scores || {})
+                        .filter(([, v]) => v >= 0.05)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 3)
+                        .map(([d]) => {
+                            const color = DOMAIN_COLOR_MAP[d] || '#94A3B8';
+                            const label = DOMAIN_NAME_MAP[d] || d;
+                            return `<span class="focus-tag" style="background:${color}22;color:${color};border-color:${color}44">${label}</span>`;
+                        }).join(' ')}
                 </td>
             </tr>
         `;
@@ -674,8 +769,8 @@ function renderProfile(p, isBasic = false) {
                         <span style="font-weight: 700; color: var(--bitcoin-orange);">${p.impact_score != null ? (p.dev_type === 'Creator' ? 'Creator' : Number(p.impact_score)) : '—'}</span>
                     </div>
                     <div class="profile-info-row" style="border: none;">
-                        <span>Technical Focus</span>
-                        <span style="font-weight: 700;">${p.technical_focus}</span>
+                        <span>Expertise Domains</span>
+                        <span style="font-weight: 700;">${(p.expertise_domains || []).map(d => DOMAIN_NAME_MAP[d] || d).join(', ') || '—'}</span>
                     </div>
                 </div>
                 <div>

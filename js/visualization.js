@@ -3,19 +3,21 @@
  * Using D3.js Force-Directed Graph
  */
 
-const THEME_MAPPING = {
-    'soft-fork-activation': 'Consensus', 'hard-fork-block-size': 'Consensus', 'consensus-cleanup': 'Consensus', 'segwit': 'Consensus', 'taproot': 'Consensus',
-    'covenants': 'Script', 'script-opcodes': 'Script', 'vaults': 'Script', 'dlc': 'Script',
-    'lightning': 'L2', 'l2-bridges': 'L2', 'sidechains-drivechain': 'L2', 'bitvm': 'L2', 'atomic-swaps': 'L2',
-    'privacy': 'Privacy', 'silent-payments': 'Privacy',
-    'wallet-keys': 'Wallet', 'multisig-threshold': 'Wallet',
-    'mining': 'Mining',
-    'mempool-fees': 'Mempool', 'spam-filtering': 'Mempool',
-    'p2p-network': 'Network',
-    'signatures-sighash': 'Crypto', 'quantum': 'Crypto',
-    'utxo-sync': 'Data', 'transaction-format': 'Data', 'data-structures': 'Data',
-    'payment-protocol': 'Ecosystem', 'ecash': 'Ecosystem', 'nostr': 'Ecosystem', 'scaling': 'Ecosystem', 'testing-devtools': 'Ecosystem', 'core-dev': 'Ecosystem', 'bip-process': 'Ecosystem'
-};
+// Domain metadata is loaded from allData.metadata.domains (embedded in network_graph.json).
+// Do NOT add hardcoded domain mapping dicts here — edit metadata/expertise_domains.json instead.
+
+// Helpers populated after data load:
+let domainColorMap = {};  // id → color
+let domainNameMap = {};   // id → name
+
+function buildDomainMaps(domains) {
+    domainColorMap = {};
+    domainNameMap = {};
+    (domains || []).forEach(d => {
+        domainColorMap[d.id] = d.color;
+        domainNameMap[d.id] = d.name;
+    });
+}
 
 // Archetype Color Mapping
 const ARCHETYPE_COLORS = {
@@ -30,22 +32,7 @@ function getNodeColor(d) {
     return ARCHETYPE_COLORS[d.dev_type] || '#475569';
 }
 
-const THEME_COLORS = {
-    'Consensus': 'var(--color-consensus)',
-    'Script': 'var(--color-script)',
-    'L2': 'var(--color-l2)',
-    'Privacy': 'var(--color-privacy)',
-    'Wallet': 'var(--color-wallet)',
-    'Mempool': 'var(--color-mempool)',
-    'Network': 'var(--color-network)',
-    'Mining': 'var(--color-mining)',
-    'Crypto': '#a855f7',
-    'Data': '#6366f1',
-    'Ecosystem': '#94a3b8',
-    'other': 'var(--color-other)'
-};
-
-const THEME_CLUSTER_ORDER = ['Consensus', 'Script', 'L2', 'Privacy', 'Wallet', 'Mempool', 'Network', 'Mining', 'Crypto', 'Data', 'Ecosystem', 'other'];
+const THEME_CLUSTER_ORDER = ['Consensus', 'Script', 'L2', 'Privacy', 'Wallet', 'Mempool', 'Network', 'Mining', 'Cryptography', 'Infrastructure', 'Ecosystem', 'other'];
 
 // Community hull palette — distinct colours that read well on a dark background.
 // Each entry is the RGB triplet used with variable alpha for fills vs. strokes.
@@ -103,13 +90,14 @@ function initViz() {
     d3.json(graphPath).then((data) => {
         allData = data;
         totalPopulation = data.metadata?.total_population || data.nodes.length;
+        buildDomainMaps(data.metadata?.domains);
 
         document.getElementById('total-pop').innerText = totalPopulation.toLocaleString();
         document.getElementById('viz-count').innerText = data.nodes.length.toLocaleString();
 
         allData.nodes.forEach(n => {
-            n.theme = THEME_MAPPING[n.top_category] || 'other';
-            n.expertise.forEach(e => { e.theme = THEME_MAPPING[e.topic] || 'other'; });
+            // Use first expertise_domain as the node's theme; fall back to top_category slug.
+            n.theme = (n.expertise_domains && n.expertise_domains[0]) || n.top_category || 'other';
             // n.id is already the canonical uuid — use it directly for directory deep-links
             n.uuid = n.id;
         });
@@ -259,7 +247,11 @@ function updateViz() {
 
     nodes = allData.nodes.filter(n => {
         const score = getScore(n);
-        if (currentFilters.theme !== 'all' && n.theme !== currentFilters.theme) return false;
+        if (currentFilters.theme !== 'all') {
+            // Threshold-based: include contributor if they have ≥5% expertise share
+            // in the selected domain, so secondary/tertiary specialists show up.
+            if (((n.expertise_domain_scores || {})[currentFilters.theme] || 0) <= 0.05) return false;
+        }
         if (currentFilters.archetype !== 'all' && n.dev_type !== currentFilters.archetype) return false;
         if (currentFilters.bip !== '') {
             if (!n.bips.some(b => b.includes(currentFilters.bip))) return false;
@@ -429,14 +421,20 @@ function render() {
     }
 
     node.on("mouseover", (e, d) => {
+        const _eraCommits = currentFilters.view === 'p2016' ? (d.code_stats.p2016_commits || 0)
+            : currentFilters.view === 'modern' ? (d.code_stats.modern_commits || 0)
+            : d.code_stats.commits;
+        const _eraPosts = currentFilters.view === 'p2016' ? (d.p2016_posts || 0)
+            : currentFilters.view === 'modern' ? (d.modern_posts || 0)
+            : d.threads_started + d.replies_sent;
         tooltip.style("display", "block").html(`
             <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${d.display_name || d.id}</div>
             <div style="font-size:11px; font-weight:600; color:${getNodeColor(d)}; text-transform:uppercase; margin-bottom:4px;">${d.dev_type}</div>
             <div style="color:var(--text-secondary); font-size:10px;">Last Active: ${new Date(d.last_active).toLocaleDateString()}</div>
             <div style="margin-top:8px; font-size:11px; color:var(--text-secondary); border-top:1px solid var(--border); padding-top:6px;">
-                Focus: <span style="color:${THEME_COLORS[d.theme] || 'var(--text-primary)'}; font-weight:600;">${d.theme}</span><br>
-                Code: <b>${d.code_stats.commits}</b> commits<br>
-                Social: <b>${d.threads_started + d.replies_sent}</b> posts<br>
+                Focus: <span style="color:${domainColorMap[d.theme] || 'var(--text-primary)'}; font-weight:600;">${domainNameMap[d.theme] || d.theme}</span><br>
+                Code: <b>${_eraCommits}</b> commits<br>
+                Social: <b>${_eraPosts}</b> posts<br>
                 Influence: <span style="color:var(--bitcoin-orange); font-weight:600;">${formatInfluence(d)}</span>
             </div>
         `);
@@ -530,15 +528,13 @@ function forceBox(width, height) {
 function showProfile(d) {
     document.getElementById('selection-panel').style.display = 'block';
     const srcClass = d.dominant_source === 'delving' ? 'tag-delving' : (d.dominant_source === 'mailing_list' ? 'tag-ml' : 'tag-mixed');
-    let expertiseHtml = d.expertise.map(exp => `
-        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
-            <span>${exp.topic}</span>
-            <span>${Math.round(exp.share * 100)}%</span>
-        </div>
-        <div class="expertise-meter">
-            <div class="expertise-segment" style="width:${exp.share * 100}%; background:${THEME_COLORS[exp.theme] || '#444'}"></div>
-        </div>
-    `).join('');
+    // Expertise chips from synthesized expertise_domains
+    const domains = d.expertise_domains || [];
+    let expertiseHtml = domains.map(domId => {
+        const color = domainColorMap[domId] || '#444';
+        const label = domainNameMap[domId] || domId;
+        return `<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:${color}22;color:${color};border:1px solid ${color}44;margin:2px 2px 2px 0;">${label}</span>`;
+    }).join('');
 
     let bipsHtml = d.bips.length > 0 ? d.bips.map(b => `<span class="bip-chip">BIP ${b}</span>`).join('') : '<span style="color:var(--text-secondary); font-size:11px;">None cited</span>';
     const rank = rankMap.get(d.id) || 'N/A';
@@ -562,20 +558,31 @@ function showProfile(d) {
             </div>
 
             <div style="display:flex; gap:20px; margin-bottom:20px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-subtle);">
-                <div>
-                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Commits</div>
-                    <div style="font-size:15px; font-weight:700; color:var(--primary);">${d.code_stats.commits.toLocaleString()}</div>
-                </div>
-                <div style="border-left: 1px solid var(--border-subtle);"></div>
-                <div>
-                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Reviews</div>
-                    <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${(d.reviews_count || 0).toLocaleString()}</div>
-                </div>
-                <div style="border-left: 1px solid var(--border-subtle);"></div>
-                <div>
-                    <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Auth Score</div>
-                    <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${formatInfluence(d)}</div>
-                </div>
+                ${(() => {
+                    const eraLabel = currentFilters.view === 'p2016' ? ' 2016+' : currentFilters.view === 'modern' ? ' 3yr' : '';
+                    const eraCommits = currentFilters.view === 'p2016' ? (d.code_stats.p2016_commits || 0)
+                        : currentFilters.view === 'modern' ? (d.code_stats.modern_commits || 0)
+                        : d.code_stats.commits;
+                    const eraReviews = currentFilters.view === 'p2016' ? (d.p2016_reviews_count || 0)
+                        : currentFilters.view === 'modern' ? (d.modern_reviews_count || 0)
+                        : (d.reviews_count || 0);
+                    const eraLabelHtml = eraLabel ? `<span style="font-size:7px; opacity:0.65; display:block;">(${eraLabel.trim()})</span>` : '';
+                    return `
+                    <div>
+                        <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Commits${eraLabelHtml}</div>
+                        <div style="font-size:15px; font-weight:700; color:var(--primary);">${eraCommits.toLocaleString()}</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--border-subtle);"></div>
+                    <div>
+                        <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Reviews${eraLabelHtml}</div>
+                        <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${eraReviews.toLocaleString()}</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--border-subtle);"></div>
+                    <div>
+                        <div style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Auth Score</div>
+                        <div style="font-size:15px; font-weight:700; color:var(--text-primary);">${formatInfluence(d)}</div>
+                    </div>`;
+                })()}
             </div>
 
             ${d.uuid ? `
@@ -611,17 +618,30 @@ function showProfile(d) {
     }
 }
 
-function getScore(d) { 
-    if (currentFilters.view === 'all') return d.hybrid_score || 0;
-    return d.scores[currentFilters.view] || 0; 
+function getScore(d) {
+    let base;
+    if (currentFilters.view === 'all') {
+        base = d.hybrid_score;
+    } else if (currentFilters.view === 'p2016') {
+        base = d.p2016_hybrid_score;
+    } else if (currentFilters.view === 'modern') {
+        base = d.modern_hybrid_score;
+    } else {
+        base = 0;
+    }
+    // When filtering by domain, weight by domain share so rankings reflect
+    // authority within that domain rather than global influence.
+    if (currentFilters.theme !== 'all') {
+        return base * (d.expertise_domain_scores[currentFilters.theme] || 0.01);
+    }
+    return base;
 }
 
 function getRadius(d) {
-    // If backend provided a pre-scaled value, use it, otherwise fall back to legacy scaling
-    if (currentFilters.view === 'all' && d.val) return d.val;
-    
-    const score = getScore(d);
-    return Math.pow(score, 0.85) * 800 + 3;
+    if (currentFilters.view === 'all') return d.val;
+    if (currentFilters.view === 'p2016') return (d.p2016_hybrid_score * 10) + 2;
+    if (currentFilters.view === 'modern') return (d.modern_hybrid_score * 10) + 2;
+    return 2;
 }
 function drag(simulation) {
     return d3.drag()

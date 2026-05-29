@@ -36,23 +36,18 @@ const GHIBLI_PALETTE = [
     '#384D48','#ACD7EC'
 ];
 
-const TOPIC_LABELS = {
-    'quantum':'Quantum Resistance','covenants':'Covenants & Vaults','taproot':'Taproot',
-    'mining':'Mining Protocol','mempool-fees':'Mempool & Fees','privacy':'Privacy',
-    'lightning':'Lightning / L2','bitvm':'BitVM','p2p-network':'P2P Network',
-    'bip-process':'BIP Process','testing-devtools':'Dev Tooling',
-    'soft-fork-activation':'Soft Fork Activation','segwit':'SegWit',
-    'script-opcodes':'Script & Opcodes','ecash':'eCash','silent-payments':'Silent Payments',
-    'signatures-sighash':'Signatures & Sighash','scaling':'Scaling',
-    'spam-filtering':'Spam Filtering','utxo-sync':'UTXO & Sync',
-    'payment-protocol':'Payment Protocol','vaults':'Vaults','dlc':'DLCs',
-    'atomic-swaps':'Atomic Swaps','multisig-threshold':'Multisig','wallet-keys':'Wallet & Keys',
-    'core-dev':'Core Dev','nostr':'Nostr','hard-fork-block-size':'Block Size Debate',
-    'l2-bridges':'L2 Bridges','sidechains-drivechain':'Sidechains / Drivechain',
-    'tokens-runes':'Tokens & Runes','ordinals-inscriptions':'Ordinals & Inscriptions',
-    'data-structures':'Data Structures','transaction-format':'Transaction Format',
-    'consensus-cleanup':'Consensus Cleanup','other':'Other',
-};
+// Domain labels are loaded from registry_index.json metadata.domains at init time.
+// Do NOT add hardcoded label maps here — edit metadata/expertise_domains.json instead.
+let DOMAIN_COLOR_MAP = {};  // id → color
+let DOMAIN_NAME_MAP  = {};  // id → name
+function buildProfileDomainMaps(domains) {
+    DOMAIN_COLOR_MAP = {};
+    DOMAIN_NAME_MAP = {};
+    (domains || []).forEach(d => {
+        DOMAIN_COLOR_MAP[d.id] = d.color;
+        DOMAIN_NAME_MAP[d.id]  = d.name;
+    });
+}
 
 const BIP_STATUS_COLORS = {
     // Live / deployed
@@ -242,9 +237,21 @@ function renderStatBar(p) {
 }
 
 function renderWorkDetail(p) {
-    const focusAreas = Array.isArray(p.focus_areas) ? p.focus_areas :
-                       Array.isArray(p.technical_focus) ? p.technical_focus :
-                       (p.technical_focus ? [p.technical_focus] : []);
+    // Derive top-3 focus areas from expertise_domain_scores (sorted by score desc).
+    // Fall back to legacy expertise_domains list if scores not available.
+    const focusAreas = (() => {
+        if (p.expertise_domain_scores && Object.keys(p.expertise_domain_scores).length) {
+            return Object.entries(p.expertise_domain_scores)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([id]) => DOMAIN_NAME_MAP[id] || id);
+        }
+        if (Array.isArray(p.expertise_domains) && p.expertise_domains.length) {
+            return p.expertise_domains.map(d => DOMAIN_NAME_MAP[d] || d);
+        }
+        return Array.isArray(p.technical_focus) ? p.technical_focus
+             : (p.technical_focus ? [p.technical_focus] : []);
+    })();
     const focusDisplay = focusAreas.slice(0, 3).join(', ') || p.primary_category || '—';
 
     const reciprocity = Number(p.review_reciprocity);
@@ -473,7 +480,7 @@ async function renderCharts(p) {
                 xAxis: { type: 'category', data: years, axisLabel },
                 yAxis: { type: 'value', axisLabel, splitLine },
                 series: topics.map((topic, idx) => ({
-                    name: TOPIC_LABELS[topic] || topic,
+                    name: DOMAIN_NAME_MAP[topic] || topic,
                     type: 'bar', stack: 'total', barMaxWidth: 48,
                     emphasis: { focus: 'series' },
                     itemStyle: { color: GHIBLI_PALETTE[idx % GHIBLI_PALETTE.length] },
@@ -482,6 +489,105 @@ async function renderCharts(p) {
             });
         }
     }
+}
+
+// ── Influence scores (temporal: all-time / since-2016 / last-3-years) ─────────
+function renderInfluenceScores(p) {
+    const all    = p.hybrid_score        != null ? Number(p.hybrid_score).toFixed(2) : null;
+    const p2016  = p.p2016_hybrid_score  != null ? Number(p.p2016_hybrid_score).toFixed(2) : null;
+    const modern = p.modern_hybrid_score != null ? Number(p.modern_hybrid_score).toFixed(2) : null;
+
+    if (!all && !p2016 && !modern) {
+        document.getElementById('profile-influence-slot').innerHTML = '';
+        return;
+    }
+
+    const items = [
+        { label: 'All-time',     value: all    || '—', context: 'incl. BIP &amp; maintainer bonuses' },
+        { label: 'Since 2016',   value: p2016  || '—', context: 'post-2016 commits &amp; PageRank' },
+        { label: 'Last 3 Years', value: modern || '—', context: 'recent activity &amp; influence' },
+    ];
+
+    document.getElementById('profile-influence-slot').innerHTML = `
+        <div class="profile-section">
+            <p class="section-title">Influence Scores</p>
+            <div class="temporal-scores">
+                ${items.map(it => `
+                <div class="temporal-score-item">
+                    <div class="temporal-score-label">${it.label}</div>
+                    <div class="temporal-score-value">${it.value}</div>
+                    <div class="temporal-score-context">${it.context}</div>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+// ── Expertise domains section ─────────────────────────────────────────────────
+function renderExpertiseSection(p) {
+    const domainScores = p.expertise_domain_scores;
+    const bySource = p.expertise_by_source || {};
+
+    if (!domainScores || Object.keys(domainScores).length === 0) {
+        document.getElementById('profile-expertise-slot').innerHTML = '';
+        return;
+    }
+
+    const sorted = Object.entries(domainScores).sort((a, b) => b[1] - a[1]);
+    const maxScore = sorted[0][1] || 1;
+
+    function makeBar(domainId, score, maxVal) {
+        const pct = Math.round(score * 100);
+        const barWidth = Math.round((score / maxVal) * 100);
+        const color = DOMAIN_COLOR_MAP[domainId] || '#7BA9CC';
+        const name = DOMAIN_NAME_MAP[domainId] || domainId;
+        return `<div class="expertise-bar-row">
+            <span class="expertise-bar-label">${esc(name)}</span>
+            <div class="expertise-bar-track">
+                <div class="expertise-bar-fill" style="width:${barWidth}%;background:${color};"></div>
+            </div>
+            <span class="expertise-bar-pct">${pct}%</span>
+        </div>`;
+    }
+
+    function makeSourceCol(label, icon, sourceData) {
+        if (!sourceData || Object.keys(sourceData).length === 0) return '';
+        const entries = Object.entries(sourceData).sort((a, b) => b[1] - a[1]);
+        const rows = entries.map(([domainId, score]) => {
+            const pct = Math.round(score * 100);
+            const color = DOMAIN_COLOR_MAP[domainId] || '#7BA9CC';
+            const name = DOMAIN_NAME_MAP[domainId] || domainId;
+            return `<div class="source-domain-row">
+                <span class="source-domain-dot" style="background:${color};"></span>
+                <span class="source-domain-name">${esc(name)}</span>
+                <span class="source-domain-pct">${pct}%</span>
+            </div>`;
+        }).join('');
+        return `<div class="expertise-source-col">
+            <p class="work-col-title"><i class="${icon}"></i> ${label}</p>
+            ${rows}
+        </div>`;
+    }
+
+    const primaryBars = sorted.map(([id, score]) => makeBar(id, score, maxScore)).join('');
+    const codeCol       = makeSourceCol('Code',       'fas fa-code',     bySource.code);
+    const bipsCol       = makeSourceCol('BIPs',       'fas fa-scroll',   bySource.bips);
+    const discussionCol = makeSourceCol('Discussion', 'fas fa-comments', bySource.discussion);
+    const hasSources = codeCol || bipsCol || discussionCol;
+
+    document.getElementById('profile-expertise-slot').innerHTML = `
+        <div class="profile-section">
+            <p class="section-title">Expertise Domains</p>
+            <div class="expertise-grid">
+                <div class="expertise-primary">
+                    ${primaryBars}
+                </div>
+                ${hasSources ? `<div class="expertise-sources">
+                    ${codeCol}
+                    ${bipsCol}
+                    ${discussionCol}
+                </div>` : ''}
+            </div>
+        </div>`;
 }
 
 // ── Full profile render orchestration ─────────────────────────────────────────
@@ -493,7 +599,9 @@ function renderProfile(p) {
 
     renderHero(p);
     renderStatBar(p);
+    renderInfluenceScores(p);
     renderWorkDetail(p);
+    renderExpertiseSection(p);
     renderJumpNav(p);
     renderCommitChartSlot(p);
     renderBips(p);
@@ -620,6 +728,7 @@ async function initProfilePage() {
         const res = await fetch(REGISTRY_URL);
         if (!res.ok) throw new Error('registry fetch failed');
         const data = await res.json();
+        buildProfileDomainMaps(data.metadata?.domains);
         contributors = data.contributors || [];
     } catch (e) {
         console.warn('Registry fetch failed:', e);

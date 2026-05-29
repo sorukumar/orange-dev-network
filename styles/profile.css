@@ -616,6 +616,146 @@ a.msg-subject:hover {
 .mini-badge.author     { background: rgba(139,92,246,0.1);   color: #8b5cf6; border-color: rgba(139,92,246,0.25); }
 .mini-badge.maintainer { background: rgba(245,158,11,0.1);   color: #f59e0b; border-color: rgba(245,158,11,0.25); }
 
+/* ── Influence trajectory (temporal scores) ─────────────────────────────────── */
+.temporal-scores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 520px) {
+    .temporal-scores { grid-template-columns: 1fr; }
+}
+
+.temporal-score-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+
+.temporal-score-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.1px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.temporal-score-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.temporal-score-context {
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    line-height: 1.4;
+}
+
+/* ── Expertise domains ───────────────────────────────────────────────────────── */
+.expertise-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 28px;
+}
+
+@media (max-width: 760px) {
+    .expertise-grid { grid-template-columns: 1fr; }
+}
+
+.expertise-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.expertise-bar-row:last-child { border-bottom: none; }
+
+.expertise-bar-label {
+    width: 120px;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.expertise-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.expertise-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.expertise-bar-pct {
+    width: 36px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.expertise-sources {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 480px) {
+    .expertise-sources { grid-template-columns: 1fr; }
+}
+
+.expertise-source-col .work-col-title {
+    margin-bottom: 10px;
+}
+
+.source-domain-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.source-domain-row:last-child { border-bottom: none; }
+
+.source-domain-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.source-domain-name {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.source-domain-pct {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
 /* ── Not-found state ─────────────────────────────────────────────────────────── */
 .profile-not-found {
     text-align: center;
