@@ -447,15 +447,19 @@ function sortData() {
             if (authA !== authB) return authB - authA;
         }
         // For Impact/Commits columns, map to era-appropriate fields
-        let valA = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (a.p2016_hybrid_score || 0)
-            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (a.modern_hybrid_score || 0)
+        let valA = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (a.p2016_impact_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (a.modern_impact_score || 0)
             : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (a.p2016_authored_commits || 0)
             : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (a.modern_authored_commits || 0)
+            : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (a.p2016_bips_authored || 0)
+            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (a.modern_bips_authored || 0)
             : a[currentSort.col];
-        let valB = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (b.p2016_hybrid_score || 0)
-            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (b.modern_hybrid_score || 0)
+        let valB = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (b.p2016_impact_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (b.modern_impact_score || 0)
             : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (b.p2016_authored_commits || 0)
             : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (b.modern_authored_commits || 0)
+            : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (b.p2016_bips_authored || 0)
+            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (b.modern_bips_authored || 0)
             : b[currentSort.col];
 
         // Handle nested github login for display_name sort if needed, 
@@ -488,12 +492,9 @@ function renderTable() {
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const pageItems = filteredContributors.slice(startIndex, startIndex + PAGE_SIZE);
 
-    // Compute max era score for progress bar normalization
-    const maxEraScore = currentFilterView === 'p2016'
-        ? Math.max(...filteredContributors.map(c => c.p2016_hybrid_score || 0), 0.01)
-        : currentFilterView === 'modern'
-        ? Math.max(...filteredContributors.map(c => c.modern_hybrid_score || 0), 0.01)
-        : 100; // impact_score is already 0–100
+    // All three eras use the 0–100 saturation-curve impact score, so the bar
+    // always fills relative to 100 (not relative to the filtered-set max).
+    const maxEraScore = 100;
 
     // Update column headers to reflect current era
     const impactTh = document.querySelector('th[data-sort="impact_score"]');
@@ -515,9 +516,17 @@ function renderTable() {
     }
     const delvingTh = document.querySelector('th[data-sort="delving_total"]');
     if (delvingTh) {
-        delvingTh.innerHTML = currentFilterView === 'all'
-            ? 'Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i>'
-            : 'Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(n/a)</span> <i class="fas fa-sort"></i>';
+        if (currentFilterView === 'all') {
+            delvingTh.innerHTML = 'Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(T/R)</span> <i class="fas fa-sort"></i>';
+        } else {
+            const eraLabel = currentFilterView === 'p2016' ? '2016+' : '3yr';
+            delvingTh.innerHTML = `Delving <span style="font-size: 0.7em; opacity: 0.6; font-weight: 400;">(${eraLabel})</span> <i class="fas fa-sort"></i>`;
+        }
+    }
+    const bipsTh = document.querySelector('th[data-sort="bips_authored"]');
+    if (bipsTh) {
+        const eraLabel = currentFilterView === 'p2016' ? ' (2016+)' : currentFilterView === 'modern' ? ' (3yr)' : '';
+        bipsTh.innerHTML = `BIPs${eraLabel} <i class="fas fa-sort"></i>`;
     }
     updateSortIcons();
 
@@ -527,13 +536,13 @@ function renderTable() {
 
         let impactPct, impactDisplay;
         if (currentFilterView === 'p2016') {
-            const eScore = c.p2016_hybrid_score || 0;
-            impactPct = Math.min(100, (eScore / maxEraScore) * 100);
-            impactDisplay = eScore > 0 ? eScore.toFixed(2) : '-';
+            const eScore = c.p2016_impact_score != null ? Number(c.p2016_impact_score) : 0;
+            impactPct = Math.min(100, eScore);
+            impactDisplay = eScore > 0 ? eScore : '-';
         } else if (currentFilterView === 'modern') {
-            const eScore = c.modern_hybrid_score || 0;
-            impactPct = Math.min(100, (eScore / maxEraScore) * 100);
-            impactDisplay = eScore > 0 ? eScore.toFixed(2) : '-';
+            const eScore = c.modern_impact_score != null ? Number(c.modern_impact_score) : 0;
+            impactPct = Math.min(100, eScore);
+            impactDisplay = eScore > 0 ? eScore : '-';
         } else {
             const impact = c.impact_score != null ? Number(c.impact_score) : 0;
             impactPct = Math.min(100, impact);
@@ -587,7 +596,11 @@ function renderTable() {
                     </div>
                 </td>
                 <td style="text-align: center; font-weight: 600;">${currentFilterView === 'p2016' ? (c.p2016_authored_commits?.toLocaleString() || 0) : currentFilterView === 'modern' ? (c.modern_authored_commits?.toLocaleString() || 0) : (c.authored_commits?.toLocaleString() || 0)}</td>
-                <td style="text-align: center; color: var(--text-secondary);">${c.bips_authored || 0}</td>
+                <td style="text-align: center; color: var(--text-secondary);">${
+                    currentFilterView === 'p2016' ? (c.p2016_bips_authored || 0)
+                    : currentFilterView === 'modern' ? (c.modern_bips_authored || 0)
+                    : (c.bips_authored || 0)
+                }</td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
                     ${socialMlHtml}
                 </td>
