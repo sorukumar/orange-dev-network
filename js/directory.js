@@ -681,6 +681,9 @@ function renderTable() {
 function showProfile(uuid) {
     window.location.href = 'profile.html?uuid=' + encodeURIComponent(uuid);
 }
+// Expose to global scope — needed because renderTable() generates inline onclick
+// handlers (onclick="showProfile(...)") which cannot reach module-scoped functions.
+window.showProfile = showProfile;
 
 function renderProfile(p, isBasic = false) {
     let avatarHtml = `<div class="avatar-placeholder profile-large"><i class="fas fa-user-circle"></i></div>`;
