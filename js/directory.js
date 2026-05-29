@@ -1,12 +1,20 @@
 /**
  * Contributor Directory - Logic for fetching and rendering the contributor index.
+ *
+ * Data loading: uses registry_contributors.parquet (via hyparquet) + registry_metadata.json
+ * instead of the monolithic registry_index.json (~10 MB) to reduce initial load time.
+ * Nested columns (expertise_domain_scores, roles, github, etc.) are stored as JSON strings
+ * in the parquet and parsed back to objects after loading. See METADATA_REFERENCE.md.
  */
+import { parquetRead } from 'https://cdn.jsdelivr.net/npm/hyparquet@1.17.1/+esm';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const DATA_BASE_URL = isLocal 
     ? 'output/shared/contributors/' 
     : 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/shared/contributors/';
-const REGISTRY_URL = DATA_BASE_URL + 'registry_index.json';
+const REGISTRY_URL = DATA_BASE_URL + 'registry_index.json';         // kept for fallback
+const REGISTRY_METADATA_URL = DATA_BASE_URL + 'registry_metadata.json';
+const REGISTRY_PARQUET_URL  = DATA_BASE_URL + 'registry_contributors.parquet';
 const PROFILE_BASE_URL = DATA_BASE_URL + 'profiles/';
 
 let allContributors = [];
@@ -241,19 +249,46 @@ async function initDirectory() {
     const params = new URLSearchParams(window.location.search);
     const directUuid = params.get('uuid');
     try {
-        const response = await fetch(REGISTRY_URL);
-        const data = await response.json();
-        buildRegistryDomainMaps(data.metadata?.domains);
-        allContributors = data.contributors.map(c => {
-            if (c.global_last_active) {
-                const d = new Date(c.global_last_active).getTime();
-                if (d > datasetLatestDate) datasetLatestDate = d;
-            }
-            return {
-                ...c,
-                ml_total: (c.ml_threads || 0) + (c.ml_responses || 0),
-                delving_total: (c.delving_threads || 0) + (c.delving_responses || 0)
-            };
+        // Fetch metadata JSON (tiny) and parquet binary in parallel
+        const [metaResp, parquetResp] = await Promise.all([
+            fetch(REGISTRY_METADATA_URL),
+            fetch(REGISTRY_PARQUET_URL),
+        ]);
+        const meta = await metaResp.json();
+        const ab   = await parquetResp.arrayBuffer();
+
+        buildRegistryDomainMaps(meta.metadata?.domains);
+
+        // Column order and which columns contain JSON-stringified nested objects
+        // are declared by the pipeline in registry_metadata.json — no hardcoding needed.
+        const colNames   = meta.metadata.parquet_columns;
+        const nestedCols = new Set(meta.metadata.parquet_nested_cols || []);
+
+        await parquetRead({
+            file: ab,
+            onComplete: (rows) => {
+                allContributors = rows.map(row => {
+                    // Reconstruct object from positional array
+                    const obj = Object.fromEntries(colNames.map((col, i) => [col, row[i]]));
+                    // Parse JSON-string columns back to objects/arrays
+                    for (const col of nestedCols) {
+                        if (typeof obj[col] === 'string') {
+                            try { obj[col] = JSON.parse(obj[col]); } catch { obj[col] = null; }
+                        }
+                    }
+                    // Track dataset latest date for "modern" era calculation
+                    if (obj.global_last_active) {
+                        const d = new Date(obj.global_last_active).getTime();
+                        if (d > datasetLatestDate) datasetLatestDate = d;
+                    }
+                    return {
+                        ...obj,
+                        ml_total: (obj.ml_threads || 0) + (obj.ml_responses || 0),
+                        delving_total: (obj.delving_threads || 0) + (obj.delving_responses || 0),
+                    };
+                });
+            },
+            onError: (err) => { throw err; }
         });
 
         // Initial filter & sort
