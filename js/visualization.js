@@ -32,6 +32,18 @@ function getNodeColor(d) {
     return ARCHETYPE_COLORS[d.dev_type] || '#475569';
 }
 
+function nodeMatchesSearch(node, term) {
+    if (!term) return false;
+    const normalized = term.toLowerCase();
+    const name = (node.display_name || '').toLowerCase();
+    const id = (node.id || '').toLowerCase();
+    const login = (node.login || '').toLowerCase();
+    if (name.includes(normalized) || id.includes(normalized) || login.includes(normalized)) {
+        return true;
+    }
+    return false;
+}
+
 const THEME_CLUSTER_ORDER = ['Consensus', 'Script', 'L2', 'Privacy', 'Wallet', 'Mempool', 'Network', 'Mining', 'Cryptography', 'Infrastructure', 'Ecosystem', 'other'];
 
 // Community hull palette — distinct colours that read well on a dark background.
@@ -192,6 +204,13 @@ function setupEventListeners() {
             }
             updateViz();
         });
+
+        unifiedInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusFirstSearchMatch();
+            }
+        });
     }
 
     document.getElementById('zoom-in').onclick = () => svg.transition().duration(300).call(zoom.scaleBy, 1.5);
@@ -203,21 +222,12 @@ function setupEventListeners() {
         clusterMode = 'social';
         document.getElementById('cluster-social').classList.add('active');
         document.getElementById('cluster-expertise').classList.remove('active');
-        document.getElementById('cluster-domain').classList.remove('active');
         updateViz();
     };
     document.getElementById('cluster-expertise').onclick = () => {
         clusterMode = 'expertise';
         document.getElementById('cluster-expertise').classList.add('active');
         document.getElementById('cluster-social').classList.remove('active');
-        document.getElementById('cluster-domain').classList.remove('active');
-        updateViz();
-    };
-    document.getElementById('cluster-domain').onclick = () => {
-        clusterMode = 'domain';
-        document.getElementById('cluster-domain').classList.add('active');
-        document.getElementById('cluster-social').classList.remove('active');
-        document.getElementById('cluster-expertise').classList.remove('active');
         updateViz();
     };
 
@@ -248,9 +258,10 @@ function updateViz() {
     nodes = allData.nodes.filter(n => {
         const score = getScore(n);
         if (currentFilters.theme !== 'all') {
-            // Threshold-based: include contributor if they have ≥5% expertise share
-            // in the selected domain, so secondary/tertiary specialists show up.
-            if (((n.expertise_domain_scores || {})[currentFilters.theme] || 0) <= 0.05) return false;
+            // Use era-aware domain authority the same way the directory focus filter does:
+            // keep contributors only if their selected-era hybrid score multiplied by
+            // their domain share is meaningfully positive.
+            if ((score * ((n.expertise_domain_scores || {})[currentFilters.theme] || 0)) <= 0.01) return false;
         }
         if (currentFilters.archetype !== 'all' && n.dev_type !== currentFilters.archetype) return false;
         if (currentFilters.bip !== '') {
@@ -271,18 +282,51 @@ function updateViz() {
 
     document.getElementById('node-count').innerText = nodes.length;
     render();
-    if (currentFilters.search) highlightSearch();
+    if (currentFilters.search || currentFilters.bip) {
+        highlightSearch();
+    }
+}
+
+function focusFirstSearchMatch() {
+    const term = currentFilters.search;
+    if (!term && !currentFilters.bip) return;
+    const matches = nodes.filter(n => currentFilters.bip ? n.bips.some(b => b.includes(currentFilters.bip)) : nodeMatchesSearch(n, term));
+    if (!matches.length) return;
+    const target = matches[0];
+    if (!target || target.x === undefined || target.y === undefined) return;
+    const scale = Math.min(3.5, Math.max(1.3, Math.min(width, height) / 350));
+    const tx = width / 2 - target.x * scale;
+    const ty = height / 2 - target.y * scale;
+    svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
 }
 
 function highlightSearch() {
     const term = currentFilters.search;
+    const matchedNodes = new Set();
+    g.selectAll("circle").each((d) => {
+        if (currentFilters.bip) {
+            if (d.bips.some(b => b.includes(currentFilters.bip))) matchedNodes.add(d.id);
+        } else if (term) {
+            if (nodeMatchesSearch(d, term)) matchedNodes.add(d.id);
+        }
+    });
+
+    const matchCount = matchedNodes.size;
     g.selectAll("circle")
-        .style("stroke", n => n.id.toLowerCase().includes(term) && term !== '' ? "var(--text-primary)" : "var(--bg-secondary)")
-        .style("stroke-width", n => n.id.toLowerCase().includes(term) && term !== '' ? 2 : 0.5)
-        .attr("r", n => {
-            const base = getRadius(n);
-            return n.id.toLowerCase().includes(term) && term !== '' ? base * 1.5 : base;
+        .style("opacity", d => matchCount > 0 ? (matchedNodes.has(d.id) ? 1 : 0.18) : 1)
+        .style("stroke", d => matchedNodes.has(d.id) ? "var(--primary)" : "#000")
+        .style("stroke-width", d => matchedNodes.has(d.id) ? 2.2 : 0.5)
+        .attr("r", d => {
+            const base = getRadius(d);
+            return matchedNodes.has(d.id) ? base * 1.4 : base;
         });
+    g.selectAll("text.label")
+        .style("opacity", d => matchedNodes.has(d.id) ? 1 : 0.25);
+
+    if (matchCount === 1) {
+        focusFirstSearchMatch();
+    }
+    return matchCount;
 }
 
 function formatInfluence(n) {
@@ -525,9 +569,37 @@ function forceBox(width, height) {
     return force;
 }
 
+function getTrendTag(d) {
+    const scoreP2016 = Number(d.p2016_hybrid_score || 0);
+    const scoreModern = Number(d.modern_hybrid_score || 0);
+    const firstActive = d.first_active || d.global_first_active || d.first_seen;
+    let firstActiveDate = null;
+    if (firstActive) {
+        const parsed = new Date(firstActive);
+        if (!Number.isNaN(parsed.getTime())) {
+            firstActiveDate = parsed;
+        }
+    }
+    const hasModernCommit = Number(d.code_stats?.modern_commits || 0) > 0;
+    const hasModernReview = Number(d.modern_reviews_count || 0) > 0;
+    const hasModernSocial = Number(d.modern_posts || 0) > 0;
+    const hasRecentActivity = hasModernCommit || hasModernReview || hasModernSocial || scoreModern > 0;
+    const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+    if (firstActiveDate && (Date.now() - firstActiveDate.getTime()) <= oneYearMs && hasRecentActivity) {
+        return `<span class="tag tag-new">New</span>`;
+    }
+    const growth = scoreP2016 > 0 ? scoreModern / scoreP2016 : (scoreModern > 0 ? 2 : 0);
+    if (growth > 1.5) return `<span class="tag tag-rising">Rising</span>`;
+    if (growth >= 0.8) return `<span class="tag tag-steady">Steady</span>`;
+    if (growth > 0 && scoreModern >= 0.35) return `<span class="tag tag-steady">Steady</span>`;
+    if (growth > 0) return `<span class="tag tag-fading">Fading</span>`;
+    return '';
+}
+
 function showProfile(d) {
-    document.getElementById('selection-panel').style.display = 'block';
-    const srcClass = d.dominant_source === 'delving' ? 'tag-delving' : (d.dominant_source === 'mailing_list' ? 'tag-ml' : 'tag-mixed');
+    const selectionPanel = document.getElementById('selection-panel');
+    if (selectionPanel) selectionPanel.style.display = 'block';
+    const trendTag = getTrendTag(d);
     // Expertise chips from synthesized expertise_domains
     const domains = d.expertise_domains || [];
     let expertiseHtml = domains.map(domId => {
@@ -544,8 +616,7 @@ function showProfile(d) {
         <div style="border-left: 3px solid ${color}; padding-left: 16px; margin-left: -4px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div style="display:flex; gap:6px;">
-                    <span class="tag ${srcClass}">${d.dominant_source.replace('_', ' ')}</span>
-                    ${d.growth > 1.5 ? `<span class="tag" style="color:var(--primary); border:1px solid var(--primary); font-size: 9px; background: rgba(232, 145, 107, 0.05);">↑ Rising</span>` : ''}
+                    ${trendTag}
                 </div>
                 <div style="font-size:10px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em;">
                     Authority #${rank}
@@ -612,9 +683,10 @@ function showProfile(d) {
             </div>
         </div>`;
 
-    // Smooth scroll to selection info on mobile if needed
-    if (window.innerWidth < 768) {
-        document.getElementById('selection-panel').scrollIntoView({ behavior: 'smooth' });
+    // Smooth scroll the selection panel into view whenever a node is picked.
+    const selectionPanelElem = document.getElementById('selection-panel');
+    if (selectionPanelElem) {
+        selectionPanelElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 

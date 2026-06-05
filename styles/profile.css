@@ -284,6 +284,12 @@
     color: var(--text-secondary);
 }
 
+.hero-maintainer-timeline {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
 .hero-links {
     display: flex;
     gap: 10px;
@@ -615,6 +621,7 @@ a.msg-subject:hover {
 .mini-badge.reviewer   { background: rgba(59,130,246,0.1);   color: #3b82f6; border-color: rgba(59,130,246,0.25); }
 .mini-badge.author     { background: rgba(139,92,246,0.1);   color: #8b5cf6; border-color: rgba(139,92,246,0.25); }
 .mini-badge.maintainer { background: rgba(245,158,11,0.1);   color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+.mini-badge.maintainer.retired { background: rgba(245,158,11,0.06);   color: #fbbf24; border-color: rgba(245,158,11,0.18); }
 
 /* ── Influence trajectory (temporal scores) ─────────────────────────────────── */
 .temporal-scores {

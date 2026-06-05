@@ -94,7 +94,7 @@
                             <span id="viz-count" class="stat-val highlight">-</span>
                         </div>
                         <div class="stat-row"
-                             style="border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px;">
+                            style="border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px;">
                             <span>Filtered View</span>
                             <span id="node-count" class="stat-val highlight">-</span>
                         </div>
@@ -115,53 +115,72 @@
             <div id="sidebar">
                 <div class="sidebar-header">
                     <h1><i class="fas fa-project-diagram"></i> Influence Map</h1>
-                    <p>Each node represents a developer, and edges map their technical interactions. Node size reflects their composite influence score.</p>
+                    <p>Each node represents a developer, and edges map their technical interactions. Node size reflects
+                        their composite influence score.</p>
+                </div>
+
+                <!-- Selection Details (Populated by JS) -->
+                <div id="selection-panel" class="info-panel"
+                    style="display: none; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
+                    <div id="selection-content"></div>
                 </div>
 
                 <div class="filter-group" style="padding: 12px;">
                     <span class="filter-label" style="margin-bottom: 8px;">How To Read</span>
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Hover any node for influence details. Click to pin a profile panel with fast actions.</p>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Use mouse wheel to zoom, drag to pan, and Reset View to return to the default layout.</p>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Hover for a
+                        quick preview. Click a node to open the developer profile instantly.</p>
                 </div>
 
                 <!-- Search Controls -->
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; margin-top: 4px;">
                     <div class="search-container">
-                        <input type="text" id="unified-search" placeholder="Search Contributor or BIP (e.g. 119)..." style="width: 100%;">
+                        <input type="text" id="unified-search"
+                            placeholder="Search by name, username, or BIP (e.g. 119)..." style="width: 100%;"
+                            title="Type a name, username, or BIP to locate a contributor on the map.">
                     </div>
-                    
-                    <!-- Directory Navigation -->
-                    <div class="search-container">
-                        <a href="directory.html" class="filter-btn active" id="view-directory-btn"
-                           style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;">
-                            <i class="fas fa-address-book"></i> VIEW DIRECTORY
-                        </a>
-                    </div>
+                </div>
+
+                <div class="legend-panel">
+                    <div class="legend-chip"><span class="legend-dot"
+                            style="background: var(--legend-creator);"></span>Creator</div>
+                    <div class="legend-chip"><span class="legend-dot"
+                            style="background: var(--legend-architect);"></span>Protocol Designer</div>
+                    <div class="legend-chip"><span class="legend-dot"
+                            style="background: var(--legend-engineer);"></span>Builder</div>
+                    <div class="legend-chip"><span class="legend-dot"
+                            style="background: var(--legend-researcher);"></span>Reviewer</div>
+                    <div class="legend-chip"><span class="legend-dot"
+                            style="background: var(--legend-participant);"></span>Participant</div>
                 </div>
 
                 <!-- High-Density Controls -->
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                    <!-- Temporal & Role Grid -->
+                    <!-- Temporal & Cluster Grid -->
                     <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
                         <div class="filter-group" style="padding: 10px;">
                             <span class="filter-label" style="margin-bottom: 8px;">Temporal Window</span>
-                            <div class="btn-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
-                                <button class="filter-btn active" data-view="all" style="font-size: 10px; padding: 6px 2px;">ALL</button>
-                                <button class="filter-btn" data-view="p2016" style="font-size: 10px; padding: 6px 2px;">2016+</button>
-                                <button class="filter-btn" data-view="modern" style="font-size: 10px; padding: 6px 2px;">3Y</button>
+                            <div class="btn-group"
+                                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                                <button class="filter-btn active" data-view="all"
+                                    style="font-size: 10px; padding: 6px 2px;">ALL</button>
+                                <button class="filter-btn" data-view="p2016"
+                                    style="font-size: 10px; padding: 6px 2px;">2016+</button>
+                                <button class="filter-btn" data-view="modern"
+                                    style="font-size: 10px; padding: 6px 2px;">3Y</button>
                             </div>
                         </div>
                         <div class="filter-group" style="padding: 10px;">
                             <span class="filter-label" style="margin-bottom: 8px;">Cluster Mode</span>
-                            <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
-                                <button class="filter-btn active" id="cluster-social" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by who talks to whom (time-weighted)">
+                            <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                                <button class="filter-btn active" id="cluster-social"
+                                    style="font-size: 10px; padding: 6px 4px;"
+                                    data-tooltip="Conversation communities: who replies to whom; labels reflect dominant discussion topics">
                                     <i class="fas fa-comments" style="margin-right:4px; opacity:0.8;"></i>Social
                                 </button>
-                                <button class="filter-btn" id="cluster-expertise" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by technical specialty overlap">
+                                <button class="filter-btn" id="cluster-expertise"
+                                    style="font-size: 10px; padding: 6px 4px;"
+                                    data-tooltip="Expertise similarity/topic clusters: who works on similar domains">
                                     <i class="fas fa-code-branch" style="margin-right:4px; opacity:0.8;"></i>Expertise
-                                </button>
-                                <button class="filter-btn" id="cluster-domain" style="font-size: 10px; padding: 6px 4px;" data-tooltip="Group by broad topic domain">
-                                    <i class="fas fa-layer-group" style="margin-right:4px; opacity:0.8;"></i>Domain
                                 </button>
                             </div>
                         </div>
@@ -179,45 +198,9 @@
                             <button class="filter-btn" data-theme="Privacy">Privacy</button>
                             <button class="filter-btn" data-theme="Wallet">Wallet</button>
                             <button class="filter-btn" data-theme="Mining">Mining</button>
-                            <button class="filter-btn" data-theme="Crypto">Crypto</button>
+                            <button class="filter-btn" data-theme="Cryptography">Cryptography</button>
                         </div>
                     </div>
-
-                    <!-- Role Grid (Surgical) -->
-                    <div class="filter-group" style="padding: 10px;">
-                        <span class="filter-label" style="margin-bottom: 8px;">Technical Role</span>
-                        <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                            <button class="filter-btn active" data-archetype="all" data-tooltip="All roles">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary); margin-right:6px; display:inline-block;"></span>
-                                All
-                            </button>
-                            <button class="filter-btn" data-archetype="Creator" data-tooltip="Creator">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-creator); margin-right:6px; display:inline-block;"></span>
-                                Creator
-                            </button>
-                            <button class="filter-btn" data-archetype="Protocol Designer" data-tooltip="Architect">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-architect); margin-right:6px; display:inline-block;"></span>
-                                Architect
-                            </button>
-                            <button class="filter-btn" data-archetype="Builder" data-tooltip="Engineer">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-engineer); margin-right:6px; display:inline-block;"></span>
-                                Engineer
-                            </button>
-                            <button class="filter-btn" data-archetype="Reviewer" data-tooltip="Researcher">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-researcher); margin-right:6px; display:inline-block;"></span>
-                                Researcher
-                            </button>
-                            <button class="filter-btn" data-archetype="Participant" data-tooltip="Participant">
-                                <span style="width:6px; height:6px; border-radius:50%; background:var(--legend-participant); margin-right:6px; display:inline-block;"></span>
-                                Participant
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Selection Details (Populated by JS) -->
-                <div id="selection-panel" class="info-panel" style="display: none; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
-                    <div id="selection-content"></div>
                 </div>
             </div>
         </div>

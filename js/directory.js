@@ -9,12 +9,12 @@
 import { parquetRead } from 'https://cdn.jsdelivr.net/npm/hyparquet@1.17.1/+esm';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const DATA_BASE_URL = isLocal 
-    ? 'output/shared/contributors/' 
+const DATA_BASE_URL = isLocal
+    ? 'output/shared/contributors/'
     : 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/shared/contributors/';
 const REGISTRY_URL = DATA_BASE_URL + 'registry_index.json';         // kept for fallback
 const REGISTRY_METADATA_URL = DATA_BASE_URL + 'registry_metadata.json';
-const REGISTRY_PARQUET_URL  = DATA_BASE_URL + 'registry_contributors.parquet';
+const REGISTRY_PARQUET_URL = DATA_BASE_URL + 'registry_contributors.parquet';
 const PROFILE_BASE_URL = DATA_BASE_URL + 'profiles/';
 
 let allContributors = [];
@@ -32,61 +32,64 @@ const PAGE_SIZE = 100;
 // Archetype colors — kept in sync with visualization.js for consistency across all three pages
 // 4 roles + Creator — kept in sync with visualization.js and influence.py archetypes.
 const ARCHETYPE_COLORS = {
-    'Creator':           '#E8916B',  // Bitcoin orange — matches theme accent
-    'Protocol Designer': '#8a7a5f',  // Warm bronze — matches text-secondary
-    'Builder':           '#f59e0b',  // Amber — matches script color
-    'Reviewer':          '#10b981',  // Green — matches L2 color
-    'Participant':       '#94A3B8',  // Slate — neutral gray
+    'Creator': '#FFB000',
+    'Protocol Designer': '#E8916B',
+    'Builder': '#D4A298',
+    'Reviewer': '#8293AB',
+    'Participant': '#2D3748',
 };
 
 // Commit category colors — identical to orange-dev-tracker/js/theme.js categoryColors
 const CATEGORY_COLORS = {
-    'Consensus (Domain Logic)':      '#E07A5F',
-    'Cryptography (Primitives)':     '#C53030',
-    'Core Libs':                     '#F6AD55',
-    'Node & RPC (App/Interface)':    '#ED8936',
-    'GUI (Presentation Layer)':      '#F4A261',
-    'Wallet (Client App)':           '#D69E2E',
-    'P2P Network (Infrastructure)':  '#2B6CB0',
-    'Database (Persistence)':        '#4A5568',
-    'Utilities (Shared Libs)':       '#9F86C0',
-    'Tests (QA)':                    '#81B29A',
-    'Build & CI (DevOps)':           '#3D405B',
-    'Documentation':                 '#F2CC8F',
-    'Merge':                         '#94A3B8',
+    'Consensus': '#E07A5F',
+    'Script': '#f59e0b',
+    'Cryptography': '#C53030',
+    'Mining': '#F6AD55',
+    'Node & RPC': '#ED8936',
+    'GUI': '#F4A261',
+    'Wallet': '#D69E2E',
+    'P2P Network': '#2B6CB0',
+    'Database': '#4A5568',
+    'Utilities': '#9F86C0',
+    'Mempool': '#6366f1',
+    'Tests': '#81B29A',
+    'Build & CI': '#3D405B',
+    'Documentation': '#F2CC8F',
+    'Infrastructure': '#94A3B8',
+    'Merge': '#94A3B8',
 };
 
 // Ghibli palette for social topic trends — matches orange-dev-tracker/js/theme.js fallback
 const GHIBLI_PALETTE = [
-    '#7BA9CC','#B9D4E7','#5B8266','#A2C5AC','#E07A5F','#F4A261',
-    '#D4AF37','#E9C46A','#6D597A','#B5838D','#3E6073','#8BBEE8',
-    '#89B449','#C5D86D','#E27396','#FFB3C1','#585123','#DDA15E',
-    '#384D48','#ACD7EC'
+    '#7BA9CC', '#B9D4E7', '#5B8266', '#A2C5AC', '#E07A5F', '#F4A261',
+    '#D4AF37', '#E9C46A', '#6D597A', '#B5838D', '#3E6073', '#8BBEE8',
+    '#89B449', '#C5D86D', '#E27396', '#FFB3C1', '#585123', '#DDA15E',
+    '#384D48', '#ACD7EC'
 ];
 
 // Domain labels are loaded from registry_index.json metadata.domains.
 // Do NOT add hardcoded label maps here — edit metadata/expertise_domains.json instead.
 let DOMAIN_COLOR_MAP = {};  // id → color
-let DOMAIN_NAME_MAP  = {};  // id → name
+let DOMAIN_NAME_MAP = {};  // id → name
 function buildRegistryDomainMaps(domains) {
     DOMAIN_COLOR_MAP = {};
     DOMAIN_NAME_MAP = {};
     (domains || []).forEach(d => {
         DOMAIN_COLOR_MAP[d.id] = d.color;
-        DOMAIN_NAME_MAP[d.id]  = d.name;
+        DOMAIN_NAME_MAP[d.id] = d.name;
     });
 }
 
 // BIP status pill colors
 const BIP_STATUS_COLORS = {
-    'Final':     { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
-    'Active':    { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
-    'Proposed':  { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
-    'Draft':     { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
-    'Withdrawn': { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
-    'Rejected':  { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
-    'Replaced':  { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
-    'Obsolete':  { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+    'Final': { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
+    'Active': { bg: 'rgba(16,185,129,0.15)', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
+    'Proposed': { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
+    'Draft': { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+    'Withdrawn': { bg: 'rgba(239,68,68,0.12)', color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+    'Rejected': { bg: 'rgba(239,68,68,0.12)', color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+    'Replaced': { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
+    'Obsolete': { bg: 'rgba(148,163,184,0.15)', color: '#94A3B8', border: 'rgba(148,163,184,0.3)' },
 };
 
 // ── ECharts lazy loader ────────────────────────────────────────────────────────
@@ -108,7 +111,7 @@ function loadECharts() {
 // Hold active chart instances so they can be disposed when the modal closes
 let _activeProfileCharts = [];
 function disposeProfileCharts() {
-    _activeProfileCharts.forEach(c => { try { c.dispose(); } catch(e) {} });
+    _activeProfileCharts.forEach(c => { try { c.dispose(); } catch (e) { } });
     _activeProfileCharts = [];
 }
 
@@ -120,8 +123,8 @@ function getArchetypeColor(devType) {
 // Compares commit vs social dates so the UI can show where the person was first/last seen
 function formatActiveDate(p, which) {
     const globalDate = which === 'first' ? p.global_first_active : p.global_last_active;
-    const commitDate = which === 'first' ? p.first_commit    : p.last_commit;
-    const socialDate = which === 'first' ? p.first_active    : p.last_active;
+    const commitDate = which === 'first' ? p.first_commit : p.last_commit;
+    const socialDate = which === 'first' ? p.first_active : p.last_active;
 
     if (!globalDate) return { date: '-', source: '' };
 
@@ -141,6 +144,35 @@ function formatActiveDate(p, which) {
     return { date: formatted, source };
 }
 
+function getDirectoryTrendTag(c) {
+    const scoreP2016 = Number(c.p2016_hybrid_score || 0);
+    const scoreModern = Number(c.modern_hybrid_score || 0);
+    const firstActive = c.first_active || c.global_first_active || c.first_seen;
+    let firstActiveDate = null;
+    if (firstActive) {
+        const parsed = new Date(firstActive);
+        if (!Number.isNaN(parsed.getTime())) {
+            firstActiveDate = parsed;
+        }
+    }
+
+    const hasModernCommit = Number(c.code_stats?.modern_commits || 0) > 0;
+    const hasModernReview = Number(c.modern_reviews_count || 0) > 0;
+    const hasModernSocial = Number(c.modern_posts || 0) > 0;
+    const hasRecentActivity = hasModernCommit || hasModernReview || hasModernSocial || scoreModern > 0;
+    const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+    if (firstActiveDate && (Date.now() - firstActiveDate.getTime()) <= oneYearMs && hasRecentActivity) {
+        return { label: 'New', className: 'new' };
+    }
+
+    const growth = scoreP2016 > 0 ? scoreModern / scoreP2016 : (scoreModern > 0 ? 2 : 0);
+    if (growth > 1.5) return { label: 'Rising', className: 'rising' };
+    if (growth >= 0.8) return { label: 'Steady', className: 'steady' };
+    if (growth > 0 && scoreModern >= 0.35) return { label: 'Steady', className: 'steady' };
+    if (growth > 0) return { label: 'Fading', className: 'fading' };
+    return null;
+}
+
 // ── Profile chart rendering ────────────────────────────────────────────────────
 // Called after renderProfile() injects HTML. Loads ECharts lazily then draws
 // the commit-history and social-history stacked bar charts into their placeholder divs.
@@ -157,7 +189,7 @@ async function renderProfileCharts(p) {
     disposeProfileCharts();
 
     const axisLabelStyle = { fontSize: 11, color: '#94A3B8' };
-    const splitLineStyle  = { lineStyle: { color: 'rgba(148,163,184,0.12)' } };
+    const splitLineStyle = { lineStyle: { color: 'rgba(148,163,184,0.12)' } };
     const gridPad = { left: 8, right: 8, top: 8, bottom: 40, containLabel: true };
 
     // ── Commit History by Category ────────────────────────────────────────────
@@ -255,13 +287,13 @@ async function initDirectory() {
             fetch(REGISTRY_PARQUET_URL),
         ]);
         const meta = await metaResp.json();
-        const ab   = await parquetResp.arrayBuffer();
+        const ab = await parquetResp.arrayBuffer();
 
         buildRegistryDomainMaps(meta.metadata?.domains);
 
         // Column order and which columns contain JSON-stringified nested objects
         // are declared by the pipeline in registry_metadata.json — no hardcoding needed.
-        const colNames   = meta.metadata.parquet_columns;
+        const colNames = meta.metadata.parquet_columns;
         const nestedCols = new Set(meta.metadata.parquet_nested_cols || []);
 
         await parquetRead({
@@ -404,7 +436,7 @@ function populateDirectoryFilters() {
     const domainEntries = Object.entries(DOMAIN_NAME_MAP).sort((a, b) => a[1].localeCompare(b[1]));
 
     roleEl.innerHTML = '<option value="all">All Roles</option>' + roles.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
-    focusEl.innerHTML = '<option value="all">All Focus Areas</option>' + domainEntries.map(([id, name]) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
+    focusEl.innerHTML = '<option value="all">All Focus Domains</option>' + domainEntries.map(([id, name]) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
 }
 
 function applyDirectoryFilters() {
@@ -434,7 +466,7 @@ function applyDirectoryFilters() {
         // Uses the era-appropriate hybrid score so p2016/modern views rank contributors correctly.
         const eraHybrid = currentFilterView === 'p2016' ? (c.p2016_hybrid_score || 0)
             : currentFilterView === 'modern' ? (c.modern_hybrid_score || 0)
-            : (c.hybrid_score || 0);
+                : (c.hybrid_score || 0);
         const focusSelectionMatch = currentFocusFilter === 'all' ||
             (eraHybrid * ((c.expertise_domain_scores || {})[currentFocusFilter] || 0)) > 0.01;
 
@@ -481,21 +513,22 @@ function sortData() {
             const authB = eraB * ((b.expertise_domain_scores || {})[currentFocusFilter] || 0);
             if (authA !== authB) return authB - authA;
         }
-        // For Impact/Commits columns, map to era-appropriate fields
-        let valA = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (a.p2016_impact_score || 0)
-            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (a.modern_impact_score || 0)
-            : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (a.p2016_authored_commits || 0)
-            : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (a.modern_authored_commits || 0)
-            : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (a.p2016_bips_authored || 0)
-            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (a.modern_bips_authored || 0)
-            : a[currentSort.col];
-        let valB = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (b.p2016_impact_score || 0)
-            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (b.modern_impact_score || 0)
-            : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (b.p2016_authored_commits || 0)
-            : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (b.modern_authored_commits || 0)
-            : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (b.p2016_bips_authored || 0)
-            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (b.modern_bips_authored || 0)
-            : b[currentSort.col];
+        // For Impact/Commits columns, map to era-appropriate fields.
+        // Note: Impact is displayed as normalized 0-100 on the page, but sorting uses the underlying influence score.
+        let valA = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (a.p2016_hybrid_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (a.modern_hybrid_score || 0)
+                : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (a.p2016_authored_commits || 0)
+                    : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (a.modern_authored_commits || 0)
+                        : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (a.p2016_bips_authored || 0)
+                            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (a.modern_bips_authored || 0)
+                                : a[currentSort.col];
+        let valB = currentSort.col === 'impact_score' && currentFilterView === 'p2016' ? (b.p2016_hybrid_score || 0)
+            : currentSort.col === 'impact_score' && currentFilterView === 'modern' ? (b.modern_hybrid_score || 0)
+                : currentSort.col === 'authored_commits' && currentFilterView === 'p2016' ? (b.p2016_authored_commits || 0)
+                    : currentSort.col === 'authored_commits' && currentFilterView === 'modern' ? (b.modern_authored_commits || 0)
+                        : currentSort.col === 'bips_authored' && currentFilterView === 'p2016' ? (b.p2016_bips_authored || 0)
+                            : currentSort.col === 'bips_authored' && currentFilterView === 'modern' ? (b.modern_bips_authored || 0)
+                                : b[currentSort.col];
 
         // Handle nested github login for display_name sort if needed, 
         // but display_name is already at top level
@@ -567,7 +600,12 @@ function renderTable() {
 
     list.innerHTML = pageItems.map(c => {
         // Removed live GitHub avatar fetching based on user request to improve performance and reliability
-        const avatarPlaceholder = `<div class="avatar-placeholder"><i class="fas fa-user"></i></div>`;
+        const archetypeColor = getArchetypeColor(c.dev_type);
+        const avatarInitial = (c.display_name || '?').trim().charAt(0).toUpperCase();
+        const avatarBackground = c.dev_type ? archetypeColor : 'rgba(255, 255, 255, 0.05)';
+        const avatarColor = c.dev_type ? '#ffffff' : 'var(--text-secondary)';
+        const avatarBorder = c.dev_type ? archetypeColor : 'var(--border)';
+        const avatarPlaceholder = `<div class="avatar-placeholder" style="background:${avatarBackground}; border:1px solid ${avatarBorder}; color:${avatarColor};">${avatarInitial}</div>`;
 
         let impactPct, impactDisplay;
         if (currentFilterView === 'p2016') {
@@ -584,11 +622,23 @@ function renderTable() {
             impactDisplay = c.dev_type === 'Creator' ? 'Creator' : (impact > 0 ? impact : '-');
         }
 
-        const badges = (c.roles || []).map(r => `<span class="mini-badge ${r.toLowerCase()}">${r}</span>`).join('');
-        const archetypeColor = getArchetypeColor(c.dev_type);
-        const archetypeBadge = c.dev_type
-            ? `<span class="mini-badge" style="background:${archetypeColor}22; color:${archetypeColor}; border:1px solid ${archetypeColor}44; font-size:10px;">${c.dev_type}</span>`
-            : '';
+        const badgeInfo = c.badges && typeof c.badges === 'object' ? c.badges : {};
+        const badgeItems = [];
+        const isMaintainer = badgeInfo.is_maintainer || c.code_stats?.is_maintainer;
+
+        if (isMaintainer) {
+            const maintainerStatus = badgeInfo.maintainer_status || 'active';
+            const maintainerClass = maintainerStatus === 'active'
+                ? 'maintainer current'
+                : 'maintainer retired';
+            badgeItems.push({ label: 'Maintainer', className: maintainerClass });
+        }
+        const trend = getDirectoryTrendTag(c);
+        if (trend) {
+            badgeItems.push({ label: trend.label, className: trend.className });
+        }
+
+        const badges = badgeItems.map(({ label, className }) => `<span class="mini-badge ${className}">${label}</span>`).join('');
 
         // Social columns: era-specific source-split counts or all-time threads/responses
         let socialMlHtml, socialDelvingHtml;
@@ -618,7 +668,7 @@ function renderTable() {
                         ${avatarPlaceholder}
                         <div class="contributor-info">
                             <span class="contributor-name">${c.display_name}</span>
-                            <div class="badge-list">${badges}${archetypeBadge}</div>
+                            <div class="badge-list">${badges}</div>
                         </div>
                     </div>
                 </td>
@@ -631,11 +681,10 @@ function renderTable() {
                     </div>
                 </td>
                 <td style="text-align: center; font-weight: 600;">${currentFilterView === 'p2016' ? (c.p2016_authored_commits?.toLocaleString() || 0) : currentFilterView === 'modern' ? (c.modern_authored_commits?.toLocaleString() || 0) : (c.authored_commits?.toLocaleString() || 0)}</td>
-                <td style="text-align: center; color: var(--text-secondary);">${
-                    currentFilterView === 'p2016' ? (c.p2016_bips_authored || 0)
-                    : currentFilterView === 'modern' ? (c.modern_bips_authored || 0)
+                <td style="text-align: center; color: var(--text-secondary);">${currentFilterView === 'p2016' ? (c.p2016_bips_authored || 0)
+                : currentFilterView === 'modern' ? (c.modern_bips_authored || 0)
                     : (c.bips_authored || 0)
-                }</td>
+            }</td>
                 <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">
                     ${socialMlHtml}
                 </td>
@@ -644,14 +693,14 @@ function renderTable() {
                 </td>
                 <td>
                     ${Object.entries(c.expertise_domain_scores || {})
-                        .filter(([, v]) => v >= 0.05)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 3)
-                        .map(([d]) => {
-                            const color = DOMAIN_COLOR_MAP[d] || '#94A3B8';
-                            const label = DOMAIN_NAME_MAP[d] || d;
-                            return `<span class="focus-tag" style="background:${color}22;color:${color};border-color:${color}44">${label}</span>`;
-                        }).join(' ')}
+                .filter(([, v]) => v >= 0.05)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([d]) => {
+                    const color = DOMAIN_COLOR_MAP[d] || '#94A3B8';
+                    const label = DOMAIN_NAME_MAP[d] || d;
+                    return `<span class="focus-tag" style="background:${color}22;color:${color};border-color:${color}44">${label}</span>`;
+                }).join(' ')}
                 </td>
             </tr>
         `;
@@ -728,7 +777,7 @@ function renderProfile(p, isBasic = false) {
     if (!isBasic && p.bip_list && p.bip_list.length > 0) {
         const bipItems = p.bip_list.map(b => {
             const num = b.number ? String(b.number).padStart(4, '0') : '????';
-            const sc  = BIP_STATUS_COLORS[b.status] || BIP_STATUS_COLORS['Draft'];
+            const sc = BIP_STATUS_COLORS[b.status] || BIP_STATUS_COLORS['Draft'];
             const pill = `<span class="bip-status-pill" style="background:${sc.bg};color:${sc.color};border-color:${sc.border};">${b.status || 'Unknown'}</span>`;
             const link = b.link ? `<a href="${b.link}" target="_blank" class="bip-number">BIP-${num}</a>` : `<span class="bip-number">BIP-${num}</span>`;
             return `<li class="bip-item">${link}<span class="bip-title-text">${b.title}</span>${pill}</li>`;
@@ -746,10 +795,10 @@ function renderProfile(p, isBasic = false) {
         const msgCard = (msg, label) => {
             if (!msg) return '';
             const srcLabel = msg.source === 'mailing_list' ? 'Mailing List' : 'Delving Bitcoin';
-            const srcCls   = msg.source === 'mailing_list' ? 'msg-src-ml' : 'msg-src-delving';
-            const dateStr  = msg.date ? msg.date.slice(0, 10) : '';
-            const subj     = msg.subject ? msg.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '(no subject)';
-            const linkEl   = msg.link
+            const srcCls = msg.source === 'mailing_list' ? 'msg-src-ml' : 'msg-src-delving';
+            const dateStr = msg.date ? msg.date.slice(0, 10) : '';
+            const subj = msg.subject ? msg.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '(no subject)';
+            const linkEl = msg.link
                 ? `<a href="${msg.link}" target="_blank" class="msg-subject">${subj}</a>`
                 : `<span class="msg-subject">${subj}</span>`;
             return `<div class="message-card">
@@ -826,8 +875,8 @@ function renderProfile(p, isBasic = false) {
                 </div>
                 <div>
                     <h4 style="color: var(--text-secondary); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 16px;">Core Stats & Efficiency</h4>
-                    ${ (() => { const fa = formatActiveDate(p, 'first'); return `<div class="profile-info-row"><span>First Active</span><span style="color: var(--text-secondary);">${fa.date}${fa.source ? ` <span style="font-size:10px; opacity:0.5; margin-left:4px;">via ${fa.source}</span>` : ''}</span></div>`; })() }
-                    ${ (() => { const la = formatActiveDate(p, 'last');  return `<div class="profile-info-row" style="border: none;"><span>Last Active</span><span style="color: var(--text-secondary);">${la.date}${la.source ? ` <span style="font-size:10px; opacity:0.5; margin-left:4px;">via ${la.source}</span>` : ''}</span></div>`; })() }
+                    ${(() => { const fa = formatActiveDate(p, 'first'); return `<div class="profile-info-row"><span>First Active</span><span style="color: var(--text-secondary);">${fa.date}${fa.source ? ` <span style="font-size:10px; opacity:0.5; margin-left:4px;">via ${fa.source}</span>` : ''}</span></div>`; })()}
+                    ${(() => { const la = formatActiveDate(p, 'last'); return `<div class="profile-info-row" style="border: none;"><span>Last Active</span><span style="color: var(--text-secondary);">${la.date}${la.source ? ` <span style="font-size:10px; opacity:0.5; margin-left:4px;">via ${la.source}</span>` : ''}</span></div>`; })()}
                     <!-- Review Reciprocity and Avg Approval Latency hidden pending further refinement -->
                 </div>
             </div>

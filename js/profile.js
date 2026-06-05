@@ -14,19 +14,22 @@ const PROFILE_BASE_URL = DATA_BASE_URL + 'profiles/';
 
 // ── Category colors — identical to orange-dev-tracker/js/theme.js ─────────────
 const CATEGORY_COLORS = {
-    'Consensus (Domain Logic)':      '#E07A5F',
-    'Cryptography (Primitives)':     '#C53030',
-    'Core Libs':                     '#F6AD55',
-    'Node & RPC (App/Interface)':    '#ED8936',
-    'GUI (Presentation Layer)':      '#F4A261',
-    'Wallet (Client App)':           '#D69E2E',
-    'P2P Network (Infrastructure)':  '#2B6CB0',
-    'Database (Persistence)':        '#4A5568',
-    'Utilities (Shared Libs)':       '#9F86C0',
-    'Tests (QA)':                    '#81B29A',
-    'Build & CI (DevOps)':           '#3D405B',
-    'Documentation':                 '#F2CC8F',
-    'Merge':                         '#94A3B8',
+    'Consensus':    '#E07A5F',
+    'Script':       '#f59e0b',
+    'Cryptography': '#C53030',
+    'Mining':       '#F6AD55',
+    'Node & RPC':   '#ED8936',
+    'GUI':          '#F4A261',
+    'Wallet':       '#D69E2E',
+    'P2P Network':  '#2B6CB0',
+    'Database':     '#4A5568',
+    'Utilities':    '#9F86C0',
+    'Mempool':      '#6366f1',
+    'Tests':        '#81B29A',
+    'Build & CI':   '#3D405B',
+    'Documentation':'#F2CC8F',
+    'Infrastructure':'#94A3B8',
+    'Merge':        '#94A3B8',
 };
 
 const GHIBLI_PALETTE = [
@@ -123,6 +126,51 @@ function fmtDate(val) {
     return isNaN(d) ? s.slice(0, 10) : d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function fmtDateRange(first, last) {
+    const firstDate = fmtDate(first);
+    const lastDate = fmtDate(last);
+    if (firstDate === '—' && lastDate === '—') return '—';
+    if (firstDate === lastDate) return firstDate;
+    if (firstDate === '—') return lastDate;
+    if (lastDate === '—') return firstDate;
+    return `${firstDate} – ${lastDate}`;
+}
+
+function parseDateOnly(val) {
+    if (!val) return null;
+    const s = String(val).slice(0, 10);
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+
+function formatDuration(start, end) {
+    const startDate = parseDateOnly(start);
+    if (!startDate) return '—';
+    const endDate = end ? parseDateOnly(end) : new Date();
+    if (!endDate || isNaN(endDate)) return '—';
+
+    let years = endDate.getFullYear() - startDate.getFullYear();
+    let months = endDate.getMonth() - startDate.getMonth();
+    let days = endDate.getDate() - startDate.getDate();
+    if (days < 0) {
+        months -= 1;
+    }
+    if (months < 0) {
+        years -= 1;
+        months += 12;
+    }
+    if (years < 0) {
+        years = 0;
+        months = 0;
+    }
+
+    if (years > 1) return `${years} yrs${months ? ` ${months} mos` : ''}`;
+    if (years === 1) return `1 yr${months ? ` ${months} mos` : ''}`;
+    if (months > 1) return `${months} mos`;
+    if (months === 1) return `1 mo`;
+    return '≤ 1 mo';
+}
+
 function fmtNum(v, fallback = '—') {
     const n = Number(v);
     if (isNaN(n)) return fallback;
@@ -161,6 +209,9 @@ function renderHero(p) {
     const roles = (p.roles || []).map(r =>
         `<span class="mini-badge ${r.toLowerCase()}">${esc(r)}</span>`
     ).join('');
+    const maintainerBadge = p.badges?.is_maintainer
+        ? `<span class="mini-badge maintainer${p.badges.maintainer_status === 'active' ? ' current' : ' retired'}">Maintainer</span>`
+        : '';
 
     const archetypeBadge = p.dev_type
         ? `<span class="archetype-badge" style="${getArchetypeStyle(p.dev_type)}">${esc(p.dev_type)}</span>`
@@ -188,6 +239,10 @@ function renderHero(p) {
         ? `<a href="https://delvingbitcoin.org/u/${dlUser}" target="_blank" class="hero-link"><i class="fas fa-comments"></i> Delving</a>`
         : '';
 
+    const maintainerTimeline = p.badges?.is_maintainer && p.badges.maintainer_appointed
+        ? `<div class="hero-maintainer-timeline">Maintainer: ${fmtDate(p.badges.maintainer_appointed)} – ${p.badges.maintainer_stepped_down ? fmtDate(p.badges.maintainer_stepped_down) : 'Present'} (${formatDuration(p.badges.maintainer_appointed, p.badges.maintainer_stepped_down)})</div>`
+        : '';
+
     document.getElementById('profile-hero-slot').innerHTML = `
         <div class="profile-hero">
             <div class="hero-strip"></div>
@@ -198,8 +253,10 @@ function renderHero(p) {
                     <div class="hero-badges-row">
                         ${archetypeBadge}
                         ${roles}
+                        ${maintainerBadge}
                     </div>
                     ${period ? `<div class="hero-period">${period}</div>` : ''}
+                    ${maintainerTimeline}
                 </div>
                 <div class="hero-links">
                     ${ghLink}
@@ -280,10 +337,9 @@ function renderWorkDetail(p) {
                 </div>
                 <div>
                     <p class="work-col-title">Timeline</p>
-                    <div class="info-row"><span class="info-row-label">First Commit</span><span class="info-row-value">${fmtDate(p.first_commit)}</span></div>
-                    <div class="info-row"><span class="info-row-label">Last Commit</span><span class="info-row-value">${fmtDate(p.last_commit)}</span></div>
-                    <div class="info-row"><span class="info-row-label">First Social Active</span><span class="info-row-value">${p.first_message ? fmtDate(p.first_message.date) : '—'}</span></div>
-                    <div class="info-row"><span class="info-row-label">Last Social Active</span><span class="info-row-value">${p.last_message ? fmtDate(p.last_message.date) : '—'}</span></div>
+                    <div class="info-row"><span class="info-row-label">Commits</span><span class="info-row-value">${fmtDateRange(p.first_commit, p.last_commit)}</span></div>
+                    <div class="info-row"><span class="info-row-label">Reviews</span><span class="info-row-value">${fmtDateRange(p.first_review_date, p.last_review_date)}</span></div>
+                    <div class="info-row"><span class="info-row-label">Social Activity</span><span class="info-row-value">${fmtDateRange(p.first_message ? p.first_message.date : null, p.last_message ? p.last_message.date : null)}</span></div>
                 </div>
             </div>
         </div>`;
@@ -599,7 +655,6 @@ function renderProfile(p) {
 
     renderHero(p);
     renderStatBar(p);
-    renderInfluenceScores(p);
     renderWorkDetail(p);
     renderExpertiseSection(p);
     renderJumpNav(p);
