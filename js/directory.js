@@ -27,7 +27,7 @@ let currentRoleFilter = 'all';
 let currentFocusFilter = 'all';
 let datasetLatestDate = 0;
 const THREE_YEARS = 3 * 365 * 24 * 60 * 60 * 1000;
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 25;
 
 // Archetype colors — kept in sync with visualization.js for consistency across all three pages
 // 4 roles + Creator — kept in sync with visualization.js and influence.py archetypes.
