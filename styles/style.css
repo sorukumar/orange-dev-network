@@ -38,9 +38,9 @@
     /* Header & Navigation Sync - Using 'Classy' Terracotta for selections */
     --bdl-header-bg: rgba(5, 7, 10, 0.9);
     --bdl-header-bg-compressed: rgba(5, 7, 10, 0.98);
-    --bdl-subnav-bg: #0D0F14;
-    --bdl-nav-active-bg: rgba(232, 145, 107, 0.12);
-    --bdl-nav-active-text: var(--primary);
+    --bdl-subnav-bg: #05070A;
+    --bdl-nav-active-bg: rgba(247, 147, 26, 0.12);
+    --bdl-nav-active-text: #f7931a;
 }
 
 /* App name text beside logo */
@@ -61,15 +61,25 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    overflow: auto;
+    overflow-x: hidden;
     min-height: 100vh;
+    scroll-behavior: smooth;
+    /* Ensure scrollIntoView accounts for fixed headers */
+    scroll-padding-top: calc(var(--header-height, 90px) + var(--subnav-height, 50px) + 20px);
+}
+
+/* Global Overrides for Bitcoin Data Labs Layout */
+body.has-sub-nav.has-fixed-header {
+    /* Remove the default 20px gap for a sleek flush app look */
+    padding-top: calc(var(--header-height, 90px) + var(--subnav-height, 50px)) !important;
 }
 
 /* App Layout */
 #main-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 64px);
+    /* Exactly fill the remaining viewport, preventing body scroll so the network sidebar works perfectly */
+    height: calc(100vh - var(--header-height, 90px) - var(--subnav-height, 50px)) !important;
 }
 
 #header,
@@ -83,54 +93,7 @@ body {
     overflow: hidden;
 }
 
-/* Shared in-app navigation */
-.app-nav {
-    position: sticky;
-    top: 64px;
-    z-index: 90;
-    background: rgba(5, 7, 10, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--border-subtle);
 
-}
-
-.app-nav-inner {
-    max-width: 680px;
-    width: min(100%, 680px);
-    margin: 0 auto;
-    padding: 10px 16px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    overflow-x: auto;
-}
-
-.app-nav-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    border: 1px solid transparent;
-    border-radius: 999px;
-    padding: 7px 14px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.app-nav-link:hover {
-    color: var(--text-primary);
-    border-color: var(--border);
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.app-nav-link.active {
-    color: #f7931a;
-    border-color: rgba(247, 147, 26, 0.5);
-    background: rgba(247, 147, 26, 0.12);
-}
 
 #graph-container {
     flex: 1;
@@ -409,11 +372,7 @@ body {
     gap: 20px;
 }
 
-@media (max-width: 768px) {
-    .app-nav {
-        top: 56px;
-    }
-}
+
 
 .stat-val {
     font-weight: 700;
@@ -634,8 +593,15 @@ text.label {
 
 /* 📱 Responsive Engineering 📱 */
 @media screen and (max-width: 1024px) {
+    #main-container {
+        height: auto !important;
+        min-height: 100vh;
+    }
+    
     #app-content {
         flex-direction: column;
+        overflow: visible;
+        flex: none;
     }
 
     #sidebar {
@@ -643,10 +609,12 @@ text.label {
         height: auto;
         border-left: none;
         border-top: 1px solid var(--border-subtle);
+        overflow: visible;
     }
 
     #graph-container {
         height: 60vh;
+        flex: none;
     }
 }
 

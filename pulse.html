@@ -32,15 +32,6 @@
         <!-- Bitcoin Data Labs Header -->
         <div id="header"></div>
 
-        <nav class="app-nav" aria-label="Orange Dev Network">
-            <div class="app-nav-inner">
-                <a href="index.html" class="app-nav-link">Home</a>
-                <a href="directory.html" class="app-nav-link">Meet the Builders</a>
-                <a href="network.html" class="app-nav-link">Influence Map</a>
-                <a href="pulse.html" class="app-nav-link active">Protocol Pulse</a>
-            </div>
-        </nav>
-
         <div id="app-content" class="landing-layout">
             <div class="hero-section">
 
@@ -153,7 +144,13 @@
             BitcoinLabsApp.init({
                 isApp: true,
                 appName: 'orange-dev-network',
-                appHomeUrl: 'index.html'
+                appHomeUrl: 'index.html',
+                navLinks: [
+                    { name: 'Home', url: 'index.html' },
+                    { name: 'Meet the Builders', url: 'directory.html' },
+                    { name: 'Influence Map', url: 'network.html' },
+                    { name: 'Protocol Pulse', url: 'pulse.html' }
+                ]
             });
         });
     </script>
