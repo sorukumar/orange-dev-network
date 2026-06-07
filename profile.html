@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Developer Profile | Orange Dev Network</title>
-    <meta name="description" content="Deep-dive profile for a Bitcoin developer: commit history, BIPs authored, social footprint, and topic activity.">
+    <meta name="description"
+        content="Deep-dive profile for a Bitcoin developer: commit history, BIPs authored, social footprint, and topic activity.">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css">
     <link rel="stylesheet" href="styles/style.css">
@@ -25,6 +27,12 @@
 
         <div id="app-content" class="profile-layout">
 
+            <!-- Page Header -->
+            <div class="profile-page-header">
+                <h1>Developer Profile</h1>
+                <p>Deep-dive into a contributor's commits, reviews, proposals, and social footprint.</p>
+            </div>
+
             <!-- Top navigation bar: back link + developer search -->
             <div class="profile-topbar">
                 <div class="container">
@@ -35,9 +43,8 @@
                         <div class="search-combobox">
                             <div class="search-input-row">
                                 <i class="fas fa-search"></i>
-                                <input type="text" id="profile-search"
-                                       placeholder="Search another developer…"
-                                       autocomplete="off" spellcheck="false">
+                                <input type="text" id="profile-search" placeholder="Search another developer…"
+                                    autocomplete="off" spellcheck="false">
                             </div>
                             <ul id="search-dropdown" class="search-dropdown" hidden></ul>
                         </div>
@@ -75,7 +82,9 @@
 
                 <section class="methodology-note profile-methodology-note" aria-label="Data and Methodology">
                     <h2>Data & Methodology</h2>
-                    <p>Profile metrics are built from GitHub activity, Delving Bitcoin, and the bitcoin-dev mailing list. Identity matching is resolved in orange-dev-data before metrics are joined into this profile view. Dashboard artifacts are refreshed on a daily and monthly cadence.</p>
+                    <p>Profile metrics are built from GitHub activity, Delving Bitcoin, and the bitcoin-dev mailing
+                        list. Identity matching is resolved in orange-dev-data before metrics are joined into this
+                        profile view. Dashboard artifacts are refreshed on a daily and monthly cadence.</p>
                 </section>
 
             </div>
