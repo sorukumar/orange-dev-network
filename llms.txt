@@ -8,26 +8,15 @@ Orange Dev Network is an interactive visualization tool that maps the social and
 - **Map Expertise**: Linking proposal authors to their social and technical contributions.
 
 ## Technical Stats
-- **Data Source**: Bitcoin-dev mailing list (2011–Present) and Delving Bitcoin (2024–Present).
-- **Message Count**: 27,172 messages.
-- **Contributor Base**: 1,523 unique technical contributors.
+- **Data Source**: Bitcoin-dev mailing list and Delving Bitcoin.
 - **Top Categories**: Mining, Mempool/Fees, Block Size Debate, Covenants, Taproot.
 
-## Top Influencers (based on network centrality)
-1. Peter Todd
-2. Mike Hearn
-3. Gregory Maxwell
-4. Luke Dashjr
-5. Gavin Andresen
-6. Pieter Wuille
-7. ZmnSCPxj
-8. Jeff Garzik
-9. Matt Corallo
-10. Mark Friedenbach
+*(Note: Live metrics regarding total messages, unique contributors, and top influencers are updated periodically and can be explored on the Interactive Map.)*
 
 ## Project Links
 - [Interactive Map](https://sorukumar.github.io/orange-dev-network/): The primary force-directed graph visualization.
-- [GitHub Repository](https://github.com/sorukumar/orange-dev-network): Source code and data processing pipeline.
+- [Frontend Repository](https://github.com/sorukumar/orange-dev-network): Source code for the interactive visualization.
+- [Data Repository](https://github.com/sorukumar/orange-dev-data): Source code for the data processing pipeline.
 
 ## Full Context
 For a detailed technical README, see the [README.md](https://github.com/sorukumar/orange-dev-network/blob/main/README.md).

@@ -8,47 +8,27 @@ This repository analyzes 15+ years of technical discussions (2011–Present) fro
 
 ## 📊 Technical Insights
 
-### 🗓️ Temporal Leadership (Top 10 Influencers)
-*Ranked by message frequency and network centrality in specific eras.*
+The Interactive Technical Graph provides live insights into the Bitcoin development ecosystem, including:
 
-| Era | Top 10 Contributors |
-| :--- | :--- |
-| **Foundation (All-Time)** | Peter Todd, Gregory Maxwell, Mike Hearn, Luke Dashjr, Pieter Wuille, ZmnSCPxj, Gavin Andresen, Jeff Garzik, Jorge Timón, Matt Corallo |
-| **Post-Segwit (2016+)** | ZmnSCPxj, Peter Todd, Gregory Maxwell, Luke Dashjr, Erik Aronesty, Anthony Towns, Pieter Wuille, David A. Harding, Matt Corallo, Antoine Riard |
-| **Modern R&D (2023+)** | Peter Todd, Gregory Maxwell, Antoine Riard, David A. Harding, Anthony Towns, Antoine Poinsot, Jameson Lopp, Mark Erhardt, Andrew Poelstra, Boris Nagaev |
+- **Temporal Leadership**: Discover the top contributors and influence hubs across different eras (e.g., Foundation, Post-Segwit, Modern R&D).
+- **Technical Area Deep-Dives**: Track the historical evolution of specific topics like Mempool & Fees, Covenants, Lightning Network, Privacy & Fungibility, and Soft Fork Activation.
+- **Network Summary**: Explore thousands of technical messages and unique contributors parsed directly from the Bitcoin-dev Mailing List and Delving Bitcoin.
 
-### 📂 Technical Area Deep-Dive
-- **Mempool & Fees**: Discourse reached a historical peak in **2024**, marking the most active period for fee policy research in Bitcoin's history. The data shows a shift from general fee estimation toward high-complexity topics like **v3 relay** and **cluster mempool**, as the network adapted to unprecedented congestion levels.
-- **Covenants**: Currently the most explosive technical theme in the data. While research has been constant since 2022, activity doubled in **2025**, marking a transition from abstract research into a "concrete review" phase. This is currently the primary driver of incoming message volume in Delving Bitcoin.
-- **Lightning Network**: Technical discourse reached an all-time high in **2025**. The data suggests a secondary "R&D wave" that is significantly larger than the initial post-SegWit period (2018), with a modern focus on protocol safety, **Channel Jamming** mitigations, and **BOLT 12**.
-- **Privacy & Fungibility**: Although a constant concern, the data shows two distinct peaks. The first (**2015**) during early CoinJoin and Stealth Address research, and a modern resurgence (**2024-2025**) focusing on **Silent Payments** and **FROST** thresholds.
-- **Soft Fork Activation**: Peak activity occurred during the **2017** SegWit era, but the data shows a secondary spike in **2021** (Taproot activation) and a sustained high-level of debate through **2023-2025** regarding BIP 8 vs BIP 9 logic for future upgrades.
-- **Mining & PoW**: Historically peaked in **2015** (Block size debate and ASIC optimization), with a recent 2022-2024 resurgence focusing on **Stratum V2** and decentralized pool protocols.
-- **Wallet & Keys**: Massive activity in **2014** (standardization of BIP 32/39/44), followed by a modern transition (2022+) toward **Output Descriptors** and **PSBT** refinements.
-- **The BIP Paradox**: Our data reveals that only **14.6%** of technical threads actually mention an explicit BIP number. This highlights a crucial reality: the BIP process is a tool for *documentation*, not discovery. Technical consensus is forged in the "messy human conversations" of the social layer—often years before a formal proposal is numbered.
-
-### � How Influence is Calculated
+### 🧠 How Influence is Calculated
 Influence in this network is not just about posting frequency; it is a measure of **technical weight** and **directed attention**.
 
 - **For the Curious**: We use a **Temporal PageRank** algorithm (Eigenvector Centrality). We treat replies as a form of "technical peer review." When a high-influence contributor engages with your thread or responds to your post, your own centrality increases. This ensures that "signal" is prioritized over "noise."
 - **In Simple Terms**: It is a digital reputation system. If the most respected engineers in Bitcoin are constantly reviewing, debating, or building on your ideas, you gain influence. It’s not about how much you talk—it’s about who listens and responds to you.
 
-
----
-
-### �📈 Network Summary
-- **Total Messages Parsed**: 27,800+
-- **Unique Contributors**: 1,752
-- **Primary Channels**: Bitcoin-dev Mailing List & Delving Bitcoin
-- **Temporal Range**: June 2011 – February 2026
-
 ---
 
 ## 🏗️ Repository Structure
 
-- **/scripts/ingest**: Automated data gathering from Public-Inbox archives and the Delving Bitcoin forum.
-- **/data/viz**: Core JSON artifacts and graph schemas that power the interactive frontend.
-- **/docs**: Documentation on project architecture and data schema.
+This repository is strictly the frontend visualization layer. All data processing and generation pipelines have been migrated to **[orange-dev-data](https://github.com/sorukumar/orange-dev-data)**.
+
+- **/docs**: Documentation on the frontend architecture.
+- **/assets**, **/js**, **/styles**: Static assets, JavaScript logic, and CSS for the UI.
+- **index.html**, **network.html**, **profile.html**, etc.: Entry points for the interactive visualizations.
 
 
 
