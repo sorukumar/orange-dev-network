@@ -117,8 +117,7 @@
                 <section class="secondary-cta" aria-label="Follow and feedback">
                     <a href="https://x.com/BitcoinDataLabs" target="_blank" rel="noopener noreferrer"
                         class="secondary-link">Follow updates on X</a>
-                    <a href="https://github.com/sorukumar/orange-dev-network/issues" target="_blank"
-                        rel="noopener noreferrer" class="secondary-link">Share feedback</a>
+                    <a href="roadmap.html" class="secondary-link">View Roadmap & Give Feedback</a>
                 </section>
 
                 <section class="methodology-note" aria-label="Data and Methodology">
@@ -138,21 +137,7 @@
 
     <!-- Bitcoin Data Labs App Components -->
     <script src="https://bitcoindatalabs.org/components/app-components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            BitcoinLabsApp.init({
-                isApp: true,
-                appName: 'orange-dev-network',
-                appHomeUrl: 'index.html',
-                navLinks: [
-                    { name: 'Home', url: 'index.html' },
-                    { name: 'Meet the Builders', url: 'directory.html' },
-                    { name: 'Influence Map', url: 'network.html' },
-                    { name: 'Protocol Pulse', url: 'pulse.html' }
-                ]
-            });
-        });
-    </script>
+    <script src="js/app-config.js"></script>
 
     <!-- Page Logic -->
     <script src="js/landing.js"></script>
