@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Influence Map', url: 'network.html' },
                 { name: 'Protocol Pulse', url: 'pulse.html' },
                 { name: 'Roadmap & Feedback', url: 'roadmap.html' }
+            ],
+            suiteLinks: [
+                { name: 'Tracker', url: 'https://sorukumar.github.io/orange-dev-tracker', icon: 'fas fa-chart-line' }
             ]
         });
     }
