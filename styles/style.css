@@ -623,6 +623,13 @@ text.label {
         display: none !important;
     }
 
+    /* Fix mobile menu overlay covering the header */
+    body.has-nav .nav-links-wrapper {
+        z-index: 9999 !important;
+        justify-content: flex-start !important;
+        padding-top: calc(var(--header-height, 90px) + 2rem) !important;
+    }
+
     .hud {
         top: 10px;
         left: 10px;
