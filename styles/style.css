@@ -68,6 +68,13 @@ body {
     scroll-padding-top: calc(var(--header-height, 90px) + var(--subnav-height, 50px) + 20px);
 }
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
 /* Global Overrides for Bitcoin Data Labs Layout */
 body.has-sub-nav.has-fixed-header {
     /* Remove the default 20px gap for a sleek flush app look */
