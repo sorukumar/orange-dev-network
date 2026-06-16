@@ -628,10 +628,10 @@ function renderTable() {
 
         if (isMaintainer) {
             const maintainerStatus = badgeInfo.maintainer_status || 'active';
-            const maintainerClass = maintainerStatus === 'active'
-                ? 'maintainer current'
-                : 'maintainer retired';
-            badgeItems.push({ label: 'Maintainer', className: maintainerClass });
+            const isCurrent = maintainerStatus === 'active';
+            const maintainerClass = isCurrent ? 'maintainer current' : 'maintainer retired';
+            const labelText = isCurrent ? 'Current Maintainer' : 'Historical Maintainer';
+            badgeItems.push({ label: labelText, className: maintainerClass });
         }
         const trend = getDirectoryTrendTag(c);
         if (trend) {

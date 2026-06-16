@@ -34,17 +34,36 @@
         <div id="app-content" class="landing-layout">
             <div class="hero-section">
                 <h1>The People Behind Bitcoin</h1>
-                <p>Every commit, code review, BIP, and Delving & Mailing list thread - mapped to the real humans shaping
-                    Bitcoin.</p>
-                <div id="freshness-line" class="freshness-line">Updated - Contributors tracked -</div>
+                <p>Navigate developer directories and influence maps to see who shapes consensus.</p>
+                <section class="snapshot-panel" aria-label="Developer Snapshot">
+                    <div class="snapshot-panel-head">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <h2 style="margin: 0;">Developer Snapshot</h2>
+                            <span id="freshness-line" class="freshness-line" style="margin: 0; font-size: 11px; font-weight: 600; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 20px;"></span>
+                        </div>
+                        <p>Live metrics from the contributor network.</p>
+                    </div>
+                    <div class="live-widgets">
+                        <!-- Card 1: Network Coverage -->
+                        <article class="live-widget" style="grid-column: span 2;">
+                            <h3 style="margin-top: 0;">Network Coverage</h3>
+                            <p id="summary-insight" class="live-widget-note" style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Loading current contributor coverage...</p>
+                            <ul id="domain-count-list" class="summary-list" style="padding-left: 0; list-style: none;">
+                                <li>Loading contributor counts...</li>
+                            </ul>
+                        </article>
 
-                <div class="summary-section">
-                    <h2>Who's building Bitcoin</h2>
-                    <div id="summary-insight" class="summary-insight">Loading current contributor coverage...</div>
-                    <ul id="domain-count-list" class="summary-list">
-                        <li>Loading contributor counts...</li>
-                    </ul>
-                </div>
+                        <!-- Card 2: Meet the Builders -->
+                        <article class="live-widget">
+                            <h3 style="margin-top: 0;">Meet the Builders</h3>
+                            <p class="live-widget-note" style="margin-bottom: 12px;">Top reviewers and active contributors this month.</p>
+                            
+                            <div id="widget-builders-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="color: var(--text-secondary); font-size: 13px;">Loading builders...</div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
 
 
 
@@ -59,34 +78,17 @@
                         <h2>Meet the Builders</h2>
                         <p>Explore contributor profiles to find who builds, reviews, and proposes protocol changes.</p>
                     </a>
-                    <a href="https://sorukumar.github.io/orange-dev-tracker/pulse.html" class="cta-card">
-                        <div class="cta-icon"><i class="fas fa-comments"></i></div>
-                        <h2>Protocol Pulse</h2>
-                        <p>Track the debates gaining momentum before they shape what gets built next.</p>
+                    <a href="contributors.html" class="cta-card">
+                        <div class="cta-icon"><i class="fas fa-meteor"></i></div>
+                        <h2>Code Contributor Galaxy</h2>
+                        <p>A visual map of pure code contributors grouped by repository and domain.</p>
                     </a>
                 </div>
-
-                <section class="why-this-matters" aria-label="Why This Matters">
-                    <h2>Why This Matters</h2>
-                    <p>Bitcoin's roadmap emerges from thousands of distributed technical decisions. This network view
-                        helps researchers, builders, and capital allocators separate durable engineering signal from
-                        short-lived hype.</p>
-                    <p>By mapping code, review, standards, and discussion into one contributor graph, Orange Dev Network
-                        surfaces who is actively shaping consensus and where protocol attention is moving next.</p>
-                </section>
 
                 <section class="secondary-cta" aria-label="Follow and feedback">
                     <a href="https://x.com/BitcoinDataLabs" target="_blank" rel="noopener noreferrer"
                         class="secondary-link">Follow updates on X</a>
                     <a href="roadmap.html" class="secondary-link">View Roadmap & Give Feedback</a>
-                </section>
-
-                <section class="methodology-note" aria-label="Data and Methodology">
-                    <h2>Data & Methodology</h2>
-                    <p>Sources: GitHub activity, Delving Bitcoin, and the bitcoin-dev mailing list. Contributor
-                        identities are resolved to canonical profiles in orange-dev-data before any dashboard
-                        aggregation. Artifacts are rebuilt on a daily and monthly cadence depending on pipeline stage.
-                    </p>
                 </section>
 
             </div>

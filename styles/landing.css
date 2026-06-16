@@ -575,3 +575,104 @@ body.landing-layout .landing-layout {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Custom Tooltip */
+.info-tooltip-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+}
+
+.info-tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: 260px;
+    background-color: var(--card-bg);
+    color: var(--text-secondary);
+    text-align: left;
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: absolute;
+    z-index: 100;
+    top: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: normal;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.info-tooltip-container .tooltip-text::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent var(--border) transparent;
+}
+
+.info-tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Rotating Builder Card */
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.rotating-builder-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    animation: fadeInSlide 0.4s ease forwards;
+}
+
+.rotating-builder-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.builder-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: var(--bg-primary);
+    object-fit: cover;
+}
+
+.builder-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.builder-name {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.builder-metric {
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.9;
+}
