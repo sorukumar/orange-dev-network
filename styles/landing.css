@@ -633,14 +633,15 @@ body.landing-layout .landing-layout {
 .rotating-builder-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
+    gap: 20px;
+    padding: 24px;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
+    border-radius: 16px;
     text-decoration: none;
     transition: all 0.3s ease;
     animation: fadeInSlide 0.4s ease forwards;
+    margin-top: 8px;
 }
 
 .rotating-builder-card:hover {
@@ -650,8 +651,8 @@ body.landing-layout .landing-layout {
 }
 
 .builder-avatar {
-    width: 60px;
-    height: 60px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,0.1);
     background: var(--bg-primary);
@@ -661,18 +662,18 @@ body.landing-layout .landing-layout {
 .builder-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .builder-name {
     color: var(--text-primary);
-    font-size: 16px;
+    font-size: 19px;
     font-weight: 700;
 }
 
 .builder-metric {
     color: var(--primary);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     opacity: 0.9;
 }

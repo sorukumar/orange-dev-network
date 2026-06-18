@@ -33,32 +33,33 @@
         <div id="app-content" class="directory-layout">
             <div class="container">
                 <header class="page-header">
-                    <div class="header-content">
-                        <h1 style="color: var(--primary) !important;">Meet the Builders</h1>
-                        <p>Search and compare Bitcoin contributors. See who is active, what they work on, and where they
-                            contribute.</p>
+                    <div class="header-top-row">
+                        <div class="header-content">
+                            <p>Search and compare Bitcoin contributors. See who is active, what they work on, and where they
+                                contribute.</p>
+                        </div>
+                        <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
+                            <div class="segmented-control">
+                                <button class="seg-btn active" data-filter="all">All Time</button>
+                                <button class="seg-btn" data-filter="p2016">Since 2016</button>
+                                <button class="seg-btn" data-filter="modern">
+                                    <span class="pulse-dot"></span> Last 3yr
+                                </button>
+                            </div>
+                            <div class="filter-controls">
+                                <select id="role-filter" class="dir-select">
+                                    <option value="all">All Roles</option>
+                                </select>
+                                <select id="focus-filter" class="dir-select">
+                                    <option value="all">All Focus Domains</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
-                        <div class="segmented-control">
-                            <button class="seg-btn active" data-filter="all">All Time</button>
-                            <button class="seg-btn" data-filter="p2016">Since 2016</button>
-                            <button class="seg-btn" data-filter="modern">
-                                <span class="pulse-dot"></span> Last 3yr
-                            </button>
-                        </div>
-                        <div class="filter-controls">
-                            <select id="role-filter" class="dir-select">
-                                <option value="all">All Roles</option>
-                            </select>
-                            <select id="focus-filter" class="dir-select">
-                                <option value="all">All Focus Domains</option>
-                            </select>
-                        </div>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="directory-search"
-                                placeholder="Search by name, login, or subsystem...">
-                        </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="directory-search"
+                            placeholder="Search by name, login, or subsystem..." style="padding: 14px 16px 14px 44px; font-size: 15px;">
                     </div>
                 </header>
 

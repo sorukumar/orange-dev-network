@@ -19,15 +19,17 @@
     position: sticky;
     top: var(--header-height, 90px);
     z-index: 100;
-    background: rgba(13, 15, 20, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    transition: top 0.3s ease;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
 }
 
 body.header-scrolled .profile-topbar {
     top: var(--header-height-compressed, 65px);
+    background: rgba(13, 15, 20, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
 }
 
 @media (max-width: 768px) {
@@ -172,7 +174,7 @@ body.header-scrolled .profile-topbar {
 .profile-container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 32px 24px 64px;
+    padding: 16px 24px 64px;
 }
 
 .profile-loading {
@@ -224,7 +226,7 @@ body.header-scrolled .profile-topbar {
     display: flex;
     align-items: flex-start;
     gap: 24px;
-    padding: 20px 32px 28px;
+    padding: 16px 32px 20px;
     margin-top: 0;
     flex-wrap: wrap;
 }
@@ -667,15 +669,21 @@ a.msg-subject:hover {
 }
 
 .mini-badge.maintainer {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.25);
+    background: rgba(224, 122, 95, 0.2);
+    color: #E07A5F;
+    border: 1px solid rgba(224, 122, 95, 0.45);
+}
+
+.mini-badge.ecosystem {
+    background: rgba(99, 102, 241, 0.15);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .mini-badge.maintainer.retired {
-    background: rgba(245, 158, 11, 0.06);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.18);
+    background: rgba(148, 163, 184, 0.08);
+    color: #94A3B8;
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 /* ── Influence trajectory (temporal scores) ─────────────────────────────────── */

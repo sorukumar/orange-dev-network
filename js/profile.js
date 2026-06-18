@@ -206,11 +206,22 @@ function renderHero(p) {
         ? `<img class="hero-avatar" src="https://github.com/${login}.png?size=120" alt="${esc(p.display_name)}" onerror="this.outerHTML='<div class=hero-avatar-placeholder><i class=\\'fas fa-user-circle\\'></i></div>'">`
         : `<div class="hero-avatar-placeholder"><i class="fas fa-user-circle"></i></div>`;
 
-    const roles = (p.roles || []).map(r =>
-        `<span class="mini-badge ${r.toLowerCase()}">${esc(r)}</span>`
-    ).join('');
-    const maintainerBadge = p.badges?.is_maintainer
-        ? `<span class="mini-badge maintainer${p.badges.maintainer_status === 'active' ? ' current' : ' retired'}">Maintainer</span>`
+    const roles = (p.roles || []).map(r => {
+        const lower = r.toLowerCase();
+        let classes = ['mini-badge'];
+        if (lower.includes('maintainer')) {
+            classes.push('maintainer');
+            classes.push(lower.includes('former') ? 'retired' : 'current');
+        } else {
+            classes.push(lower.replace(/\s+/g, '-'));
+        }
+        return `<span class="${classes.join(' ')}">${esc(r)}</span>`;
+    }).join('');
+    
+    // Hide ecosystem badge if they are active in core
+    const isCoreActive = (p.tier1_authored_commits > 0) || p.badges?.is_maintainer;
+    const ecosystemBadge = (p.badges?.ecosystem_contributor && !isCoreActive)
+        ? `<span class="mini-badge ecosystem">🌐 Ecosystem</span>`
         : '';
 
     const archetypeBadge = p.dev_type
@@ -253,7 +264,7 @@ function renderHero(p) {
                     <div class="hero-badges-row">
                         ${archetypeBadge}
                         ${roles}
-                        ${maintainerBadge}
+                        ${ecosystemBadge}
                     </div>
                     ${period ? `<div class="hero-period">${period}</div>` : ''}
                     ${maintainerTimeline}
@@ -321,6 +332,11 @@ function renderWorkDetail(p) {
         ? `<div class="info-row"><span class="info-row-label">PRs Approved</span><span class="info-row-value">${fmtNum(approvalsCount, '—')}</span></div>`
         : '';
 
+    const tierSplitRows = (p.tier2_authored_commits > 0)
+        ? `<div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Core repos</span><span class="info-row-value">${fmtNum(p.tier1_authored_commits, '0')} <span style="font-weight: normal; opacity: 0.7; margin-left: 4px;">(secp256k1, bitcoin/bitcoin, gui)</span></span></div>
+           <div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Ecosystem</span><span class="info-row-value">${fmtNum(p.tier2_authored_commits, '0')} <span style="font-weight: normal; opacity: 0.7; margin-left: 4px;">(guix.sigs, HWI, qa-assets)</span></span></div>`
+        : '';
+
     document.getElementById('profile-work-slot').innerHTML = `
         <div class="profile-section">
             <p class="section-title">Work Profile</p>
@@ -329,6 +345,7 @@ function renderWorkDetail(p) {
                     <p class="work-col-title">Codebase Activity</p>
                     <div class="info-row"><span class="info-row-label">Total Commits</span><span class="info-row-value">${fmtNum(p.total_commits, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">Authored Commits</span><span class="info-row-value">${fmtNum(p.authored_commits, '—')}</span></div>
+                    ${tierSplitRows}
                     <div class="info-row"><span class="info-row-label">Merge Commits</span><span class="info-row-value">${fmtNum(p.merge_commits, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">PRs Authored</span><span class="info-row-value">${fmtNum(p.prs_authored, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">PRs Reviewed</span><span class="info-row-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">${fmtNum(p.reviews_count, '—')}${reciprocityNote}</span></div>
@@ -337,7 +354,12 @@ function renderWorkDetail(p) {
                 </div>
                 <div>
                     <p class="work-col-title">Timeline</p>
-                    <div class="info-row"><span class="info-row-label">Commits</span><span class="info-row-value">${fmtDateRange(p.first_commit, p.last_commit)}</span></div>
+                    ${p.tier2_authored_commits > 0 ? `
+                        <div class="info-row"><span class="info-row-label">Commits (Core)</span><span class="info-row-value">${fmtDateRange(p.first_core_commit, p.last_core_commit)}</span></div>
+                        <div class="info-row"><span class="info-row-label">Commits (Ecosystem)</span><span class="info-row-value">${fmtDateRange(p.first_ecosystem_commit, p.last_ecosystem_commit)}</span></div>
+                    ` : `
+                        <div class="info-row"><span class="info-row-label">Commits</span><span class="info-row-value" title="Tenure based on first Core PR merge" style="cursor: help; border-bottom: 1px dotted var(--text-secondary);">${fmtDateRange(p.first_commit, p.last_commit)}</span></div>
+                    `}
                     <div class="info-row"><span class="info-row-label">Reviews</span><span class="info-row-value">${fmtDateRange(p.first_review_date, p.last_review_date)}</span></div>
                     <div class="info-row"><span class="info-row-label">Social Activity</span><span class="info-row-value">${fmtDateRange(p.first_message ? p.first_message.date : null, p.last_message ? p.last_message.date : null)}</span></div>
                 </div>

@@ -19,96 +19,86 @@
     <meta property="og:description" content="Meet the decentralized army behind Bitcoin Core.">
     <meta property="og:image" content="https://sorukumar.github.io/orange-dev-network/assets/og-image.png">
     <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/directory.css">
 </head>
 
 <body class="has-fixed-header">
     <div id="header"></div>
 
-    <div class="container">
-        <!-- Contributor Galaxy Section -->
-        <section class="slide">
-            <div class="card" style="min-height: 1000px; position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
-                    <div>
-                        <h2 style="font-size: 24px; color: var(--primary) !important; margin-bottom: 4px;">The Contributor Galaxy</h2>
-                        <p style="color: #718096; font-size: 14px; max-width: 600px; margin: 0;">
-                            Visual history of every developer. Each bubble represents a dev contributor.
-
-                        </p>
+    <div id="app-content" class="directory-layout">
+        <div class="container">
+            <header class="page-header">
+                <div class="header-content">
+                    <p>Visual history of every developer. Each bubble represents a contributor—the higher the bubble, the more commits they have. <strong>Click on any bubble</strong> to reveal their historical timeline and technical profile.</p>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
+                    <div class="segmented-control">
+                        <button id="btn-galaxy-total" class="seg-btn active">Total Activity</button>
+                        <button id="btn-galaxy-authored" class="seg-btn">Authored Work</button>
                     </div>
-                    <div style="display: flex; gap: 20px; align-items: flex-end;">
-                        <div class="toggle-group" style="margin-bottom: 2px;">
-                            <button id="btn-galaxy-total" class="active">Total Activity</button>
-                            <button id="btn-galaxy-authored">Authored Work</button>
-                        </div>
-                        <div style="display: flex; gap: 15px;">
-                            <div style="border-left: 3px solid #E07A5F; padding-left: 10px;">
-                                <div style="font-size: 10px; color: #718096; text-transform: uppercase;"
-                                    id="galaxy-y-label">
-                                    Y: Total Commits
-                                </div>
+                    <div style="display: flex; gap: 15px; margin-left: 10px;">
+                        <div style="border-left: 3px solid #E07A5F; padding-left: 10px;">
+                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;" id="galaxy-y-label">
+                                Y: Total Commits
                             </div>
-                            <div style="border-left: 3px solid #3182CE; padding-left: 10px;">
-                                <div style="font-size: 10px; color: #718096; text-transform: uppercase;">X: Joined Year
-                                </div>
+                        </div>
+                        <div style="border-left: 3px solid #3182CE; padding-left: 10px;">
+                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">X: Joined Year
                             </div>
                         </div>
                     </div>
                 </div>
+            </header>
 
+            <div class="glassman-surface" style="padding: 24px; margin-bottom: 40px; position: relative;">
                 <div id="chart-contributor-landscape" style="width: 100%; height: 850px;"></div>
+            </div>
 
-                <!-- Contributor History Section (Hidden by Default) -->
-                <div id="contributor-history-section"
-                    style="display: none; margin-top: 40px; padding-top: 20px; border-top: 1px solid #E2E8F0;">
-                    <div style="margin-bottom: 20px;">
-                        <h2 style="font-size: 20px; color: var(--primary) !important; margin-bottom: 4px;" id="history-title">Contributor
-                            History</h2>
-                        <p style="color: #718096; font-size: 14px;">Annual contribution breakdown by category.</p>
+            <!-- Contributor History Section (Hidden by Default) -->
+            <div id="contributor-history-section" style="display: none; margin-bottom: 40px;">
+                <header class="page-header" style="margin-bottom: 20px;">
+                    <div class="header-content">
+                        <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: var(--text-primary);" id="history-title">Contributor History</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin: 4px 0 0 0;">Annual contribution breakdown by category.</p>
                     </div>
+                </header>
 
-                    <!-- Charts Container: Flexbox for Side-by-Side -->
+                <div class="glassman-surface" style="padding: 24px;">
                     <div style="display: flex; gap: 40px; flex-wrap: wrap;">
                         <!-- History Bar Chart -->
                         <div style="flex: 1.8; min-width: 500px;">
                             <div id="chart-contributor-history" style="width: 100%; height: 500px;"></div>
                         </div>
 
-                        <!-- New: Impact Radar Chart -->
+                        <!-- Impact Radar Chart -->
                         <div style="flex: 1.2; min-width: 350px;">
-                            <h4 style="color:#4A5568; font-size:14px; margin-bottom:4px; text-align:center;">Impact
-                                Profile (Risk-Weighted)</h4>
-                            <p
-                                style="color: #A0AEC0; font-size: 11px; text-align: center; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                Authored Work Only</p>
+                            <h4 style="color:var(--text-primary); font-size:14px; margin-bottom:4px; text-align:center;">Impact Profile (Risk-Weighted)</h4>
+                            <p style="color: var(--text-secondary); font-size: 11px; text-align: center; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Authored Work Only</p>
                             <div id="chart-contributor-radar" style="width: 100%; height: 450px;"></div>
                         </div>
                     </div>
                 </div>
-
-                <div class="info-box">
-                    <h4 style="margin-bottom: 10px; color: inherit;"><i class="fas fa-info-circle"
-                            style="margin-right: 8px;"></i> Understanding the Data</h4>
-                    <p style="font-size: 13px; line-height: 1.6;">
-                        <strong>Note on Methodology:</strong> We use <em>Fractional Attribution</em> to ensure accuracy.
-                        If a single commit touches multiple categories (e.g., both "GUI" and "Tests"), we split its
-                        credit evenly (e.g., 0.5 each).
-                        This ensures the total height of the bars exactly matches the developer's unique commit count,
-                        avoiding the inflation common in other impact metrics.
-                        <br><br>
-                        <strong>Impact Profile (The Radar):</strong> Not all code is equal. We use a
-                        <em>Risk-Weighted</em> model (explained in <a href="https://sorukumar.github.io/orange-dev-tracker/methodology.html#criticality"
-                            style="color: #E8916B; text-decoration: underline;">Methodology</a>) to visualize where a
-                        developer focuses their energy.
-                        "Security" code (Consensus/Crypto) is weighted significantly higher (50x) than "Education" code
-                        (Docs, 1x) because of the catastrophic risk involved.
-                        A shape skewed toward the top-right indicates a Protocol Engineer; a shape toward the
-                        bottom-left indicates a Product/UI Engineer.
-                    </p>
-                </div>
             </div>
-        </section>
 
+            <div class="info-box glassman-surface" style="padding: 24px; margin-bottom: 40px;">
+                <h4 style="margin: 0 0 10px 0; color: var(--text-primary);"><i class="fas fa-info-circle" style="margin-right: 8px; color: var(--primary);"></i> Understanding the Data</h4>
+                <p style="font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+                    <strong style="color: var(--text-primary);">Note on Methodology:</strong> We use <em>Fractional Attribution</em> to ensure accuracy.
+                    If a single commit touches multiple categories (e.g., both "GUI" and "Tests"), we split its
+                    credit evenly (e.g., 0.5 each).
+                    This ensures the total height of the bars exactly matches the developer's unique commit count,
+                    avoiding the inflation common in other impact metrics.
+                    <br><br>
+                    <strong style="color: var(--text-primary);">Impact Profile (The Radar):</strong> Not all code is equal. We use a
+                    <em>Risk-Weighted</em> model (explained in <a href="https://sorukumar.github.io/orange-dev-tracker/methodology.html#criticality" style="color: var(--primary); text-decoration: underline;">Methodology</a>) to visualize where a
+                    developer focuses their energy.
+                    "Security" code (Consensus/Crypto) is weighted significantly higher (50x) than "Education" code
+                    (Docs, 1x) because of the catastrophic risk involved.
+                    A shape skewed toward the top-right indicates a Protocol Engineer; a shape toward the
+                    bottom-left indicates a Product/UI Engineer.
+                </p>
+            </div>
+        </div>
     </div>
 
     <div id="footer"></div>

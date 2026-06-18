@@ -64,9 +64,9 @@ function renderDomainSummary(stats) {
     
     if (insightEl) {
         if (totalStr && totalActive) {
-            insightEl.innerHTML = `From a registry of ${totalStr} ecosystem profiles, ${totalActive} are active contributors. Only ${allFourValue} span all four domains. <span class="info-tooltip-container" style="margin-left: 4px;"><i class="fas fa-info-circle" style="color: var(--primary); opacity: 0.7;"></i><span class="tooltip-text">Active contributors have engaged directly in Code, Review, Research, or Standards.<br><br>The broader registry of mapped profiles includes ecosystem participants such as issue reporters, issue commenters, and individuals mentioned in discussions.</span></span>`;
+            insightEl.innerHTML = `We map ${totalStr} profiles across the Bitcoin ecosystem. Currently, ${totalActive} are actively contributing to code, peer review, research, or standards—with just ${allFourValue} extraordinary builders spanning all four domains. <span class="info-tooltip-container" style="margin-left: 4px;"><i class="fas fa-info-circle" style="color: var(--primary); opacity: 0.7;"></i><span class="tooltip-text">Active contributors have engaged directly in Code, Review, Research, or Standards.<br><br>The broader registry of mapped profiles includes ecosystem participants such as issue reporters, issue commenters, and individuals mentioned in discussions.</span></span>`;
         } else {
-            insightEl.innerText = `Currently ${allFourValue} contributors span all four domains.`;
+            insightEl.innerText = `Currently ${allFourValue} extraordinary builders span all four domains.`;
         }
     }
 
@@ -88,17 +88,9 @@ function renderFreshnessLine(stats, snapshot) {
     if (!el) return;
 
     const generated = (stats && stats.generated_at) || (snapshot && snapshot.generated_at);
-    const totalActive = (stats && stats.groups && stats.groups.total_active) ? stats.groups.total_active.toLocaleString() : null;
-    const count = snapshot ? snapshot.contributors_tracked : null;
-
     const stamp = generated ? formatMonthYear(generated) : 'Unknown date';
-    const countText = count != null ? count.toLocaleString() : 'N/A';
     
-    if (totalActive) {
-        el.innerHTML = `Updated ${stamp} &nbsp;|&nbsp; ${totalActive} active contributors (${countText} profiles mapped) <span class="info-tooltip-container" style="margin-left: 4px;"><i class="fas fa-info-circle" style="opacity: 0.7;"></i><span class="tooltip-text" style="text-transform: none; font-weight: normal; letter-spacing: normal;">Active contributors have engaged directly in Code, Review, Research, or Standards.<br><br>The broader registry of mapped profiles includes ecosystem participants such as issue reporters, issue commenters, and individuals mentioned in discussions.</span></span>`;
-    } else {
-        el.textContent = `Updated ${stamp} | ${countText} profiles mapped`;
-    }
+    el.innerHTML = `<span style="letter-spacing: 0.5px; text-transform: uppercase;">Updated ${stamp}</span>`;
 }
 
 let spotlightInterval = null;

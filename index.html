@@ -37,27 +37,27 @@
                 <p>Navigate developer directories and influence maps to see who shapes consensus.</p>
                 <section class="snapshot-panel" aria-label="Developer Snapshot">
                     <div class="snapshot-panel-head">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <h2 style="margin: 0;">Developer Snapshot</h2>
-                            <span id="freshness-line" class="freshness-line" style="margin: 0; font-size: 11px; font-weight: 600; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 20px;"></span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                            <h2 style="margin: 0;">The Anatomy of Bitcoin R&D</h2>
+                            <span id="freshness-line" class="freshness-line"
+                                style="margin: 0; font-size: 11px; font-weight: 600; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 20px;"></span>
                         </div>
-                        <p>Live metrics from the contributor network.</p>
+                        <p id="summary-insight" style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--text-secondary); max-width: 90%;">Loading current contributor coverage...</p>
                     </div>
                     <div class="live-widgets">
                         <!-- Card 1: Network Coverage -->
-                        <article class="live-widget" style="grid-column: span 2;">
-                            <h3 style="margin-top: 0;">Network Coverage</h3>
-                            <p id="summary-insight" class="live-widget-note" style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Loading current contributor coverage...</p>
-                            <ul id="domain-count-list" class="summary-list" style="padding-left: 0; list-style: none;">
+                        <article class="live-widget" style="grid-column: span 2; display: flex; flex-direction: column; justify-content: center;">
+                            <ul id="domain-count-list" class="summary-list" style="padding-left: 0; list-style: none; margin: 0;">
                                 <li>Loading contributor counts...</li>
                             </ul>
                         </article>
 
                         <!-- Card 2: Meet the Builders -->
                         <article class="live-widget">
-                            <h3 style="margin-top: 0;">Meet the Builders</h3>
-                            <p class="live-widget-note" style="margin-bottom: 12px;">Top reviewers and active contributors this month.</p>
-                            
+                            <h3 style="margin-top: 0;">Featured Builders</h3>
+                            <p class="live-widget-note" style="margin-bottom: 12px;">Top reviewers and veteran
+                                contributors</p>
+
                             <div id="widget-builders-list" style="display: flex; flex-direction: column; gap: 8px;">
                                 <div style="color: var(--text-secondary); font-size: 13px;">Loading builders...</div>
                             </div>
@@ -68,15 +68,15 @@
 
 
                 <div class="cta-container">
-                    <a href="network.html" class="cta-card">
-                        <div class="cta-icon"><i class="fas fa-project-diagram"></i></div>
-                        <h2>Influence Map</h2>
-                        <p>Nodes are developers. Edges show who replied to whom. See who shapes the conversation.</p>
-                    </a>
                     <a href="directory.html" class="cta-card">
                         <div class="cta-icon"><i class="fas fa-users"></i></div>
                         <h2>Meet the Builders</h2>
                         <p>Explore contributor profiles to find who builds, reviews, and proposes protocol changes.</p>
+                    </a>
+                    <a href="network.html" class="cta-card">
+                        <div class="cta-icon"><i class="fas fa-project-diagram"></i></div>
+                        <h2>Influence Map</h2>
+                        <p>Nodes are developers. Edges show who replied to whom. See who shapes the conversation.</p>
                     </a>
                     <a href="contributors.html" class="cta-card">
                         <div class="cta-icon"><i class="fas fa-meteor"></i></div>
@@ -85,10 +85,9 @@
                     </a>
                 </div>
 
-                <section class="secondary-cta" aria-label="Follow and feedback">
+                <section class="secondary-cta" aria-label="Follow updates">
                     <a href="https://x.com/BitcoinDataLabs" target="_blank" rel="noopener noreferrer"
                         class="secondary-link">Follow updates on X</a>
-                    <a href="roadmap.html" class="secondary-link">View Roadmap & Give Feedback</a>
                 </section>
 
             </div>

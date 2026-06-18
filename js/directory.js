@@ -145,31 +145,13 @@ function formatActiveDate(p, which) {
 }
 
 function getDirectoryTrendTag(c) {
-    const scoreP2016 = Number(c.p2016_hybrid_score || 0);
-    const scoreModern = Number(c.modern_hybrid_score || 0);
-    const firstActive = c.first_active || c.global_first_active || c.first_seen;
-    let firstActiveDate = null;
-    if (firstActive) {
-        const parsed = new Date(firstActive);
-        if (!Number.isNaN(parsed.getTime())) {
-            firstActiveDate = parsed;
-        }
-    }
-
-    const hasModernCommit = Number(c.code_stats?.modern_commits || 0) > 0;
-    const hasModernReview = Number(c.modern_reviews_count || 0) > 0;
-    const hasModernSocial = Number(c.modern_posts || 0) > 0;
-    const hasRecentActivity = hasModernCommit || hasModernReview || hasModernSocial || scoreModern > 0;
-    const oneYearMs = 365 * 24 * 60 * 60 * 1000;
-    if (firstActiveDate && (Date.now() - firstActiveDate.getTime()) <= oneYearMs && hasRecentActivity) {
-        return { label: 'New', className: 'new' };
-    }
-
-    const growth = scoreP2016 > 0 ? scoreModern / scoreP2016 : (scoreModern > 0 ? 2 : 0);
-    if (growth > 1.5) return { label: 'Rising', className: 'rising' };
-    if (growth >= 0.8) return { label: 'Steady', className: 'steady' };
-    if (growth > 0 && scoreModern >= 0.35) return { label: 'Steady', className: 'steady' };
-    if (growth > 0) return { label: 'Fading', className: 'fading' };
+    if (!c.activity_status) return null;
+    const status = c.activity_status;
+    if (status === "Rising") return { label: 'Rising', className: 'rising' };
+    if (status === "Steady") return { label: 'Steady', className: 'steady' };
+    if (status === "Fading") return { label: 'Fading', className: 'fading' };
+    if (status === "New") return { label: 'New', className: 'new' };
+    if (status === "Retired") return { label: 'Retired', className: 'retired' };
     return null;
 }
 
@@ -624,15 +606,20 @@ function renderTable() {
 
         const badgeInfo = c.badges && typeof c.badges === 'object' ? c.badges : {};
         const badgeItems = [];
-        const isMaintainer = badgeInfo.is_maintainer || c.code_stats?.is_maintainer;
 
-        if (isMaintainer) {
-            const maintainerStatus = badgeInfo.maintainer_status || 'active';
-            const isCurrent = maintainerStatus === 'active';
-            const maintainerClass = isCurrent ? 'maintainer current' : 'maintainer retired';
-            const labelText = isCurrent ? 'Current Maintainer' : 'Historical Maintainer';
-            badgeItems.push({ label: labelText, className: maintainerClass });
+        if (c.roles) {
+            c.roles.forEach(role => {
+                const lower = role.toLowerCase();
+                if (lower.includes('maintainer')) {
+                    const isRetired = lower.includes('former');
+                    badgeItems.push({ 
+                        label: role, 
+                        className: `maintainer ${isRetired ? 'retired' : 'current'}` 
+                    });
+                }
+            });
         }
+        
         const trend = getDirectoryTrendTag(c);
         if (trend) {
             badgeItems.push({ label: trend.label, className: trend.className });
@@ -739,7 +726,19 @@ function renderProfile(p, isBasic = false) {
     if (p.github && p.github.login) {
         avatarHtml = `<img src="https://github.com/${p.github.login}.png?size=100" alt="${p.display_name}" class="avatar-placeholder profile-large" style="object-fit: cover; border: 4px solid var(--bg-secondary); background: var(--card-bg);" onerror="this.outerHTML='<div class=\\'avatar-placeholder profile-large\\'><i class=\\'fas fa-user-circle\\'></i></div>'"/>`;
     }
-    const roles = (p.roles || []).map(r => `<span class="mini-badge ${r.toLowerCase()}" style="font-size: 12px; padding: 4px 10px;">${r}</span>`).join('');
+    
+    const roles = (p.roles || []).map(r => {
+        const lower = r.toLowerCase();
+        let classes = ['mini-badge'];
+        if (lower.includes('maintainer')) {
+            classes.push('maintainer');
+            classes.push(lower.includes('former') ? 'retired' : 'current');
+        } else {
+            classes.push(lower.replace(/\s+/g, '-'));
+        }
+        return `<span class="${classes.join(' ')}" style="font-size: 12px; padding: 4px 10px;">${escapeHtml(r)}</span>`;
+    }).join('');
+
 
     const githubLink = p.github_url ? `<a href="${p.github_url}" target="_blank" class="social-link"><i class="fab fa-github"></i> GitHub</a>` : '';
     const delvingLink = p.delving_url ? `<a href="${p.delving_url}" target="_blank" class="social-link"><i class="fas fa-comments"></i> Delving Bitcoin</a>` : '';
@@ -860,6 +859,15 @@ function renderProfile(p, isBasic = false) {
                         <span>Authored Commits</span>
                         <span style="font-weight: 700;">${p.authored_commits?.toLocaleString() || p.total_commits?.toLocaleString() || 0}</span>
                     </div>
+                    ${p.tier2_authored_commits > 0 ? `
+                    <div class="profile-info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border); margin-left: 8px; padding-top: 4px; padding-bottom: 4px;">
+                        <span style="color: var(--text-secondary);">↳ Core repos</span>
+                        <span style="font-weight: 600; color: var(--text-secondary);">${p.tier1_authored_commits?.toLocaleString() || 0} <span style="font-weight: normal; opacity: 0.7; margin-left: 4px;">(secp256k1, bitcoin/bitcoin, gui)</span></span>
+                    </div>
+                    <div class="profile-info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border); margin-left: 8px; padding-top: 4px; padding-bottom: 4px;">
+                        <span style="color: var(--text-secondary);">↳ Ecosystem</span>
+                        <span style="font-weight: 600; color: var(--text-secondary);">${p.tier2_authored_commits?.toLocaleString() || 0} <span style="font-weight: normal; opacity: 0.7; margin-left: 4px;">(guix.sigs, HWI, qa-assets)</span></span>
+                    </div>` : ''}
                     <div class="profile-info-row">
                         <span>Merge Commits (Maintainer)</span>
                         <span style="font-weight: 700; color: var(--text-secondary);">${p.merge_commits?.toLocaleString() || 0}</span>

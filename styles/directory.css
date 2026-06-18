@@ -8,7 +8,7 @@
 .directory-layout {
     display: block !important;
     overflow: visible !important;
-    padding: 32px 0 48px 0;
+    padding: 32px 0 32px 0;
     background: radial-gradient(circle at 50% 0%, rgba(232, 145, 107, 0.03) 0%, transparent 60%);
 }
 
@@ -20,10 +20,18 @@
 
 .page-header {
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.header-top-row {
+    display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    margin-bottom: 32px;
+    flex-wrap: wrap;
 }
 
 .page-header h1 {
@@ -36,7 +44,7 @@
 
 .header-content {
     flex: 1;
-    min-width: 0;
+    min-width: 300px;
 }
 
 .page-header p {
@@ -47,7 +55,7 @@
 
 .search-box {
     position: relative;
-    width: min(520px, 100%);
+    width: 100%;
 }
 
 .search-box i {
@@ -289,13 +297,21 @@
 }
 
 .mini-badge.maintainer {
-    background: rgba(245, 158, 11, 0.12);
-    color: #d97706;
+    background: rgba(224, 122, 95, 0.2);
+    color: #E07A5F;
+    border: 1px solid rgba(224, 122, 95, 0.45);
+}
+
+.mini-badge.ecosystem {
+    background: rgba(99, 102, 241, 0.15);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .mini-badge.maintainer.retired {
-    background: rgba(245, 158, 11, 0.06);
-    color: #fbbf24;
+    background: rgba(148, 163, 184, 0.08);
+    color: #94A3B8;
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .mini-badge.new {

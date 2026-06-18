@@ -570,29 +570,13 @@ function forceBox(width, height) {
 }
 
 function getTrendTag(d) {
-    const scoreP2016 = Number(d.p2016_hybrid_score || 0);
-    const scoreModern = Number(d.modern_hybrid_score || 0);
-    const firstActive = d.first_active || d.global_first_active || d.first_seen;
-    let firstActiveDate = null;
-    if (firstActive) {
-        const parsed = new Date(firstActive);
-        if (!Number.isNaN(parsed.getTime())) {
-            firstActiveDate = parsed;
-        }
-    }
-    const hasModernCommit = Number(d.code_stats?.modern_commits || 0) > 0;
-    const hasModernReview = Number(d.modern_reviews_count || 0) > 0;
-    const hasModernSocial = Number(d.modern_posts || 0) > 0;
-    const hasRecentActivity = hasModernCommit || hasModernReview || hasModernSocial || scoreModern > 0;
-    const oneYearMs = 365 * 24 * 60 * 60 * 1000;
-    if (firstActiveDate && (Date.now() - firstActiveDate.getTime()) <= oneYearMs && hasRecentActivity) {
-        return `<span class="tag tag-new">New</span>`;
-    }
-    const growth = scoreP2016 > 0 ? scoreModern / scoreP2016 : (scoreModern > 0 ? 2 : 0);
-    if (growth > 1.5) return `<span class="tag tag-rising">Rising</span>`;
-    if (growth >= 0.8) return `<span class="tag tag-steady">Steady</span>`;
-    if (growth > 0 && scoreModern >= 0.35) return `<span class="tag tag-steady">Steady</span>`;
-    if (growth > 0) return `<span class="tag tag-fading">Fading</span>`;
+    if (!d.activity_status) return '';
+    const status = d.activity_status;
+    if (status === "Rising") return `<span class="tag tag-rising">Rising</span>`;
+    if (status === "Steady") return `<span class="tag tag-steady">Steady</span>`;
+    if (status === "Fading") return `<span class="tag tag-fading">Fading</span>`;
+    if (status === "New") return `<span class="tag tag-new">New</span>`;
+    if (status === "Retired") return `<span class="tag tag-retired">Retired</span>`;
     return '';
 }
 
@@ -674,7 +658,14 @@ function showProfile(d) {
                     <div class="expertise-label" style="font-size:10px; margin-bottom:6px;">Protocol Assets</div>
                     <div style="display:flex; flex-wrap:wrap; gap:4px;">
                         ${bipsHtml}
-                        ${d.code_stats.is_maintainer ? '<span class="bip-chip" style="background:rgba(16, 185, 129, 0.1); color:#10b981; border-color:rgba(16, 185, 129, 0.2); font-size:9px;">MAINTAINER</span>' : ''}
+                        ${(d.roles || []).some(r => r.toLowerCase().includes('maintainer')) ? 
+                            (() => {
+                                const mRole = d.roles.find(r => r.toLowerCase().includes('maintainer'));
+                                const isRetired = mRole.toLowerCase().includes('former');
+                                const bg = isRetired ? 'rgba(100, 116, 139, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+                                const color = isRetired ? '#64748b' : '#10b981';
+                                return `<span class="bip-chip" style="background:${bg}; color:${color}; border-color:${bg}; font-size:9px;">${mRole.toUpperCase()}</span>`;
+                            })() : ''}
                     </div>
                 </div>
                 <div style="font-size:10px; color:var(--text-secondary); text-align:right;">

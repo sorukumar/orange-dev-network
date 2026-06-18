@@ -592,6 +592,12 @@ text.label {
     border: 1px solid rgba(244, 63, 94, 0.14);
 }
 
+.tag-retired {
+    background: rgba(148, 163, 184, 0.08);
+    color: #94A3B8;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
 .tag-mixed {
     background: rgba(253, 246, 227, 0.05);
     color: var(--text-primary);

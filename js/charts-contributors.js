@@ -97,16 +97,13 @@ function setupGalaxyToggles() {
     const updateToggleUI = (view) => {
         [btnTotal, btnAuthored].forEach(btn => {
             btn.classList.remove('active');
-            btn.style.background = 'transparent';
-            btn.style.color = '#718096';
-            btn.style.boxShadow = 'none';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.boxShadow = '';
         });
 
         const activeBtn = view === 'total' ? btnTotal : btnAuthored;
         activeBtn.classList.add('active');
-        activeBtn.style.background = '#fff';
-        activeBtn.style.color = 'inherit';
-        activeBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
 
         if (yLabel) {
             yLabel.innerText = view === 'total' ? 'Y: Total Commits' : 'Y: Authored Commits';
@@ -259,7 +256,7 @@ function renderGalaxy(viewType = 'total') {
                             ${badge}
                         </div>
                         <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11px;">
-                            <div><span style="opacity:0.6;">Tenure:</span><br/><b>${r.span || 'N/A'}</b></div>
+                            <div style="grid-column: span 2;"><span style="opacity:0.6;">First Merged Contribution:</span> <b>${r.cohort_year || 'N/A'}</b> <span style="opacity:0.5; margin-left:8px;">(Tenure: ${r.span || 'N/A'})</span></div>
                             <div><span style="opacity:0.6;">Commits:</span><br/>
                                 <b>${formatCount(r.total_commits || 0)}</b>
                                 ${r.merge_commits > 0 ? `<div style="font-size:9px; opacity:0.7;">${formatCount(r.authored_commits)} Auth + ${formatCount(r.merge_commits)} Merge</div>` : ""}
@@ -274,7 +271,7 @@ function renderGalaxy(viewType = 'total') {
         },
         xAxis: {
             ...axisStyle, type: 'value', min: 2008.5, max: 2026.5, splitLine: { show: false },
-            name: 'Year Joined', nameLocation: 'middle', nameGap: 35,
+            name: 'First Merged Contribution', nameLocation: 'middle', nameGap: 35,
             axisLabel: {
                 formatter: (v) => v === 2026 ? '2026 (Partial)' : v.toString()
             }
