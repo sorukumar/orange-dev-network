@@ -301,6 +301,12 @@ async function initDirectory() {
                         ml_total: (obj.ml_threads || 0) + (obj.ml_responses || 0),
                         delving_total: (obj.delving_threads || 0) + (obj.delving_responses || 0),
                     };
+                }).filter(c => {
+                    // Strip out mapped profiles that have done nothing across the 4 pillars
+                    const code = (c.total_commits || 0);
+                    const bips = (c.bips_authored || 0);
+                    const hybrid = (c.hybrid_score || 0);
+                    return hybrid > 0 || code > 0 || bips > 0 || c.dev_type === 'Creator';
                 });
             },
             onError: (err) => { throw err; }
@@ -516,9 +522,9 @@ function sortData() {
         // Handle nested github login for display_name sort if needed, 
         // but display_name is already at top level
 
-        // Treat "Creator" string as maximum numeric impact score
-        if (valA === "Creator") valA = Infinity;
-        if (valB === "Creator") valB = Infinity;
+        // Boost "Creator" to the top ONLY if the user is explicitly searching for them
+        if (a.dev_type === "Creator" && currentSort.col.includes('impact_score') && currentSearchTerm.includes('satoshi')) valA = Infinity;
+        if (b.dev_type === "Creator" && currentSort.col.includes('impact_score') && currentSearchTerm.includes('satoshi')) valB = Infinity;
 
         // Handle nulls/NaNs
         if (valA === null || (typeof valA === 'number' && isNaN(valA))) valA = -1;
@@ -609,7 +615,12 @@ function renderTable() {
         } else {
             const impact = c.impact_score != null ? Number(c.impact_score) : 0;
             impactPct = Math.min(100, impact);
-            impactDisplay = c.dev_type === 'Creator' ? 'Creator' : (impact > 0 ? impact : '-');
+            impactDisplay = impact > 0 ? impact : '-';
+        }
+
+        if (c.dev_type === 'Creator') {
+            impactPct = 100;
+            impactDisplay = 'Creator';
         }
 
         const badgeInfo = c.badges && typeof c.badges === 'object' ? c.badges : {};

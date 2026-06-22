@@ -35,6 +35,16 @@
             <div class="hero-section">
                 <h1>The People Behind Bitcoin</h1>
                 <p>Know who builds Bitcoin, what they contribute, and who they collaborate with.</p>
+                
+                <div class="hero-search-wrapper" style="position: relative; z-index: 1000; max-width: 600px; margin: 32px auto 48px auto; width: 100%;">
+                    <div class="search-box" style="width: 100%; position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); z-index: 2;"></i>
+                        <input type="text" id="global-hero-search" placeholder="Search for a developer (e.g. Pieter Wuille, Satoshi...)" autocomplete="off" spellcheck="false" style="width: 100%; padding: 16px 20px 16px 48px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(253, 246, 227, 0.04); color: var(--text-primary); backdrop-filter: blur(8px); outline: none; transition: all 0.2s; box-sizing: border-box; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                    </div>
+                    <ul id="hero-search-dropdown" class="search-dropdown" hidden style="position: absolute; top: calc(100% + 8px); left: 0; width: 100%; max-height: 350px; overflow-y: auto; list-style: none; padding: 0; margin: 0; z-index: 100; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); background: rgba(8, 10, 15, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);"></ul>
+                </div>
+
+
                 <section class="snapshot-panel" aria-label="Developer Snapshot">
                     <div class="snapshot-panel-head">
                         <div
@@ -85,8 +95,8 @@
                     </a>
                     <a href="contributors.html" class="cta-card">
                         <div class="cta-icon"><i class="fas fa-meteor"></i></div>
-                        <h2>Code Contributor Galaxy</h2>
-                        <p>A visual map of pure code contributors grouped by repository and domain.</p>
+                        <h2>Builder Galaxy</h2>
+                        <p>A visual map of the developer ecosystem plotted across time and technical footprint.</p>
                     </a>
                 </div>
 

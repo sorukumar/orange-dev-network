@@ -706,20 +706,24 @@ text.label {
 }
 
 /* Scrollbar Styles */
-#sidebar::-webkit-scrollbar {
+#sidebar::-webkit-scrollbar,
+.search-dropdown::-webkit-scrollbar {
     width: 6px;
 }
 
-#sidebar::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+#sidebar::-webkit-scrollbar-track,
+.search-dropdown::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-#sidebar::-webkit-scrollbar-thumb {
+#sidebar::-webkit-scrollbar-thumb,
+.search-dropdown::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 3px;
 }
 
-#sidebar::-webkit-scrollbar-thumb:hover {
+#sidebar::-webkit-scrollbar-thumb:hover,
+.search-dropdown::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 

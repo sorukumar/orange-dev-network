@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Home', url: 'index.html' },
                 { name: 'Meet the Builders', url: 'directory.html' },
                 { name: 'Influence Map', url: 'network.html' },
-                { name: 'Contributors', url: 'contributors.html' },
+                { name: 'Builder Galaxy', url: 'contributors.html' },
                 { name: 'Roadmap & Feedback', url: 'roadmap.html' }
             ],
             suiteLinks: [
