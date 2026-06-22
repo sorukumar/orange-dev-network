@@ -598,6 +598,12 @@ text.label {
     border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
+.tag-active {
+    background: rgba(253, 246, 227, 0.04);
+    color: #cbd5e1;
+    border: 1px solid rgba(253, 246, 227, 0.1);
+}
+
 .tag-mixed {
     background: rgba(253, 246, 227, 0.05);
     color: var(--text-primary);

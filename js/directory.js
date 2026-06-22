@@ -152,6 +152,7 @@ function getDirectoryTrendTag(c) {
     if (status === "Fading") return { label: 'Fading', className: 'fading' };
     if (status === "New") return { label: 'New', className: 'new' };
     if (status === "Retired") return { label: 'Retired', className: 'retired' };
+    if (status === "Active") return { label: 'Active', className: 'active' };
     return null;
 }
 

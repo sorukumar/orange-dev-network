@@ -577,6 +577,7 @@ function getTrendTag(d) {
     if (status === "Fading") return `<span class="tag tag-fading">Fading</span>`;
     if (status === "New") return `<span class="tag tag-new">New</span>`;
     if (status === "Retired") return `<span class="tag tag-retired">Retired</span>`;
+    if (status === "Active") return `<span class="tag tag-active">Active</span>`;
     return '';
 }
 
