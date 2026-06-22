@@ -337,6 +337,16 @@ function renderWorkDetail(p) {
            <div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Ecosystem</span><span class="info-row-value">${fmtNum(p.tier2_authored_commits, '0')} <span style="font-weight: normal; opacity: 0.7; margin-left: 4px;">(guix.sigs, HWI, qa-assets)</span></span></div>`
         : '';
 
+    const prAuthoredTierSplitRows = (p.tier2_prs_authored > 0)
+        ? `<div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Core repos</span><span class="info-row-value">${fmtNum(p.tier1_prs_authored, '0')}</span></div>
+           <div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Ecosystem</span><span class="info-row-value">${fmtNum(p.tier2_prs_authored, '0')}</span></div>`
+        : '';
+
+    const reviewTierSplitRows = (p.tier2_reviews_count > 0)
+        ? `<div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Core repos</span><span class="info-row-value">${fmtNum(p.tier1_reviews_count, '0')}</span></div>
+           <div class="info-row" style="padding-left: 12px; font-size: 12px; border-left: 2px solid var(--border-color); margin-left: 8px;"><span class="info-row-label">↳ Ecosystem</span><span class="info-row-value">${fmtNum(p.tier2_reviews_count, '0')}</span></div>`
+        : '';
+
     document.getElementById('profile-work-slot').innerHTML = `
         <div class="profile-section">
             <p class="section-title">Work Profile</p>
@@ -348,7 +358,9 @@ function renderWorkDetail(p) {
                     ${tierSplitRows}
                     <div class="info-row"><span class="info-row-label">Merge Commits</span><span class="info-row-value">${fmtNum(p.merge_commits, '—')}</span></div>
                     <div class="info-row"><span class="info-row-label">PRs Authored</span><span class="info-row-value">${fmtNum(p.prs_authored, '—')}</span></div>
+                    ${prAuthoredTierSplitRows}
                     <div class="info-row"><span class="info-row-label">PRs Reviewed</span><span class="info-row-value" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">${fmtNum(p.reviews_count, '—')}${reciprocityNote}</span></div>
+                    ${reviewTierSplitRows}
                     ${approvalsRow}
                     <div class="info-row"><span class="info-row-label">Primary Focus</span><span class="info-row-value" style="font-size:12px;">${esc(focusDisplay)}</span></div>
                 </div>

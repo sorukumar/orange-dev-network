@@ -515,14 +515,21 @@ function sortData() {
         // Handle nested github login for display_name sort if needed, 
         // but display_name is already at top level
 
+        // Treat "Creator" string as maximum numeric impact score
+        if (valA === "Creator") valA = Infinity;
+        if (valB === "Creator") valB = Infinity;
+
         // Handle nulls/NaNs
         if (valA === null || (typeof valA === 'number' && isNaN(valA))) valA = -1;
         if (valB === null || (typeof valB === 'number' && isNaN(valB))) valB = -1;
 
-        if (typeof valA === 'string') {
+        if (typeof valA === 'string' && typeof valB === 'string') {
             return currentSort.dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
         } else {
-            return currentSort.dir === 'asc' ? valA - valB : valB - valA;
+            // Force numeric comparison if one of them is now Infinity
+            const numA = (typeof valA === 'string') ? -1 : valA;
+            const numB = (typeof valB === 'string') ? -1 : valB;
+            return currentSort.dir === 'asc' ? numA - numB : numB - numA;
         }
     });
 }

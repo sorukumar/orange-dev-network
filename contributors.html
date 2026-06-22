@@ -32,9 +32,13 @@
                     <p>Visual history of every developer. Each bubble represents a contributor—the higher the bubble, the more commits they have. <strong>Click on any bubble</strong> to reveal their historical timeline and technical profile.</p>
                 </div>
                 <div class="header-actions" style="display: flex; gap: 16px; align-items: center;">
-                    <div class="segmented-control">
-                        <button id="btn-galaxy-total" class="seg-btn active">Total Activity</button>
-                        <button id="btn-galaxy-authored" class="seg-btn">Authored Work</button>
+                    <div class="segmented-control" id="archetype-filters">
+                        <button data-filter="All" class="seg-btn active">All</button>
+                        <button data-filter="Engineers" class="seg-btn">Engineers</button>
+                        <button data-filter="BIP Authors" class="seg-btn">BIP Authors</button>
+                        <button data-filter="Reviewers" class="seg-btn">Reviewers</button>
+                        <button data-filter="Research Contributors" class="seg-btn">Research Contributors</button>
+                        <button data-filter="Protocol Designers" class="seg-btn">Protocol Designers</button>
                     </div>
                     <div style="display: flex; gap: 15px; margin-left: 10px;">
                         <div style="border-left: 3px solid #E07A5F; padding-left: 10px;">

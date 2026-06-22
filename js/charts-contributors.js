@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 
 let galaxyData = null;
-let currentGalaxyView = 'total';
+let currentGalaxyView = 'All';
 let activeContributorData = null;
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -88,46 +88,45 @@ async function loadContributorLandscape() {
 }
 
 function setupGalaxyToggles() {
-    const btnTotal = document.getElementById('btn-galaxy-total');
-    const btnAuthored = document.getElementById('btn-galaxy-authored');
+    const container = document.getElementById('archetype-filters');
     const yLabel = document.getElementById('galaxy-y-label');
 
-    if (!btnTotal || !btnAuthored) return;
+    if (!container) return;
+
+    const btns = container.querySelectorAll('.seg-btn');
 
     const updateToggleUI = (view) => {
-        [btnTotal, btnAuthored].forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.style.boxShadow = '';
+        btns.forEach(btn => {
+            if (btn.dataset.filter === view) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
         });
 
-        const activeBtn = view === 'total' ? btnTotal : btnAuthored;
-        activeBtn.classList.add('active');
-
         if (yLabel) {
-            yLabel.innerText = view === 'total' ? 'Y: Total Commits' : 'Y: Authored Commits';
+            if (view === 'All') yLabel.innerText = 'Y: Total Commits';
+            else if (view === 'Engineers') yLabel.innerText = 'Y: Total Commits';
+            else if (view === 'BIP Authors') yLabel.innerText = 'Y: Impact Score';
+            else if (view === 'Reviewers') yLabel.innerText = 'Y: PRs Reviewed';
+            else if (view === 'Research Contributors') yLabel.innerText = 'Y: Impact Score';
+            else if (view === 'Protocol Designers') yLabel.innerText = 'Y: Impact Score';
         }
     };
 
-    btnTotal.addEventListener('click', () => {
-        if (currentGalaxyView === 'total') return;
-        currentGalaxyView = 'total';
-        updateToggleUI('total');
-        renderGalaxy('total');
-        if (activeContributorData) renderContributorHistory(activeContributorData);
-    });
-
-    btnAuthored.addEventListener('click', () => {
-        if (currentGalaxyView === 'authored') return;
-        currentGalaxyView = 'authored';
-        updateToggleUI('authored');
-        renderGalaxy('authored');
-        if (activeContributorData) renderContributorHistory(activeContributorData);
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.filter;
+            if (currentGalaxyView === view) return;
+            currentGalaxyView = view;
+            updateToggleUI(view);
+            renderGalaxy(view);
+            if (activeContributorData) renderContributorHistory(activeContributorData);
+        });
     });
 }
 
-function renderGalaxy(viewType = 'total') {
+function renderGalaxy(viewType = 'All') {
     const rankStyles = {
         'The Core (Top 1%)': { color: '#E07A5F', priority: 1, opacity: 1, symbol: 'diamond' },
         'The Contributors (Top 20%)': { color: '#F4A261', priority: 2, opacity: 0.9, symbol: 'circle' },
@@ -177,10 +176,36 @@ function renderGalaxy(viewType = 'total') {
         const portraitUrl = portraits[item.name];
 
         // Use random offset for visualization
-        const valX = Number(item.cohort_year) + (Math.random() - 0.5) * 0.7;
+        let valX;
+        if (viewType === 'All' || viewType === 'Engineers') {
+            valX = Number(item.cohort_year) + (Math.random() - 0.5) * 0.7;
+        } else {
+            valX = Number(item.global_cohort_year || item.cohort_year) + (Math.random() - 0.5) * 0.7;
+        }
+        let meetsThreshold = false;
 
-        // Select Y and Size based on viewType
-        const rawY = viewType === 'total' ? (item.total_commits || 0) : (item.authored_commits || 0);
+        if (viewType === 'All') {
+            rawY = item.total_commits || 0;
+            meetsThreshold = true;
+        } else if (viewType === 'Engineers') {
+            rawY = item.total_commits || 0;
+            meetsThreshold = item.is_engineer === true;
+        } else if (viewType === 'BIP Authors') {
+            rawY = item.impact_score || 0;
+            meetsThreshold = item.is_bip_author === true;
+        } else if (viewType === 'Reviewers') {
+            rawY = item.reviews_count || 0;
+            meetsThreshold = item.is_reviewer === true;
+        } else if (viewType === 'Research Contributors') {
+            rawY = item.impact_score || 0;
+            meetsThreshold = item.is_researcher === true;
+        } else if (viewType === 'Protocol Designers') {
+            rawY = item.impact_score || 0;
+            meetsThreshold = (item.dev_type === 'Protocol Designer');
+        }
+
+        if (!meetsThreshold) return; // Hide baseline noise for a clean view
+
         let valY = Math.max(1, Number(rawY));
 
         // Jitter small values (Start from 1.0 to fit with yAxis min 0.8)
@@ -249,6 +274,32 @@ function renderGalaxy(viewType = 'total') {
                         `</div>`;
                 }
 
+                let metricLabel = "Total Commits:";
+                let metricValue = formatCount(r.total_commits || 0);
+                let subMetricHtml = r.merge_commits > 0 ? `<div style="font-size:9px; opacity:0.7;">${formatCount(r.authored_commits)} Auth + ${formatCount(r.merge_commits)} Merge</div>` : "";
+
+                if (currentGalaxyView === 'Engineers') {
+                    metricLabel = "Total Commits:";
+                    metricValue = formatCount(r.total_commits || 0);
+                    subMetricHtml = `<div style="font-size:9px; opacity:0.7;">${formatCount(r.authored_commits || 0)} Auth + ${formatCount(r.merge_commits || 0)} Merge</div>`;
+                } else if (currentGalaxyView === 'BIP Authors') {
+                    metricLabel = "Impact Score:";
+                    metricValue = formatCount(r.impact_score || 0);
+                    subMetricHtml = `<div style="font-size:9px; opacity:0.7;">${formatCount(r.bips_authored || 0)} BIPs Authored</div>`;
+                } else if (currentGalaxyView === 'Reviewers') {
+                    metricLabel = "PRs Reviewed:";
+                    metricValue = formatCount(r.reviews_count || 0);
+                    subMetricHtml = `<div style="font-size:9px; opacity:0.7;">${formatCount(r.total_commits || 0)} Total Commits</div>`;
+                } else if (currentGalaxyView === 'Research Contributors') {
+                    metricLabel = "Impact Score:";
+                    metricValue = formatCount(r.impact_score || 0);
+                    subMetricHtml = `<div style="font-size:9px; opacity:0.7;">${formatCount(r.threads_started || 0)} Threads Started</div>`;
+                } else if (currentGalaxyView === 'Protocol Designers') {
+                    metricLabel = "Impact Score:";
+                    metricValue = formatCount(r.impact_score || 0);
+                    subMetricHtml = `<div style="font-size:9px; opacity:0.7;">${formatCount(r.bips_authored || 0)} BIPs</div>`;
+                }
+
                 return `
                     <div style="padding:15px; width:260px; font-family:Inter, sans-serif; color:#fff;">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -257,9 +308,9 @@ function renderGalaxy(viewType = 'total') {
                         </div>
                         <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11px;">
                             <div style="grid-column: span 2;"><span style="opacity:0.6;">First Merged Contribution:</span> <b>${r.cohort_year || 'N/A'}</b> <span style="opacity:0.5; margin-left:8px;">(Tenure: ${r.span || 'N/A'})</span></div>
-                            <div><span style="opacity:0.6;">Commits:</span><br/>
-                                <b>${formatCount(r.total_commits || 0)}</b>
-                                ${r.merge_commits > 0 ? `<div style="font-size:9px; opacity:0.7;">${formatCount(r.authored_commits)} Auth + ${formatCount(r.merge_commits)} Merge</div>` : ""}
+                            <div><span style="opacity:0.6;">${metricLabel}</span><br/>
+                                <b>${metricValue}</b>
+                                ${subMetricHtml}
                             </div>
                             <div><span style="opacity:0.6;">Share:</span><br/><b>${shareStr}%</b></div>
                             ${params.seriesName.includes('Scouts') ? "" : `<div><span style="opacity:0.6;">Rank:</span><br/><b>Top ${(100 - (r.percentile_raw || 0) + 0.1).toFixed(1)}%</b></div>`}
@@ -271,14 +322,22 @@ function renderGalaxy(viewType = 'total') {
         },
         xAxis: {
             ...axisStyle, type: 'value', min: 2008.5, max: 2026.5, splitLine: { show: false },
-            name: 'First Merged Contribution', nameLocation: 'middle', nameGap: 35,
+            name: (viewType === 'All' || viewType === 'Engineers') ? 'First Merged Contribution' : 'First Active (Across Domains)', 
+            nameLocation: 'middle', nameGap: 35,
+            axisLine: { show: true, lineStyle: { color: '#E07A5F', width: 2 } },
+            nameTextStyle: { color: '#E07A5F', fontSize: 13, fontWeight: 'bold', letterSpacing: 1 },
             axisLabel: {
+                color: '#E07A5F', fontWeight: 'bold',
                 formatter: (v) => v === 2026 ? '2026 (Partial)' : v.toString()
             }
         },
         yAxis: {
-            ...axisStyle, type: 'log', min: 0.8, name: viewType === 'total' ? 'Total Commits (Depth)' : 'Authored Commits (Depth)', nameLocation: 'middle', nameGap: 55,
-            axisLabel: { formatter: (v) => v >= 1 ? v.toLocaleString() : v }
+            ...axisStyle, type: 'log', min: 0.8, 
+            name: (viewType === 'All' || viewType === 'Engineers') ? 'Total Commits (Depth)' : ((viewType === 'Protocol Designers' || viewType === 'Research Contributors' || viewType === 'BIP Authors') ? 'Impact Score (Depth)' : 'PRs Reviewed (Depth)'), 
+            nameLocation: 'middle', nameGap: 55,
+            axisLine: { show: true, lineStyle: { color: '#E07A5F', width: 2 } },
+            nameTextStyle: { color: '#E07A5F', fontSize: 13, fontWeight: 'bold', letterSpacing: 1 },
+            axisLabel: { color: '#E07A5F', fontWeight: 'bold', formatter: (v) => v >= 1 ? v.toLocaleString() : v }
         },
         series: series
     }, true); // Use 'true' to clear previous state
@@ -302,12 +361,27 @@ function renderContributorHistory(contributor) {
     historySection.style.display = 'block';
 
     // Format commits with commas based on view
-    const commitCount = currentGalaxyView === 'total' ?
-        (contributor.total_commits ? contributor.total_commits.toLocaleString() : "0") :
-        (contributor.authored_commits ? contributor.authored_commits.toLocaleString() : "0");
+    let commitCount = "0";
+    let typeLabel = "Total Commits";
 
-    const typeLabel = currentGalaxyView === 'total' ? "Total" : "Authored";
-    historyTitle.innerText = `Contributor History: ${contributor.name} (${commitCount} ${typeLabel} Commits)`;
+    if (currentGalaxyView === 'All') {
+        commitCount = contributor.total_commits ? contributor.total_commits.toLocaleString() : "0";
+        typeLabel = "Total Commits";
+    } else if (currentGalaxyView === 'Core Engineers') {
+        commitCount = contributor.tier1_authored_commits ? contributor.tier1_authored_commits.toLocaleString() : "0";
+        typeLabel = "Core Commits";
+    } else if (currentGalaxyView === 'Ecosystem Builders') {
+        commitCount = contributor.tier2_authored_commits ? contributor.tier2_authored_commits.toLocaleString() : "0";
+        typeLabel = "Ecosystem Commits";
+    } else if (currentGalaxyView === 'Code Reviewers') {
+        commitCount = contributor.reviews_count ? contributor.reviews_count.toLocaleString() : "0";
+        typeLabel = "PRs Reviewed";
+    } else if (currentGalaxyView === 'Protocol Designers') {
+        commitCount = contributor.impact_score ? contributor.impact_score.toLocaleString() : "0";
+        typeLabel = "Impact Score";
+    }
+
+    historyTitle.innerText = `Contributor History: ${contributor.name} (${commitCount} ${typeLabel})`;
 
     // Scroll to history
     historySection.scrollIntoView({ behavior: 'smooth' });
@@ -320,11 +394,11 @@ function renderContributorHistory(contributor) {
     const historyData = contributor.history || {};
     const years = Object.keys(historyData).sort();
 
-    // Get all unique categories (Filter out Merge if in authored view)
+    // Get all unique categories
     const categories = new Set();
     Object.values(historyData).forEach(yearData => {
         Object.keys(yearData).forEach(cat => {
-            if (currentGalaxyView === 'total' || cat !== 'Merge') {
+            if (currentGalaxyView === 'All' || cat !== 'Merge') {
                 categories.add(cat);
             }
         });
@@ -339,7 +413,7 @@ function renderContributorHistory(contributor) {
             emphasis: { focus: 'series' },
             data: years.map(y => {
                 const val = historyData[y][cat] || 0;
-                return (currentGalaxyView === 'authored' && cat === 'Merge') ? 0 : val;
+                return (currentGalaxyView !== 'All' && cat === 'Merge') ? 0 : val;
             }),
             itemStyle: {
                 color: (categoryColors && categoryColors[cat]) ? categoryColors[cat] : null
