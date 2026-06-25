@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gatekeepers | Orange Dev Network</title>
+    <meta name="description" content="Discover the history, burden, and legacy of Bitcoin Core maintainers.">
+
+    <!-- Bitcoin Data Labs Font & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <!-- Bitcoin Data Labs Shell Styles -->
+    <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css">
+
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/directory.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png">
+
+    <link rel="stylesheet" href="styles/maintainers.css">
+</head>
+
+<body class="has-fixed-header">
+    <div id="main-container">
+        <!-- Bitcoin Data Labs Header -->
+        <div id="header"></div>
+
+        <div id="app-content" class="directory-layout">
+            <div class="container">
+                <header class="page-header" style="margin-bottom: 20px;">
+                    <div class="header-top-row">
+                        <div class="header-content">
+                            <p
+                                style="font-size: 0.95rem; line-height: 1.5; max-width: 800px; margin: 0; color: var(--color-text-secondary);">
+                                Know your maintainers.
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                <div>
+                    <h3 style="margin-bottom: 5px;">Active Maintainer Roster</h3>
+                    <p class="roster-subtitle">The current guard and their
+                        specialized technical domains.</p>
+                    <div id="roster-grid" class="roster-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div id="build-roster-container" style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 5px;">Build & Security Maintainers</h3>
+                    <p class="roster-subtitle">Maintainers holding strategic
+                        keys for deterministic builds, signing, and security (no merge access to master).</p>
+                    <div id="build-roster-grid" class="roster-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; margin-bottom: 40px;">
+                    <h3 style="margin-bottom: 5px;">Ecosystem Sub-repository Committers</h3>
+                    <p class="roster-subtitle">Developers with merge authority
+                        over critical sub-repositories and libraries.</p>
+                    <div id="ecosystem-roster-grid" class="roster-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>The Path to Trust</h3>
+                        <p>How many authored commits did it take to earn maintainership? This scatter plot shows the
+                            dedication required prior to appointment.</p>
+                    </div>
+                    <div id="chart-path" style="height: 400px; width: 100%;"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>The Relay Race: Maintainer Legacy</h3>
+                        <p>From Satoshi to the current guard. Solid bars indicate Committers (Merge Access); Dashed bars
+                            indicate Security/Build Maintainers.</p>
+                    </div>
+                    <div id="chart-maintainers" style="height: 500px; width: 100%;"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>The Weight of the Keys (Before & After)</h3>
+                        <p>How does a developer's focus shift once they earn merge access? This chart compares their
+                            <b>Proportion of Effort (100%)</b> before vs after appointment. Note the stark drop in
+                            authoring code as reviewing and merging takes over.
+                        </p>
+                    </div>
+                    <div id="chart-merges" style="height: 600px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitcoin Data Labs Footer -->
+        <div id="footer"></div>
+    </div>
+
+    <!-- Bitcoin Data Labs App Components -->
+    <script src="https://bitcoindatalabs.org/components/app-components.js"></script>
+    <script src="js/app-config.js"></script>
+
+    <!-- Maintainers Logic -->
+    <script src="js/maintainers.js"></script>
+</body>
+
+</html>
