@@ -24,7 +24,6 @@ body.landing-layout #app-content {
 
 body.landing-layout .landing-layout {
     background: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-primary) 70%) !important;
-    min-height: 100vh;
     padding-bottom: 60px;
     display: block !important;
 }

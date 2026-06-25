@@ -249,6 +249,12 @@ function renderHero(p) {
     const dlLink = dlUser
         ? `<a href="https://delvingbitcoin.org/u/${dlUser}" target="_blank" class="hero-link"><i class="fas fa-comments"></i> Delving</a>`
         : '';
+    const xLink = p.github_twitter
+        ? `<a href="https://x.com/${esc(p.github_twitter)}" target="_blank" class="hero-link"><i class="fab fa-x-twitter"></i> X / Twitter</a>`
+        : '';
+    const blogLink = p.github_blog
+        ? `<a href="${esc(p.github_blog.startsWith('http') ? p.github_blog : 'https://' + p.github_blog)}" target="_blank" class="hero-link"><i class="fas fa-link"></i> Website</a>`
+        : '';
 
     const maintainerTimeline = p.badges?.is_maintainer && p.badges.maintainer_appointed
         ? `<div class="hero-maintainer-timeline">Maintainer: ${fmtDate(p.badges.maintainer_appointed)} – ${p.badges.maintainer_stepped_down ? fmtDate(p.badges.maintainer_stepped_down) : 'Present'} (${formatDuration(p.badges.maintainer_appointed, p.badges.maintainer_stepped_down)})</div>`
@@ -272,6 +278,8 @@ function renderHero(p) {
                 <div class="hero-links">
                     ${ghLink}
                     ${dlLink}
+                    ${xLink}
+                    ${blogLink}
                 </div>
             </div>
         </div>`;
