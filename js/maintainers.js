@@ -206,9 +206,9 @@ function renderTimelineChart() {
     if (!chartDom) return;
     const myChart = echarts.init(chartDom, 'dark');
 
-    // Filter to only Core Committers (Merge Authority) for the Relay Race
-    const coreCommitters = maintainerData.filter(m => m.merge_authority);
-    const names = coreCommitters.map(m => m.name);
+    // Include all maintainers for the Relay Race (Committers and Build Maintainers)
+    const chartMaintainers = maintainerData;
+    const names = chartMaintainers.map(m => m.name);
     const seriesData = [];
     
     // Helper to get Era Color
@@ -225,7 +225,7 @@ function renderTimelineChart() {
         return '#48BB78'; // Modern Era (Fresh Green)
     };
 
-    coreCommitters.forEach((m, idx) => {
+    chartMaintainers.forEach((m, idx) => {
         const isLatest = m.status === 'active';
         const eraColor = getEraColor(m);
         
@@ -272,7 +272,7 @@ function renderTimelineChart() {
         tooltip: {
             ...tooltipStyle,
             formatter: function (params) {
-                const m = coreCommitters[params.value[0]];
+                const m = chartMaintainers[params.value[0]];
                 if (!m) return '';
                 const holdsKeys = m.merge_authority;
                 const icon = m.type === 'ecosystem' ? '🛡️' : (holdsKeys ? '🔑' : '🛡️');
