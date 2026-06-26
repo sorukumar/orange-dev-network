@@ -308,27 +308,7 @@ body.header-scrolled .profile-topbar {
     flex-shrink: 0;
 }
 
-.hero-link {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
 
-.hero-link:hover {
-    background: rgba(232, 145, 107, 0.08);
-    border-color: rgba(232, 145, 107, 0.3);
-    color: var(--text-primary);
-}
 
 /* ── Stat bar ────────────────────────────────────────────────────────────────── */
 .stat-bar {
