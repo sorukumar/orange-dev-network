@@ -193,3 +193,36 @@
     color: #94A3B8;
     margin-bottom: 16px;
 }
+
+/* Radical Transparency: Master-Detail Layout */
+.sm-master-detail {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    gap: 20px;
+    align-items: start;
+    margin-top: 15px;
+}
+
+.sm-details-col {
+    height: 500px;
+    overflow-y: auto;
+    padding-left: 20px;
+    padding-right: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media screen and (max-width: 1024px) {
+    .sm-master-detail {
+        grid-template-columns: 1fr;
+    }
+    
+    .sm-details-col {
+        height: auto;
+        max-height: 400px;
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+}

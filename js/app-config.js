@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks: [
                 { name: 'Home', url: 'index.html' },
                 { name: 'Meet the Builders', url: 'directory.html' },
-                { name: 'The Gatekeepers', url: 'maintainers.html' },
+                { name: 'Maintainers', url: 'maintainers.html' },
                 { name: 'Influence Map', url: 'network.html' },
                 { name: 'Builder Galaxy', url: 'contributors.html' }
             ],

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gatekeepers | Orange Dev Network</title>
-    <meta name="description" content="Discover the history, burden, and legacy of Bitcoin Core maintainers.">
+    <title>Maintainers | Orange Dev Network</title>
+    <meta name="description" content="Discover the history, responsibilities, and structure of Bitcoin Core maintainers.">
 
     <!-- Bitcoin Data Labs Font & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -42,68 +42,126 @@
                         <div class="header-content">
                             <p
                                 style="font-size: 0.95rem; line-height: 1.5; max-width: 800px; margin: 0; color: var(--color-text-secondary);">
-                                Know your maintainers.
+                                The Stewards of Bitcoin Core<br>
+                                <span style="font-size: 0.85rem; color: #94a3b8;">The individuals entrusted with reviewing, merging, and securing the Bitcoin protocol.</span>
                             </p>
                         </div>
                     </div>
                 </header>
 
                 <div>
-                    <h3 style="margin-bottom: 5px;">Active Maintainer Roster</h3>
-                    <p class="roster-subtitle">The current guard and their
-                        specialized technical domains.</p>
+                    <h3 style="margin-bottom: 5px;">Lead Maintainers (Master Branch)</h3>
+                    <p class="roster-subtitle">Active stewards managing pull requests and merges to the main protocol repository.</p>
                     <div id="roster-grid" class="roster-grid">
                         <!-- Populated by JS -->
                     </div>
                 </div>
 
                 <div id="build-roster-container" style="margin-top: 20px;">
-                    <h3 style="margin-bottom: 5px;">Build & Security Maintainers</h3>
-                    <p class="roster-subtitle">Maintainers holding strategic
-                        keys for deterministic builds, signing, and security (no merge access to master).</p>
+                    <h3 style="margin-bottom: 5px;">Security & Release Maintainers</h3>
+                    <p class="roster-subtitle">Contributors managing release signing, deterministic builds, and vulnerability disclosures.</p>
                     <div id="build-roster-grid" class="roster-grid">
                         <!-- Populated by JS -->
                     </div>
                 </div>
 
-                <div style="margin-top: 20px; margin-bottom: 40px;">
-                    <h3 style="margin-bottom: 5px;">Ecosystem Sub-repository Committers</h3>
-                    <p class="roster-subtitle">Developers with merge authority
-                        over critical sub-repositories and libraries.</p>
-                    <div id="ecosystem-roster-grid" class="roster-grid">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
+
 
 
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3>The Path to Trust</h3>
-                        <p>How many authored commits did it take to earn maintainership? This scatter plot shows the
-                            dedication required prior to appointment.</p>
+                        <h3>Path to Maintainership</h3>
+                        <p>Historical analysis of contributor effort (authored commits) required prior to receiving merge access.</p>
                     </div>
                     <div id="chart-path" style="height: 400px; width: 100%;"></div>
                 </div>
 
+
+
+                <!-- Workload & Merge Distribution Row (Half/Half) -->
+                <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                    <div class="chart-container" style="flex: 1; min-width: 400px;">
+                        <div class="chart-header">
+                            <h3>The Maintainer Workload Shift</h3>
+                            <p>Comparing developer focus before and after assuming maintainer responsibilities. Shows the shift from authoring code to reviewing.</p>
+                        </div>
+                        <div id="chart-merges" style="height: 500px; width: 100%;"></div>
+                    </div>
+
+                    <div class="chart-container" style="flex: 1; min-width: 400px;">
+                        <div class="chart-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3>Merge Load Distribution (Main Repo)</h3>
+                                <p style="margin: 0;">Proportion of total merges performed in the main bitcoin/bitcoin repository.</p>
+                            </div>
+                            <div class="merge-time-toggles" style="display: flex; gap: 6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
+                                <button class="period-btn" data-period="all" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">All Time</button>
+                                <button class="period-btn" data-period="5yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">5 Years</button>
+                                <button class="period-btn" data-period="3yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">3 Years</button>
+                                <button class="period-btn active" data-period="1yr" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">1 Year</button>
+                            </div>
+                        </div>
+                        <div id="chart-merge-distribution" style="height: 500px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Radical Transparency: Self-Merges -->
+                <div class="chart-container">
+                    <div class="chart-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3>Radical Transparency: Self-Merges</h3>
+                            <p style="margin: 0;">Detailed breakdown of self-merged PRs. In healthy decentralized projects, self-merges for consensus-critical code should be zero. Most self-merges are for administrative or CI tasks.</p>
+                        </div>
+                        <div class="sm-time-toggles" style="display: flex; gap: 6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
+                            <button class="sm-period-btn" data-period="all" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">All Time</button>
+                            <button class="sm-period-btn" data-period="5yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">5 Years</button>
+                            <button class="sm-period-btn" data-period="3yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">3 Years</button>
+                            <button class="sm-period-btn active" data-period="1yr" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">1 Year</button>
+                        </div>
+                    </div>
+                    <div class="sm-master-detail">
+                        <div class="sm-chart-col">
+                            <div id="chart-self-merge" style="height: 500px; width: 100%;"></div>
+                            <div class="sm-legend-definitions" style="display: flex; justify-content: center; gap: 20px; font-size: 11px; color: #a0aec0; margin-top: 10px; flex-wrap: wrap;">
+                                <div data-tooltip="0 reviews/ACKs prior to merge" style="cursor: help;"><span style="color:#E53E3E; font-weight: bold; margin-right: 4px;">■</span>Ninja Merge</div>
+                                <div data-tooltip="1-2 reviews/ACKs prior to merge" style="cursor: help;"><span style="color:#D69E2E; font-weight: bold; margin-right: 4px;">■</span>Light Review</div>
+                                <div data-tooltip="3+ reviews/ACKs prior to merge" style="cursor: help;"><span style="color:#48BB78; font-weight: bold; margin-right: 4px;">■</span>Administrative Merge</div>
+                            </div>
+                        </div>
+                        <div class="sm-details-col">
+                            <div id="self-merge-details-wrapper">
+                                <p style="font-size: 12px; color: #94a3b8; text-align: center; font-style: italic; margin-top: 200px;" id="sm-instruction">Click on a maintainer's bar in the chart to view their specific self-merged PRs.</p>
+                                <div id="self-merge-details"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sponsorship & Influence Sankey -->
+                <div class="chart-container">
+                    <div class="chart-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3>Sponsorship & Influence: Where Does Funding Flow?</h3>
+                            <p style="margin: 0;">Mapping capital flow (Sponsors) to developers, and developers to their engineering impact (Commit Categories). Influence is heavily weighted towards merge/gatekeeping authority over authored code.</p>
+                        </div>
+                        <div class="sankey-time-toggles" style="display: flex; gap: 6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
+                            <button class="sankey-period-btn" data-period="all" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">All Time</button>
+                            <button class="sankey-period-btn" data-period="5yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">5 Years</button>
+                            <button class="sankey-period-btn" data-period="3yr" style="background: transparent; border: 1px solid transparent; color: #a0aec0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">3 Years</button>
+                            <button class="sankey-period-btn active" data-period="1yr" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">1 Year</button>
+                        </div>
+                    </div>
+                    <div id="chart-sankey" style="height: 600px; width: 100%; margin-top: 15px;"></div>
+                </div>
+                
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h3>The Relay Race: Maintainer Legacy</h3>
-                        <p>Solid bars indicate Committers (Merge Access); Dashed bars
-                            indicate Security/Build Maintainers.</p>
+                        <h3>Maintainer Succession Timeline</h3>
+                        <p>Tracking the active tenure of Bitcoin Core maintainers from inception to present. Provides historical context on system continuity.</p>
                     </div>
                     <div id="chart-maintainers" style="height: 500px; width: 100%;"></div>
                 </div>
 
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>The Weight of the Keys (Before & After)</h3>
-                        <p>How does a developer's focus shift once they earn merge access? This chart compares their
-                            <b>Proportion of Effort (100%)</b> before vs after appointment. Note the stark drop in
-                            authoring code as reviewing and merging takes over.
-                        </p>
-                    </div>
-                    <div id="chart-merges" style="height: 600px; width: 100%;"></div>
-                </div>
             </div>
         </div>
 

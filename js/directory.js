@@ -306,7 +306,7 @@ async function initDirectory() {
                     const code = (c.total_commits || 0);
                     const bips = (c.bips_authored || 0);
                     const hybrid = (c.hybrid_score || 0);
-                    return hybrid > 0 || code > 0 || bips > 0 || c.dev_type === 'Creator';
+                    return hybrid > 0 || code > 0 || bips > 0 || c.ml_total > 0 || c.delving_total > 0 || c.dev_type === 'Creator';
                 });
             },
             onError: (err) => { throw err; }
