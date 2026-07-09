@@ -8,7 +8,7 @@ const SHARED_BASE = isLocal
     : 'https://raw.githubusercontent.com/sorukumar/orange-dev-data/main/output/shared/';
 
 const STATS_URL = SHARED_BASE + 'ecosystem_summary.json';
-const SNAPSHOT_URL = SHARED_BASE + 'network_home_snapshot.json';
+const SNAPSHOT_URL = SHARED_BASE + 'ecosystem_home_snapshot.json';
 
 async function initLanding() {
     let stats = null;
