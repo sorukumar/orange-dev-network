@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://sorukumar.github.io/orange-dev-network/sitemap.xml
+Sitemap: https://network.bitcoindatalabs.org/sitemap.xml

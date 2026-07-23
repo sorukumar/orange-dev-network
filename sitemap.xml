@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/</loc>
+        <loc>https://network.bitcoindatalabs.org/</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/index.html</loc>
+        <loc>https://network.bitcoindatalabs.org/index.html</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/network.html</loc>
+        <loc>https://network.bitcoindatalabs.org/network.html</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/directory.html</loc>
+        <loc>https://network.bitcoindatalabs.org/directory.html</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/profile.html</loc>
+        <loc>https://network.bitcoindatalabs.org/profile.html</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://sorukumar.github.io/orange-dev-network/pulse.html</loc>
+        <loc>https://network.bitcoindatalabs.org/pulse.html</loc>
         <lastmod>2026-06-08</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

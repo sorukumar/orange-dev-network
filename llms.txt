@@ -14,7 +14,7 @@ Orange Dev Network is an interactive visualization tool that maps the social and
 *(Note: Live metrics regarding total messages, unique contributors, and top influencers are updated periodically and can be explored on the Interactive Map.)*
 
 ## Project Links
-- [Interactive Map](https://sorukumar.github.io/orange-dev-network/): The primary force-directed graph visualization.
+- [Interactive Map](https://network.bitcoindatalabs.org/): The primary force-directed graph visualization.
 - [Frontend Repository](https://github.com/sorukumar/orange-dev-network): Source code for the interactive visualization.
 - [Data Repository](https://github.com/sorukumar/orange-dev-data): Source code for the data processing pipeline.
 

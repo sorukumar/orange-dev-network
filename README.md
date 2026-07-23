@@ -1,6 +1,6 @@
 # 🟠 Orange Dev Network | The Human Layer of Bitcoin R&D
 
-**[Enter the Network Dashboard](https://sorukumar.github.io/orange-dev-network/)**
+**[Enter the Network Dashboard](https://network.bitcoindatalabs.org/)**
 
 Mapping the hidden structures of **Bitcoin R&D** through the lens of technical consensus.
 
